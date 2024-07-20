@@ -1,10 +1,22 @@
-import React from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Home from "./pages/Home"
+import About from "./pages/About"
+import Profile from "./pages/Auth/Profile"
+import SignUp from "./pages/Auth/SignUp"
+import SignIn from "./pages/Auth/SignIn"
 
 function App() {
   return (
-    <div className='text-red-600'>
-      Yash Chavan
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </BrowserRouter>
+
   )
 }
 
