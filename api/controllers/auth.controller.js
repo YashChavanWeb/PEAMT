@@ -1,6 +1,5 @@
 import User from "../models/user.model.js";
 import bcryptjs from 'bcryptjs';
-import { errorHandler } from "../utils/error.js";
 
 export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
@@ -12,8 +11,8 @@ export const signup = async (req, res, next) => {
         await user.save();
         res.status(201).json({ message: "User saved successfully" });
     } catch (error) {
-        next(error);
-        // next(errorHandler(300, "something went wrong"));
+        console.error('Error saving user:', error.message);
+        // Pass the error to the next middleware (error handling middleware)
+        return next(error);
     }
-
 };
