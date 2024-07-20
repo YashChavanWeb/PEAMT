@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SignUp() {
     const [formData, setFormData] = useState({
@@ -10,6 +10,7 @@ function SignUp() {
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
 
     const handleChange = (e) => {
@@ -45,6 +46,8 @@ function SignUp() {
                 console.log('Signup successful:', data);
             }
 
+            navigate('/sign-in');
+
         } catch (error) {
             console.error('Sign up error:', error.message);
             setError('Something went wrong. Please try again.');
@@ -70,7 +73,7 @@ function SignUp() {
             <div className='flex gap-2 mt-5'>
                 <p>Already have an account</p>
                 <Link to='/sign-in'>
-                    <span className='text-blue-500'>Log In</span>
+                    <span className='text-blue-500'>Sign In</span>
                 </Link>
             </div>
 
