@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { signInStart, signInFailure, signInSuccess } from '../../redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function SignIn() {
     const [formData, setFormData] = useState({
@@ -7,8 +9,8 @@ function SignIn() {
         password: ''
     });
 
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const { loading, error } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -18,10 +20,9 @@ function SignIn() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        setLoading(true);
-        setError('');
-
         try {
+            dispatch(signInStart());
+
             const response = await fetch('/api/auth/signin', {
                 method: 'POST',
                 headers: {
@@ -30,29 +31,29 @@ function SignIn() {
                 body: JSON.stringify(formData),
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
             const data = await response.json();
 
-            if (data.success === false) {
-                setError(data.message || 'Sign in failed');
-                setLoading(false);
-            } else {
-                // Sign in successful
-                console.log('Sign in successful:', data);
-                // Redirect or handle success as needed
+            if (!response.ok) {
+                throw new Error(data.message || 'Sign in failed');
             }
 
+            if (data.success === false) {
+                if (data.errorType === 'user_not_found') {
+                    throw new Error('User not found. Please check your credentials.');
+                } else if (data.errorType === 'wrong_credentials') {
+                    throw new Error('Incorrect password. Please try again.');
+                } else {
+                    throw new Error(data.message || 'Sign in failed');
+                }
+            }
+
+            dispatch(signInSuccess(data));
+            console.log('Sign in successful:', data);
             navigate('/');
 
         } catch (error) {
             console.error('Sign in error:', error.message);
-            setError('Something went wrong. Please try again.');
-            setLoading(false);
-        } finally {
-            setLoading(false);
+            dispatch(signInFailure(error.message));
         }
     };
 
