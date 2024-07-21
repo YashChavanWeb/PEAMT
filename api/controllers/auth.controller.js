@@ -69,3 +69,48 @@ export const signin = async (req, res, next) => {
         return next(error); // Pass the error to the next middleware
     }
 };
+
+
+export const google = async (req, res, next) => {
+    try {
+        const { email, name, photo } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            res.cookie('access_token', token, { httpOnly: true });
+
+            const { password: hashPassword, ...userWithoutPassword } = user.toObject();
+            return res.status(200).json({ message: "User signed in successfully", user: userWithoutPassword });
+        } else {
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+            // Generate a username from name
+            const username = name.toLowerCase().replace(/\s/g, "") + Math.floor(Math.random() * 10000).toString();
+
+            // Create a new user instance
+            const newUser = new User({ username, email, password: hashedPassword, profilePicture: photo });
+
+            await newUser.save();
+
+            // Now generate token after saving user
+            const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            res.cookie('access_token', token, { httpOnly: true });
+
+            // Respond with user data
+            const { password: hashPassword, ...userWithoutPassword } = newUser.toObject();
+            return res.status(200).json({ message: "User signed in successfully", user: userWithoutPassword });
+        }
+    } catch (error) {
+        console.error('Error signing in with Google:', error);
+        return next(error); // Pass the error to the next middleware
+    }
+}
