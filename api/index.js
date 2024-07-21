@@ -3,37 +3,46 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
-
+import cookieParser from 'cookie-parser';
+import path from 'path';
 dotenv.config();
 
-// use try and catch for mongo connection 
-mongoose.connect(process.env.MONGO).then(() => {
+mongoose
+  .connect(process.env.MONGO)
+  .then(() => {
     console.log('Connected to MongoDB');
-}).catch((err) => {
-    console.log(err)
-});
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+const __dirname = path.resolve();
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
+
 app.use(express.json());
 
-app.listen(3000, () => {
-    console.log('Listening on port 3000')
-})
+app.use(cookieParser());
 
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
 
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 
-
-// middleware
 app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
-    res.status(statusCode).json({
-        success: false,
-        message,
-        statusCode
-
-    });
-})
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+  return res.status(statusCode).json({
+    success: false,
+    message,
+    statusCode,
+  });
+});
