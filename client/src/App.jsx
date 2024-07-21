@@ -6,6 +6,7 @@ import SignUp from "./pages/Auth/SignUp"
 import SignIn from "./pages/Auth/SignIn"
 import Header from "./components/Header"
 import PrivateRoute from "./components/PrivateRoute"
+import RegistrationForm from "./pages/registration/RegistrationForm"
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path='/sign-up' element={<SignUp />} />
         <Route element={<PrivateRoute />}>
           <Route path='/profile' element={<Profile />} />
+          <Route path='/registration-form' element={<RegistrationForm />} />
         </Route>
       </Routes>
     </BrowserRouter>
