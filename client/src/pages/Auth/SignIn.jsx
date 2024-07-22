@@ -7,6 +7,7 @@ import {
 } from '../../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import OAuth from '../../components/OAuth';
+import pc from '../../assets/login.jpeg'
 
 export default function SignIn() {
     const [formData, setFormData] = useState({});
@@ -43,7 +44,11 @@ export default function SignIn() {
     };
 
     return (
-        <div className='p-3 max-w-lg mx-auto'>
+        <div className='flex row p-4 max-w-4xl mx-auto m-20 border-4 rounded-3xl'>
+        <div className='max-w-md '>
+            <img src={pc}></img>
+        </div>
+        <div className='mx-auto p-10'>
             <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
             <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
                 <input
@@ -77,6 +82,7 @@ export default function SignIn() {
             <p className='text-red-700 mt-5'>
                 {error ? error.message || 'Something went wrong!' : ''}
             </p>
+            </div>
         </div>
     );
 }
