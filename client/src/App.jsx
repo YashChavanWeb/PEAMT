@@ -1,14 +1,19 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Home from "./pages/Home"
-import About from "./pages/About"
-import Profile from "./pages/Auth/Profile"
-import SignUp from "./pages/Auth/SignUp"
-import SignIn from "./pages/Auth/SignIn"
-import Header from "./components/Header"
-import PrivateRoute from "./components/PrivateRoute"
-import RegistrationForm from "./pages/registration/RegistrationForm"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Profile from "./pages/Auth/Profile";
+import SignUp from "./pages/Auth/SignUp";
+import SignIn from "./pages/Auth/SignIn";
+import Header from "./components/Header";
+import PrivateRoute from "./components/PrivateRoute";
+import RegistrationForm from "./pages/registration/RegistrationForm";
+import PrivateDashboard from "./pages/PrivateDashboard";
 
 function App() {
+
+  // const idnumber = String(import.meta.env.PRIVATE_DASHBOARD_ID);
+  const idnumber = '11h8e1vHg2Lp'
+
   return (
     <BrowserRouter>
       {/* Header component */}
@@ -21,11 +26,12 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path='/profile' element={<Profile />} />
           <Route path='/registration-form' element={<RegistrationForm />} />
+          <Route path={`/private-dashboard/${idnumber}`} element={<PrivateDashboard />} />
         </Route>
+
       </Routes>
     </BrowserRouter>
-
-  )
+  );
 }
 
-export default App
+export default App;
