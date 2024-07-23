@@ -5,10 +5,10 @@ export default function Header() {
     const { currentUser } = useSelector((state) => state.user);
 
     return (
-        <div className='bg-transparent h-20 fixed top-0 left-0 right-0 z-10'>
+        <div className='bg-transparent h-20 fixed top-0 left-0 right-0 z-10 backdrop-blur-lg'>
             <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
                 <Link to='/'>
-                    <h1 className='font-bold text-3xl'>PEAMT</h1>
+                    <h1 className='font-bold text-4xl text-white'>TestOPs</h1>
                 </Link>
                 <ul className='flex gap-16 items-end'>
                     <button className='button'>

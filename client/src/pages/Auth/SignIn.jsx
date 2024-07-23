@@ -8,6 +8,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import OAuth from '../../components/OAuth';
 import pc from '../../assets/login.jpeg'
+import '../../styles/pages/Signin.css'
 
 export default function SignIn() {
     const [formData, setFormData] = useState({});
@@ -44,45 +45,50 @@ export default function SignIn() {
     };
 
     return (
-        <div className='flex row p-4 max-w-4xl mx-auto m-20 border-4 rounded-3xl'>
-        <div className='max-w-md '>
-            <img src={pc}></img>
-        </div>
-        <div className='mx-auto p-10'>
-            <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
-            <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-                <input
-                    type='email'
-                    placeholder='Email'
-                    id='email'
-                    className='bg-slate-100 p-3 rounded-lg'
-                    onChange={handleChange}
-                />
-                <input
-                    type='password'
-                    placeholder='Password'
-                    id='password'
-                    className='bg-slate-100 p-3 rounded-lg'
-                    onChange={handleChange}
-                />
-                <button
-                    disabled={loading}
-                    className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
-                >
-                    {loading ? 'Loading...' : 'Sign In'}
-                </button>
-                <OAuth />
-            </form>
-            <div className='flex gap-2 mt-5'>
-                <p>Don't have an account?</p>
-                <Link to='/sign-up'>
-                    <span className='text-blue-500'>Sign up</span>
-                </Link>
+        <section className='bg-gradient-to-r from-violet-600 to-indigo-300 p-28' style={{width: '100%', height: '100vh' }}>
+            <section className='signInBox flex row max-w-4xl mx-auto my-auto rounded-3xl bg-white' 
+                data-aos="flip-left"
+                data-aos-easing="ease-out-cubic"
+                data-aos-duration="1000"
+            >
+            <div className='imageSection'>
             </div>
-            <p className='text-red-700 mt-5'>
-                {error ? error.message || 'Something went wrong!' : ''}
-            </p>
-            </div>
-        </div>
+            <div className='mx-auto p-4'>
+                <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
+                <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+                    <input
+                        type='email'
+                        placeholder='Email'
+                        id='email'
+                        className='inputBox'
+                        onChange={handleChange}
+                    />
+                    <input
+                        type='password'
+                        placeholder='Password'
+                        id='password'
+                        className='inputBox'
+                        onChange={handleChange}
+                    />
+                    <button
+                        disabled={loading}
+                        className='formButton'
+                    >
+                        {loading ? 'Loading...' : 'Sign In'}
+                    </button>
+                    <OAuth />
+                </form>
+                <div className='flex gap-2 mt-5'>
+                    <p>Don't have an account?</p>
+                    <Link to='/sign-up'>
+                        <span className='text-violet-500 font-bold transition-all ease-in-out hover:text-violet-700 hover:drop-shadow-xl'>Sign up</span>
+                    </Link>
+                </div>
+                <p className='text-red-700 mt-5'>
+                    {error ? error.message || 'Something went wrong!' : ''}
+                </p>
+                </div>
+            </section>
+        </section>
     );
 }

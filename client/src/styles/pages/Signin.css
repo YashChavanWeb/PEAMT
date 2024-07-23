@@ -1,0 +1,42 @@
+.signInBox{
+    height: 70vh;
+}
+.imageSection{
+    width: 50%;
+    background-image: url('../../assets/login.jpeg');
+    background-size: cover;
+    border-radius: 24px
+}
+
+.inputBox{
+    width: 100%;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    background-color: rgb(243, 220, 255);
+    color: black;
+    font-size: 16px;
+    padding: 10px;
+    transition: ease-in-out 0.3s;
+}
+.inputBox:hover{
+    box-shadow: 0 0 7px 3px rgb(60, 21, 128);
+}
+.formButton{
+    background-color: rgb(91 33 182);
+    color: white;
+    padding: 10px;
+    border-radius: 24px;
+    font-weight: 700;
+    transition: ease-in-out 0.3s;
+}
+.formButton:hover, .googleBtn:hover{
+    background-color: rgb(196 181 253);
+    color: black;
+    box-shadow: 0 0 5px 3px rgb(45, 8, 107);
+}
+.googleBtn{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    transition: ease-in-out 0.3s;
+}
