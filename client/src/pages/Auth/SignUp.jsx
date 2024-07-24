@@ -37,8 +37,8 @@ export default function SignUp() {
         }
     };
     return (
-        <section className='bg-gradient-to-r from-violet-600 to-indigo-300 p-28' style={{width: '100%', height: '100vh' }}>
-            <section className='signInBox flex row max-w-4xl mx-auto my-auto rounded-3xl bg-white' 
+        <section className='bg-gradient-to-r from-cyan-600 to-indigo-300 p-28' style={{width: '100%', height: '100vh' }}>
+            <section className='signUpBox flex row max-w-screen-lg mx-auto my-auto rounded-3xl bg-white' 
                 data-aos="flip-right"
                 data-aos-easing="ease-out-cubic"
                 data-aos-duration="1000"
@@ -78,12 +78,12 @@ export default function SignUp() {
                     <div className='flex gap-2 mt-5'>
                         <p>Have an account?</p>
                         <Link to='/sign-in'>
-                            <span className='text-violet-500 font-bold transition-all ease-in-out hover:text-violet-700 hover:drop-shadow-xl'>Sign in</span>
+                            <span className='text-cyan-500 font-bold transition-all ease-in-out hover:text-cyan-700 hover:drop-shadow-xl'>Sign in</span>
                         </Link>
                     </div>
                     <p className='text-red-700 mt-5'>{error && 'Something went wrong!'}</p>
                 </div>
-                <div className='imageSection'>
+                <div className='SignUpimageSection'>
                 </div>
             </section>
         </section>

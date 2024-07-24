@@ -1,28 +1,38 @@
-.signInBox{
-    height: 70vh;
+.signInBox, .signUpBox{
+    height: 75vh;
+    overflow: hidden;
 }
-.imageSection{
-    width: 50%;
-    background-image: url('../../assets/login.jpeg');
+.SignInimageSection{
+    width: 45%;
+    background-image: url('../../assets/woman.png');
     background-size: cover;
-    border-radius: 24px
+    background-repeat: no-repeat;
+    background-color: skyblue;
+}
+.SignUpimageSection{
+    width: 45%;
+    background-image: url('../../assets/man.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: skyblue;
 }
 
 .inputBox{
     width: 100%;
+    min-width: 280px;
     border-radius: 25px;
     margin-bottom: 20px;
-    background-color: rgb(243, 220, 255);
+    background-color: rgb(186 230 253);
     color: black;
     font-size: 16px;
     padding: 10px;
     transition: ease-in-out 0.3s;
 }
 .inputBox:hover{
-    box-shadow: 0 0 7px 3px rgb(60, 21, 128);
+    box-shadow: 0 0 7px 3px rgb(8 47 73);
 }
 .formButton{
-    background-color: rgb(91 33 182);
+    background-color: rgb(7 89 133);
     color: white;
     padding: 10px;
     border-radius: 24px;
@@ -30,9 +40,9 @@
     transition: ease-in-out 0.3s;
 }
 .formButton:hover, .googleBtn:hover{
-    background-color: rgb(196 181 253);
+    background-color: rgb(125 211 252);
     color: black;
-    box-shadow: 0 0 5px 3px rgb(45, 8, 107);
+    box-shadow: 0 0 5px 3px rgb(8 47 73);
 }
 .googleBtn{
     display: flex;

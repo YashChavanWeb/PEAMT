@@ -6,5 +6,5 @@ body{
     @apply font-poppins
 }
 .button{
-    @apply bg-violet-800 w-40 shadow-lg text-white font-poppins p-3 rounded-3xl hover:bg-violet-700 hover:shadow-violet-800/50 transition transform hover:-translate-y-1 hover:scale-105;
+    @apply bg-sky-800 w-40 shadow-lg text-white font-poppins p-3 rounded-3xl hover:bg-cyan-500 hover:shadow-cyan-800/50 hover:font-bold transition transform hover:-translate-y-1 hover:scale-105;
 }

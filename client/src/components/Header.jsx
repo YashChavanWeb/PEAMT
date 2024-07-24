@@ -5,12 +5,12 @@ export default function Header() {
     const { currentUser } = useSelector((state) => state.user);
 
     return (
-        <div className='bg-transparent h-20 fixed top-0 left-0 right-0 z-10 backdrop-blur-lg'>
+        <div className='bg-cyan-200/10 h-20 fixed top-0 left-0 right-0 z-10 backdrop-blur-lg'>
             <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
                 <Link to='/'>
                     <h1 className='font-bold text-4xl text-white'>TestOPs</h1>
                 </Link>
-                <ul className='flex gap-16 items-end'>
+                <ul className='flex gap-12 items-end'>
                     <button className='button'>
                         <Link to='/'>
                             <li>Home</li>
@@ -30,7 +30,11 @@ export default function Header() {
                             )}
                         </Link>
                     </button>
-                    
+                    <button className='button'>
+                        <Link to='/'>
+                            <li>Teacher SignIn</li>
+                        </Link>
+                    </button>
                 </ul>
             </div>
         </div>

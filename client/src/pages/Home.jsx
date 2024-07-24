@@ -1,55 +1,45 @@
 import React, { useRef, useEffect } from 'react';
-import * as THREE from 'three'; // Import three.js
-import VANTA from 'vanta'; // Import Vanta.js
-import FOG from 'vanta/dist/vanta.fog.min';
-import pc from '../assets/pc.png';
+import home1 from '../assets/2woman.png';
+import home2 from '../assets/pc.png'
+import test from '../assets/test.png'
 
 function Home() {
 
-    const vantaRef = useRef(null);
-
-    useEffect(() => {
-      let vantaEffect;
-  
-      if (vantaRef.current) {
-        vantaEffect = FOG({
-          el: vantaRef.current,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          highlightColor: 0x7b7ff4,
-          midtoneColor: 0x7600ff,
-          lowlightColor: 0xac,
-          baseColor: 0xf9d1f9
-        });
-      }
-  
-      // Clean up Vanta.js effect
-      return () => {
-        if (vantaEffect) vantaEffect.destroy();
-      };
-    }, []);
-
     return (
-        <div ref={vantaRef} style={{ height: '100%', width: '100vw', overflowX: 'hidden' }}>
+        <div className='bg-gradient-to-r from-cyan-600 to-indigo-300' style={{ height: '100%', width: '100vw', overflowX: 'hidden' }}>
             <section className='intro p-20 text-white flex row justify-between'>
-                <h1>TestOps</h1>
-                <img src={pc} className='w-1/2' data-aos="fade-left"></img>
+                <section className='m-auto' 
+                  data-aos="zoom-out-right"
+                  data-aos-offset="500"
+                  data-aos-duration="1000"
+                  data-aos-easing="linear"
+                  >
+                  <h2 className='text-6xl p-4' 
+                    data-aos-duration="1000"
+                  ><b>Secure Exams, Guaranteed Success.</b></h2>
+                  <h4 className='text-3xl m-auto mt-10 p-3 font-bold'>Welcome to TestOps :) </h4>
+                  <p className='p-3'>Your Trusted Online Exam Proctoring Solution! 
+                  At TestOps, we understand that maintaining the integrity of online exams is crucial. That's why we've created an easy-to-use, reliable tool that helps ensure a fair testing environment. Whether you're a student taking an important test or an educator administering one, TestOps is here to make the process smooth and secure.
+                  </p>
+                </section>
+                <img src={home1} className='w-1/2 m-auto mt-4' data-aos="fade-left" data-aos-duration="1000" data-aos-easing="linear"></img>
             </section>
             <section className='intro p-20 text-white flex row justify-evenly'>
-                <img src={pc} className='w-1/2' 
+                <img src={test} className='w-1/2' 
                   data-aos="fade-down-right"
                   data-aos-anchor-placement="top-center"
                 ></img>
-                <p>GSAP has sensible defaults for units. If you want to set the x property, you can say x: 24 instead of x: "24px" because GSAP uses pixels as the default unit for x. If you want to specify a particular unit you can append the unit value on the end and wrap the value in a string.</p>
+                <p className='p-3'>Your Trusted Online Exam Proctoring Solution! 
+                  At TestOps, we understand that maintaining the integrity of online exams is crucial. That's why we've created an easy-to-use, reliable tool that helps ensure a fair testing environment. Whether you're a student taking an important test or an educator administering one, TestOps is here to make the process smooth and secure.
+                  </p>
             </section>
             <section className='intro p-20 text-white flex row justify-between'>
-                <p>GSAP has sensible defaults for units. If you want to set the x property, you can say x: 24 instead of x: "24px" because GSAP uses pixels as the default unit for x. If you want to specify a particular unit you can append the unit value on the end and wrap the value in a string.</p>
-                <img src={pc} className='w-1/2' 
+                <p className='p-3'>Your Trusted Online Exam Proctoring Solution! 
+                  At TestOps, we understand that maintaining the integrity of online exams is crucial. That's why we've created an easy-to-use, reliable tool that helps ensure a fair testing environment. Whether you're a student taking an important test or an educator administering one, TestOps is here to make the process smooth and secure.
+                  </p>
+                <img src={home2} className='w-1/2' 
                   data-aos="fade-left"
-                  data-aos-anchor-placement="top-center"
+                  data-aos-anchor-placement="bottom-bottom"
                 ></img>
             </section>
         </div>

@@ -37,7 +37,7 @@ export default function OAuth() {
         <button
             type='button'
             onClick={handleGoogleClick}
-            className='googleBtn bg-violet-500 text-white rounded-3xl p-3 uppercase'
+            className='googleBtn bg-sky-500 text-white rounded-3xl p-3 uppercase'
         >
             <img src={google} style={{width: '18px' , padding: '2px'}}></img>
             Continue with google
