@@ -25,10 +25,6 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    verification: {
-        type: String,
-        // required: true
-    }
 });
 
 // Check and use correct URI from environment variables
