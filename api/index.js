@@ -3,12 +3,14 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
+import addressRoutes from './routes/address.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+
 dotenv.config();
 
 mongoose
-    .connect(process.env.MONGO)
+    .connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
     })
@@ -27,15 +29,11 @@ app.get('*', (req, res) => {
 });
 
 app.use(express.json());
-
 app.use(cookieParser());
-
-app.listen(3000, () => {
-    console.log('Server listening on port 3000');
-});
 
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/address', addressRoutes); // Use the new address route
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
@@ -45,4 +43,8 @@ app.use((err, req, res, next) => {
         message,
         statusCode,
     });
+});
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
 });

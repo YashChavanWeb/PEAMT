@@ -1,14 +1,76 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const CurrentCourse = ({ handleNext }) => {
+    const [formData, setFormData] = useState({
+        isJob: false,
+        jobDetails: '',
+        admissionYear: '',
+        instituteState: '',
+        instituteDistrict: '',
+        instituteTaluka: '',
+        qualificationLevel: '',
+        stream: '',
+        collegeName: '',
+        courseName: '',
+        admissionType: '',
+        marksDetails: '',
+        yearOfStudy: '',
+        studyStatus: '',
+        gapInStudy: '',
+        studyMode: ''
+    });
+
+    const [errors, setErrors] = useState({});
+    const [showError, setShowError] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value
+        });
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        const requiredFields = [
+            'admissionYear', 'instituteState', 'instituteDistrict', 'instituteTaluka',
+            'qualificationLevel', 'stream', 'collegeName', 'courseName',
+            'admissionType', 'marksDetails', 'yearOfStudy', 'studyStatus', 'gapInStudy', 'studyMode'
+        ];
+
+        requiredFields.forEach(field => {
+            if (!formData[field]) {
+                newErrors[field] = 'This field is required';
+            }
+        });
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setShowError(true);
+            return false;
+        }
+
+        setShowError(false);
+        return true;
+    };
+
     const handleNextClick = () => {
-        handleNext();
+        if (validateForm()) {
+            handleNext();
+        }
     };
 
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h2 className="text-xl font-bold mb-2">Current Course Details</h2>
             <hr className="mb-4" />
+
+            {showError && (
+                <div className="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded">
+                    <p className="text-sm">Please fill all required fields.</p>
+                </div>
+            )}
 
             <div className="mb-4">
                 <h3 className="text-lg font-bold mb-2">Job Details</h3>
@@ -21,6 +83,8 @@ const CurrentCourse = ({ handleNext }) => {
                             id="isJob"
                             name="isJob"
                             type="checkbox"
+                            checked={formData.isJob}
+                            onChange={handleChange}
                             className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
                         />
                     </div>
@@ -32,6 +96,8 @@ const CurrentCourse = ({ handleNext }) => {
                             id="jobDetails"
                             name="jobDetails"
                             rows="3"
+                            value={formData.jobDetails}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Job Details"
                         ></textarea>
@@ -51,9 +117,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="admissionYear"
                             type="text"
                             autoComplete="off"
+                            value={formData.admissionYear}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Year"
                         />
+                        {errors.admissionYear && <p className="text-red-500 text-xs">{errors.admissionYear}</p>}
                     </div>
                     <div>
                         <label htmlFor="instituteState" className="block text-sm font-medium text-gray-700">
@@ -64,9 +133,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="instituteState"
                             type="text"
                             autoComplete="off"
+                            value={formData.instituteState}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute State"
                         />
+                        {errors.instituteState && <p className="text-red-500 text-xs">{errors.instituteState}</p>}
                     </div>
                     <div>
                         <label htmlFor="instituteDistrict" className="block text-sm font-medium text-gray-700">
@@ -77,9 +149,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="instituteDistrict"
                             type="text"
                             autoComplete="off"
+                            value={formData.instituteDistrict}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute District"
                         />
+                        {errors.instituteDistrict && <p className="text-red-500 text-xs">{errors.instituteDistrict}</p>}
                     </div>
                     <div>
                         <label htmlFor="instituteTaluka" className="block text-sm font-medium text-gray-700">
@@ -90,9 +165,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="instituteTaluka"
                             type="text"
                             autoComplete="off"
+                            value={formData.instituteTaluka}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute Taluka"
                         />
+                        {errors.instituteTaluka && <p className="text-red-500 text-xs">{errors.instituteTaluka}</p>}
                     </div>
                     <div>
                         <label htmlFor="qualificationLevel" className="block text-sm font-medium text-gray-700">
@@ -103,9 +181,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="qualificationLevel"
                             type="text"
                             autoComplete="off"
+                            value={formData.qualificationLevel}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Qualification Level"
                         />
+                        {errors.qualificationLevel && <p className="text-red-500 text-xs">{errors.qualificationLevel}</p>}
                     </div>
                     <div>
                         <label htmlFor="stream" className="block text-sm font-medium text-gray-700">
@@ -116,9 +197,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="stream"
                             type="text"
                             autoComplete="off"
+                            value={formData.stream}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Stream"
                         />
+                        {errors.stream && <p className="text-red-500 text-xs">{errors.stream}</p>}
                     </div>
                     <div>
                         <label htmlFor="collegeName" className="block text-sm font-medium text-gray-700">
@@ -129,9 +213,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="collegeName"
                             type="text"
                             autoComplete="off"
+                            value={formData.collegeName}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter College / School Name"
                         />
+                        {errors.collegeName && <p className="text-red-500 text-xs">{errors.collegeName}</p>}
                     </div>
                     <div>
                         <label htmlFor="courseName" className="block text-sm font-medium text-gray-700">
@@ -142,9 +229,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="courseName"
                             type="text"
                             autoComplete="off"
+                            value={formData.courseName}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Course Name"
                         />
+                        {errors.courseName && <p className="text-red-500 text-xs">{errors.courseName}</p>}
                     </div>
                     <div>
                         <label htmlFor="admissionType" className="block text-sm font-medium text-gray-700">
@@ -155,21 +245,28 @@ const CurrentCourse = ({ handleNext }) => {
                             name="admissionType"
                             type="text"
                             autoComplete="off"
+                            value={formData.admissionType}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Type"
                         />
+                        {errors.admissionType && <p className="text-red-500 text-xs">{errors.admissionType}</p>}
                     </div>
                     <div>
                         <label htmlFor="marksDetails" className="block text-sm font-medium text-gray-700">
-                            Marks and Details
+                            Marks Details
                         </label>
-                        <textarea
+                        <input
                             id="marksDetails"
                             name="marksDetails"
-                            rows="3"
+                            type="text"
+                            autoComplete="off"
+                            value={formData.marksDetails}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Marks and Details"
-                        ></textarea>
+                            placeholder="Enter Marks Details"
+                        />
+                        {errors.marksDetails && <p className="text-red-500 text-xs">{errors.marksDetails}</p>}
                     </div>
                     <div>
                         <label htmlFor="yearOfStudy" className="block text-sm font-medium text-gray-700">
@@ -180,24 +277,28 @@ const CurrentCourse = ({ handleNext }) => {
                             name="yearOfStudy"
                             type="text"
                             autoComplete="off"
+                            value={formData.yearOfStudy}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Year of Study"
                         />
+                        {errors.yearOfStudy && <p className="text-red-500 text-xs">{errors.yearOfStudy}</p>}
                     </div>
                     <div>
                         <label htmlFor="studyStatus" className="block text-sm font-medium text-gray-700">
                             Study Status
                         </label>
-                        <select
+                        <input
                             id="studyStatus"
                             name="studyStatus"
+                            type="text"
                             autoComplete="off"
+                            value={formData.studyStatus}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                        >
-                            <option value="">Select Study Status</option>
-                            <option value="completed">Completed</option>
-                            <option value="continuing">Continuing</option>
-                        </select>
+                            placeholder="Enter Study Status"
+                        />
+                        {errors.studyStatus && <p className="text-red-500 text-xs">{errors.studyStatus}</p>}
                     </div>
                     <div>
                         <label htmlFor="gapInStudy" className="block text-sm font-medium text-gray-700">
@@ -208,9 +309,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="gapInStudy"
                             type="text"
                             autoComplete="off"
+                            value={formData.gapInStudy}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Gap in Study"
                         />
+                        {errors.gapInStudy && <p className="text-red-500 text-xs">{errors.gapInStudy}</p>}
                     </div>
                     <div>
                         <label htmlFor="studyMode" className="block text-sm font-medium text-gray-700">
@@ -221,9 +325,12 @@ const CurrentCourse = ({ handleNext }) => {
                             name="studyMode"
                             type="text"
                             autoComplete="off"
+                            value={formData.studyMode}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Study Mode"
                         />
+                        {errors.studyMode && <p className="text-red-500 text-xs">{errors.studyMode}</p>}
                     </div>
                 </div>
             </div>

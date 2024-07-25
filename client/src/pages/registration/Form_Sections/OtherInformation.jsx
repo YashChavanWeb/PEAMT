@@ -1,8 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const OtherInformation = ({ handleNext }) => {
+    const [formData, setFormData] = useState({
+        fatherName: '',
+        fatherOccupation: '',
+        fatherIsSalaried: '',
+        motherName: '',
+        motherOccupation: '',
+        motherIsSalaried: '',
+    });
+
+    const [errors, setErrors] = useState({});
+    const [isFormTouched, setIsFormTouched] = useState(false);
+
     const handleNextClick = () => {
-        handleNext();
+        setIsFormTouched(true);
+        if (validateForm()) {
+            handleNext();
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (/^[a-zA-Z\s]*$/.test(value) || value === '') {  // Allow only letters and spaces
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        }
+    };
+
+    const validateForm = () => {
+        let formErrors = {};
+        let isValid = true;
+
+        // Check if any required fields are empty
+        for (let key in formData) {
+            if (formData[key] === '' && (key.includes('Name') || key.includes('Occupation') || key.includes('Salaried'))) {
+                isValid = false;
+                formErrors['form'] = 'Please fill in all required details.';
+                break;
+            }
+        }
+
+        setErrors(formErrors);
+        return isValid;
     };
 
     return (
@@ -16,17 +58,6 @@ const OtherInformation = ({ handleNext }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Father */}
                     <div>
-                        <label htmlFor="fatherIsAlive" className="block text-sm font-medium text-gray-700">
-                            Is Father Alive?
-                        </label>
-                        <input
-                            id="fatherIsAlive"
-                            name="fatherIsAlive"
-                            type="checkbox"
-                            className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
-                        />
-                    </div>
-                    <div>
                         <label htmlFor="fatherName" className="block text-sm font-medium text-gray-700">
                             Father's Name
                         </label>
@@ -34,6 +65,8 @@ const OtherInformation = ({ handleNext }) => {
                             id="fatherName"
                             name="fatherName"
                             type="text"
+                            value={formData.fatherName}
+                            onChange={handleChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Father's Name"
@@ -47,6 +80,8 @@ const OtherInformation = ({ handleNext }) => {
                             id="fatherOccupation"
                             name="fatherOccupation"
                             type="text"
+                            value={formData.fatherOccupation}
+                            onChange={handleChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Father's Occupation"
@@ -56,26 +91,20 @@ const OtherInformation = ({ handleNext }) => {
                         <label htmlFor="fatherIsSalaried" className="block text-sm font-medium text-gray-700">
                             Is Father Salaried?
                         </label>
-                        <input
+                        <select
                             id="fatherIsSalaried"
                             name="fatherIsSalaried"
-                            type="checkbox"
-                            className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
-                        />
+                            value={formData.fatherIsSalaried}
+                            onChange={handleChange}
+                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                        >
+                            <option value="">Select an option</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
 
-                    {/* Mother (same structure as Father) */}
-                    <div>
-                        <label htmlFor="motherIsAlive" className="block text-sm font-medium text-gray-700">
-                            Is Mother Alive?
-                        </label>
-                        <input
-                            id="motherIsAlive"
-                            name="motherIsAlive"
-                            type="checkbox"
-                            className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
-                        />
-                    </div>
+                    {/* Mother */}
                     <div>
                         <label htmlFor="motherName" className="block text-sm font-medium text-gray-700">
                             Mother's Name
@@ -84,6 +113,8 @@ const OtherInformation = ({ handleNext }) => {
                             id="motherName"
                             name="motherName"
                             type="text"
+                            value={formData.motherName}
+                            onChange={handleChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Mother's Name"
@@ -97,6 +128,8 @@ const OtherInformation = ({ handleNext }) => {
                             id="motherOccupation"
                             name="motherOccupation"
                             type="text"
+                            value={formData.motherOccupation}
+                            onChange={handleChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Mother's Occupation"
@@ -106,12 +139,17 @@ const OtherInformation = ({ handleNext }) => {
                         <label htmlFor="motherIsSalaried" className="block text-sm font-medium text-gray-700">
                             Is Mother Salaried?
                         </label>
-                        <input
+                        <select
                             id="motherIsSalaried"
                             name="motherIsSalaried"
-                            type="checkbox"
-                            className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
-                        />
+                            value={formData.motherIsSalaried}
+                            onChange={handleChange}
+                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                        >
+                            <option value="">Select an option</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -128,6 +166,8 @@ const OtherInformation = ({ handleNext }) => {
                             id="customField1"
                             name="customField1"
                             type="text"
+                            value={formData.customField1 || ''}
+                            onChange={handleChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Custom Field 1"
@@ -141,20 +181,28 @@ const OtherInformation = ({ handleNext }) => {
                             id="customField2"
                             name="customField2"
                             type="text"
+                            value={formData.customField2 || ''}
+                            onChange={handleChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Custom Field 2"
                         />
                     </div>
-                    {/* Add more custom fields as needed */}
                 </div>
             </div>
 
-            {/* Next button */}
-            <div className="mt-6 flex justify-end">
+            {/* Show error message if any details are missing */}
+            {isFormTouched && errors.form && (
+                <div className="mb-4">
+                    <span className="text-red-500 text-sm">{errors.form}</span>
+                </div>
+            )}
+
+            <div className="flex justify-end">
                 <button
+                    type="button"
                     onClick={handleNextClick}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500"
+                    className="bg-indigo-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                     Next
                 </button>
