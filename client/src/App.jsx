@@ -9,6 +9,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import RegistrationForm from "./pages/registration/RegistrationForm";
 import PrivateDashboard from "./pages/Developers/PrivateDashboard";
 import AdminEntryForm from "./pages/Developers/AdminEntryForm";
+import './index.css';
 
 function App() {
 
