@@ -28,12 +28,14 @@ const PersonalDetails = ({ handleNext }) => {
     });
 
     const [errors, setErrors] = useState({});
+    const [showError, setShowError] = useState(false);
 
     const handleNextClick = () => {
         if (validateForm()) {
             handleNext();
         } else {
-            alert('Please fill in all required fields correctly.');
+            setShowError(true);
+            setTimeout(() => setShowError(false), 3000); // Hide the error message after 3 seconds
         }
     };
 
@@ -169,6 +171,12 @@ const PersonalDetails = ({ handleNext }) => {
             <h2 className="text-xl font-bold mb-2">Personal Information</h2>
             <hr className="mb-4" />
 
+            {showError && (
+                <div className="bg-red-500 text-white p-2 mb-4 rounded">
+                    Please fill in all required fields correctly.
+                </div>
+            )}
+
             {/* Personal Details */}
             <div className="mb-4">
                 <h3 className="text-lg font-bold mb-2">Personal Details</h3>
@@ -188,9 +196,6 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Aadhar Number"
                         />
-                        {errors.aadharNumber && (
-                            <span className="text-red-500 text-sm">{errors.aadharNumber}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -206,9 +211,6 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Applicant Name"
                         />
-                        {errors.name && (
-                            <span className="text-red-500 text-sm">{errors.name}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -224,9 +226,6 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Email"
                         />
-                        {errors.email && (
-                            <span className="text-red-500 text-sm">{errors.email}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
@@ -242,9 +241,6 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Mobile Number"
                         />
-                        {errors.mobileNumber && (
-                            <span className="text-red-500 text-sm">{errors.mobileNumber}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
@@ -259,9 +255,6 @@ const PersonalDetails = ({ handleNext }) => {
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                         />
-                        {errors.dob && (
-                            <span className="text-red-500 text-sm">{errors.dob}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="age" className="block text-sm font-medium text-gray-700">
@@ -277,9 +270,6 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Age"
                         />
-                        {errors.age && (
-                            <span className="text-red-500 text-sm">{errors.age}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
@@ -297,9 +287,6 @@ const PersonalDetails = ({ handleNext }) => {
                             <option value="female">Female</option>
                             <option value="other">Other</option>
                         </select>
-                        {errors.gender && (
-                            <span className="text-red-500 text-sm">{errors.gender}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="religion" className="block text-sm font-medium text-gray-700">
@@ -315,9 +302,6 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Religion"
                         />
-                        {errors.religion && (
-                            <span className="text-red-500 text-sm">{errors.religion}</span>
-                        )}
                     </div>
                     <div>
                         <label htmlFor="casteCategory" className="block text-sm font-medium text-gray-700">
@@ -333,80 +317,38 @@ const PersonalDetails = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Caste Category"
                         />
-                        {errors.casteCategory && (
-                            <span className="text-red-500 text-sm">{errors.casteCategory}</span>
-                        )}
-                    </div>
-                   
-                    <div>
-                        <label htmlFor="authority" className="block text-sm font-medium text-gray-700">
-                            Authority
-                        </label>
-                        <input
-                            id="authority"
-                            name="authority"
-                            type="text"
-                            value={formData.authority}
-                            onChange={(e) => setFormData({ ...formData, authority: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Authority"
-                        />
-                        {errors.authority && (
-                            <span className="text-red-500 text-sm">{errors.authority}</span>
-                        )}
                     </div>
                     <div>
-                        <label htmlFor="certificateNo" className="block text-sm font-medium text-gray-700">
-                            Certificate Number
+                        <label htmlFor="applicantName" className="block text-sm font-medium text-gray-700">
+                            Applicant Name
                         </label>
                         <input
-                            id="certificateNo"
-                            name="certificateNo"
+                            id="applicantName"
+                            name="applicantName"
                             type="text"
-                            value={formData.certificateNo}
-                            onChange={(e) => setFormData({ ...formData, certificateNo: e.target.value })}
+                            value={formData.applicantName}
+                            onChange={handleApplicantNameChange}
                             autoComplete="off"
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Certificate Number"
+                            placeholder="Enter Applicant Name"
                         />
-                        {errors.certificateNo && (
-                            <span className="text-red-500 text-sm">{errors.certificateNo}</span>
-                        )}
-                    </div>
-                    <div>
-                        <label htmlFor="workingOrStudent" className="block text-sm font-medium text-gray-700">
-                            Working/Student
-                        </label>
-                        <input
-                            id="workingOrStudent"
-                            name="workingOrStudent"
-                            type="text"
-                            value={formData.workingOrStudent}
-                            onChange={(e) => setFormData({ ...formData, workingOrStudent: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Working or Student"
-                        />
-                        {errors.workingOrStudent && (
-                            <span className="text-red-500 text-sm">{errors.workingOrStudent}</span>
-                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex justify-between mt-8">
+            {/* Add other form sections here */}
+
+            <div className="mt-6 flex justify-end">
                 <button
                     type="button"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     onClick={handleNextClick}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
                     Next
                 </button>
             </div>
         </div>
     );
-}
+};
 
 export default PersonalDetails;

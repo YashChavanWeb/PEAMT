@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const CurrentCourse = ({ handleNext }) => {
     const [formData, setFormData] = useState({
@@ -25,6 +25,14 @@ const CurrentCourse = ({ handleNext }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        // Handle character-only validation for specific fields
+        if ((name === 'instituteState' || name === 'instituteDistrict' || name === 'instituteTaluka' ||
+             name === 'stream' || name === 'collegeName' || name === 'courseName' ||
+             name === 'admissionType' || name === 'studyStatus' || name === 'studyMode') &&
+            !/^[a-zA-Z\s]*$/.test(value) && value !== '') {
+            return; // Ignore invalid input
+        }
+
         setFormData({
             ...formData,
             [name]: type === 'checkbox' ? checked : value
@@ -48,6 +56,7 @@ const CurrentCourse = ({ handleNext }) => {
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             setShowError(true);
+            setTimeout(() => setShowError(false), 4000); // Hide the error after 4 seconds
             return false;
         }
 
@@ -88,20 +97,22 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
                         />
                     </div>
-                    <div>
-                        <label htmlFor="jobDetails" className="block text-sm font-medium text-gray-700">
-                            Job Details
-                        </label>
-                        <textarea
-                            id="jobDetails"
-                            name="jobDetails"
-                            rows="3"
-                            value={formData.jobDetails}
-                            onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Job Details"
-                        ></textarea>
-                    </div>
+                    {formData.isJob && (
+                        <div>
+                            <label htmlFor="jobDetails" className="block text-sm font-medium text-gray-700">
+                                Job Details
+                            </label>
+                            <textarea
+                                id="jobDetails"
+                                name="jobDetails"
+                                rows="3"
+                                value={formData.jobDetails}
+                                onChange={handleChange}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Job Details"
+                            ></textarea>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -122,7 +133,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Year"
                         />
-                        {errors.admissionYear && <p className="text-red-500 text-xs">{errors.admissionYear}</p>}
                     </div>
                     <div>
                         <label htmlFor="instituteState" className="block text-sm font-medium text-gray-700">
@@ -138,7 +148,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute State"
                         />
-                        {errors.instituteState && <p className="text-red-500 text-xs">{errors.instituteState}</p>}
                     </div>
                     <div>
                         <label htmlFor="instituteDistrict" className="block text-sm font-medium text-gray-700">
@@ -154,7 +163,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute District"
                         />
-                        {errors.instituteDistrict && <p className="text-red-500 text-xs">{errors.instituteDistrict}</p>}
                     </div>
                     <div>
                         <label htmlFor="instituteTaluka" className="block text-sm font-medium text-gray-700">
@@ -170,7 +178,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute Taluka"
                         />
-                        {errors.instituteTaluka && <p className="text-red-500 text-xs">{errors.instituteTaluka}</p>}
                     </div>
                     <div>
                         <label htmlFor="qualificationLevel" className="block text-sm font-medium text-gray-700">
@@ -186,7 +193,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Qualification Level"
                         />
-                        {errors.qualificationLevel && <p className="text-red-500 text-xs">{errors.qualificationLevel}</p>}
                     </div>
                     <div>
                         <label htmlFor="stream" className="block text-sm font-medium text-gray-700">
@@ -202,7 +208,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Stream"
                         />
-                        {errors.stream && <p className="text-red-500 text-xs">{errors.stream}</p>}
                     </div>
                     <div>
                         <label htmlFor="collegeName" className="block text-sm font-medium text-gray-700">
@@ -218,7 +223,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter College / School Name"
                         />
-                        {errors.collegeName && <p className="text-red-500 text-xs">{errors.collegeName}</p>}
                     </div>
                     <div>
                         <label htmlFor="courseName" className="block text-sm font-medium text-gray-700">
@@ -234,7 +238,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Course Name"
                         />
-                        {errors.courseName && <p className="text-red-500 text-xs">{errors.courseName}</p>}
                     </div>
                     <div>
                         <label htmlFor="admissionType" className="block text-sm font-medium text-gray-700">
@@ -250,7 +253,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Type"
                         />
-                        {errors.admissionType && <p className="text-red-500 text-xs">{errors.admissionType}</p>}
                     </div>
                     <div>
                         <label htmlFor="marksDetails" className="block text-sm font-medium text-gray-700">
@@ -266,7 +268,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Marks Details"
                         />
-                        {errors.marksDetails && <p className="text-red-500 text-xs">{errors.marksDetails}</p>}
                     </div>
                     <div>
                         <label htmlFor="yearOfStudy" className="block text-sm font-medium text-gray-700">
@@ -282,7 +283,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Year of Study"
                         />
-                        {errors.yearOfStudy && <p className="text-red-500 text-xs">{errors.yearOfStudy}</p>}
                     </div>
                     <div>
                         <label htmlFor="studyStatus" className="block text-sm font-medium text-gray-700">
@@ -298,7 +298,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Study Status"
                         />
-                        {errors.studyStatus && <p className="text-red-500 text-xs">{errors.studyStatus}</p>}
                     </div>
                     <div>
                         <label htmlFor="gapInStudy" className="block text-sm font-medium text-gray-700">
@@ -314,7 +313,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Gap in Study"
                         />
-                        {errors.gapInStudy && <p className="text-red-500 text-xs">{errors.gapInStudy}</p>}
                     </div>
                     <div>
                         <label htmlFor="studyMode" className="block text-sm font-medium text-gray-700">
@@ -330,7 +328,6 @@ const CurrentCourse = ({ handleNext }) => {
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Study Mode"
                         />
-                        {errors.studyMode && <p className="text-red-500 text-xs">{errors.studyMode}</p>}
                     </div>
                 </div>
             </div>

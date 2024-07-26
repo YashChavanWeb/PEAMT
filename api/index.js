@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
-import countryRoutes from './routes/countryRoutes.js'
+import formRoutes from './routes/form.route.js';
+import countryRoutes from './routes/countryRoutes.js';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
-
 
 dotenv.config();
 
@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, '/client/dist')));
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/form', formRoutes);
 app.use('/api', countryRoutes);
 
 // Catch-all route to serve the frontend
@@ -59,3 +60,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+export default app;

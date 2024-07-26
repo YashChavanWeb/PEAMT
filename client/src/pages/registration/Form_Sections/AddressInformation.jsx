@@ -21,6 +21,7 @@ const AddressInformation = ({ handleNext }) => {
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
+    const [error, setError] = useState(false);
 
     const fetchCountries = async () => {
         try {
@@ -87,13 +88,40 @@ const AddressInformation = ({ handleNext }) => {
     };
 
     const handleNextClick = () => {
-        handleNext();
+        // Check if all required fields are filled
+        if (
+            permanentAddress.country &&
+            permanentAddress.state &&
+            permanentAddress.city &&
+            permanentAddress.pincode &&
+            correspondingAddress.country &&
+            correspondingAddress.state &&
+            correspondingAddress.city &&
+            correspondingAddress.pincode
+        ) {
+            setError(false);
+            handleNext();
+        } else {
+            setError(true);
+            // Hide the error message after 3 seconds
+            setTimeout(() => {
+                setError(false);
+            }, 3000); // 3000 milliseconds = 3 seconds
+        }
     };
 
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h2 className="text-xl font-bold mb-2">Address Information</h2>
             <hr className="mb-4" />
+
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    <strong className="font-bold">Error!</strong>
+                    <span className="block sm:inline"> Please fill all required fields.</span>
+                </div>
+            )}
 
             {/* Permanent Address */}
             <div className="mb-4">

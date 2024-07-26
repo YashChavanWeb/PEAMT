@@ -8,21 +8,29 @@ const OtherInformation = ({ handleNext }) => {
         motherName: '',
         motherOccupation: '',
         motherIsSalaried: '',
+        customField1: '',
+        customField2: '',
     });
 
     const [errors, setErrors] = useState({});
     const [isFormTouched, setIsFormTouched] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
 
     const handleNextClick = () => {
         setIsFormTouched(true);
         if (validateForm()) {
             handleNext();
+        } else {
+            setShowPopup(true);
+            setTimeout(() => {
+                setShowPopup(false);
+            }, 3000);
         }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (/^[a-zA-Z\s]*$/.test(value) || value === '') {  // Allow only letters and spaces
+        if (/^[a-zA-Z\s]*$/.test(value) || value === '' || name.includes('IsSalaried')) {  // Allow only letters and spaces for text fields
             setFormData({
                 ...formData,
                 [name]: value,
@@ -48,8 +56,16 @@ const OtherInformation = ({ handleNext }) => {
     };
 
     return (
-        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 relative">
             <h2 className="text-xl font-bold mb-2">Other Details</h2>
+            
+            {/* Error Message */}
+            {showPopup && (
+                <div className="bg-red-500 text-white text-center p-2 mb-4">
+                    {errors.form}
+                </div>
+            )}
+            
             <hr className="mb-4" />
 
             {/* Parent Details */}
@@ -190,13 +206,6 @@ const OtherInformation = ({ handleNext }) => {
                     </div>
                 </div>
             </div>
-
-            {/* Show error message if any details are missing */}
-            {isFormTouched && errors.form && (
-                <div className="mb-4">
-                    <span className="text-red-500 text-sm">{errors.form}</span>
-                </div>
-            )}
 
             <div className="flex justify-end">
                 <button
