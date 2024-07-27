@@ -1,14 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-    signInStart,
-    signInFailure,
-    signInSuccess
-} from '../../redux/user/userSlice';
+import { signInStart, signInFailure, signInSuccess } from '../../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import OAuth from '../../components/OAuth';
-import pc from '../../assets/login.jpeg'
-import '../../styles/pages/Signin.css'
+import pc from '../../assets/login.jpeg';
+import '../../styles/pages/Signin.css';
 
 export default function SignIn() {
     const [formData, setFormData] = useState({});
@@ -39,13 +35,19 @@ export default function SignIn() {
 
             const data = await res.json();
             if (data.success === false) {
-                dispatch(signInFailure(data.errorMessage)); // Assuming errorMessage is a serializable string
+                dispatch(signInFailure(data.errorMessage));
                 return;
             }
+
             dispatch(signInSuccess(data));
-            navigate('/');
+
+            if (data.isAdmin) {
+                navigate('/admin-dashboard');
+            } else {
+                navigate('/');
+            }
         } catch (error) {
-            dispatch(signInFailure(error.message)); // Dispatching just the error message
+            dispatch(signInFailure(error.message));
         }
     };
 

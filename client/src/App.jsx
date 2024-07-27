@@ -10,6 +10,7 @@ import RegistrationForm from "./pages/registration/RegistrationForm";
 import PrivateDashboard from "./pages/Developers/PrivateDashboard";
 import AdminEntryForm from "./pages/Developers/AdminEntryForm";
 import './index.css';
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
         <Route path='/about' element={<About />} />
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
+        <Route path='/admin-dashboard' element={<AdminDashboard />} />
 
 
         <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
