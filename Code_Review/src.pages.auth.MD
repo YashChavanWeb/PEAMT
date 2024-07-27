@@ -1,66 +1,42 @@
-# User Authentication and Profile Management
+# Auth
 
-This project implements a user authentication and profile management system using React, Redux, and Firebase. Below is a detailed explanation of the functionalities and code snippets used in this system.
+## Signup
 
-## Table of Contents
+### Description
 
-1. [Sign-Up](#sign-up)
-2. [Sign-In](#sign-in)
-3. [Profile Management](#profile-management)
-4. [Account Operations](#account-operations)
+The Signup form includes three input fields: username, email, and password. Each input field has an `onChange={handleChange}` event listener to keep track of the data entered. There is also a button that displays either 'Loading...' or 'Sign Up' based on the `loading` state.
 
----
+### States
 
-## Sign-Up
+- `formData`: An array of objects used to manage the data for each input field.
+- `error`: Holds any error messages if they occur.
+- `loading`: Indicates whether the form is currently processing.
 
-### Handling Form Changes
-
-To manage the form data, we use a function that updates the state whenever the user changes an input field.
+### FormData Structure
 
 ```javascript
-const handleChange = (e) => {
-  setFormData({ ...formData, [e.target.id]: e.target.value });
-};
-```
-
-- **Purpose**: Updates the `formData` state with the new value from the input field.
-- **How it Works**: This function takes an event object `e`, and updates the `formData` state based on the `id` of the input field.
-
-### Submitting the Sign-Up Form
-
-To submit the sign-up form data to the server, we use a fetch request:
-
-```javascript
-const res = await fetch("/api/auth/signup", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
+[
+  {
+    username: "yash",
+    email: "yash@gmail.com",
+    password: "yashchavan",
   },
-  body: JSON.stringify(formData),
-});
+  // More objects can be added if necessary
+];
 ```
 
-- **Purpose**: Sends the form data to the server to create a new user.
-- **How it Works**: The fetch request sends a POST request with the form data in JSON format to the `/api/auth/signup` endpoint.
+### Handle Submit Function
 
----
+1. **Data Fetching**: Fetch data into `res` variable.
+2. **Method**: Define HTTP method.
+3. **Headers**: Set content type in headers.
+4. **Body**: Pass `formData` into the body.
+5. **Response Handling**: Store response in `data`.
+6. **Success Condition**: Check `data.success`.
+7. **Error Handling**: Update `loading` and `error` states.
+8. **Try/Catch Block**: Handle errors during submission.
 
-## Sign-In
-
-### Accessing Redux State
-
-To access the loading and error state from Redux, use the `useSelector` hook:
-
-```javascript
-const { loading, error } = useSelector((state) => state.user);
-```
-
-- **Purpose**: Allows the component to reactively access the loading and error states.
-- **How it Works**: The component will re-render whenever the `loading` or `error` state in Redux changes.
-
-### Submitting the Sign-In Form
-
-Here's how to handle user sign-in and dispatch Redux actions:
+### Code Example
 
 ```javascript
 try {
@@ -72,43 +48,132 @@ try {
     },
     body: JSON.stringify(formData),
   });
+
+  if (!res.ok) {
+    throw new Error("Failed to sign in");
+  }
+
   const data = await res.json();
   if (data.success === false) {
-    dispatch(signInFailure(data));
+    dispatch(signInFailure(data.errorMessage));
     return;
   }
+
   dispatch(signInSuccess(data));
-  navigate("/");
+
+  if (data.isAdmin) {
+    navigate("/admin-dashboard");
+  } else {
+    navigate("/");
+  }
 } catch (error) {
-  dispatch(signInFailure(error));
+  dispatch(signInFailure(error.message));
 }
 ```
 
-- **Purpose**: Authenticates the user and handles Redux state changes based on the result.
-- **How it Works**: Sends a POST request to the `/api/auth/signin` endpoint, then dispatches appropriate Redux actions based on the response.
-
----
-
-## Profile Management
-
-### Handling Image Uploads
-
-To manage image uploads, use a `useEffect` hook and Firebase storage:
+### Common Imports
 
 ```javascript
-useEffect(() => {
-  if (image) {
-    handleFileUpload(image);
-  }
-}, [image]);
+import {
+  signInStart,
+  signInFailure,
+  signInSuccess,
+} from "../../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 ```
 
-- **Purpose**: Triggers image upload when an image is selected.
-- **How it Works**: Calls `handleFileUpload` whenever the `image` state changes.
+## Signin
 
-### Uploading the Image
+### Description
 
-Here's how to upload an image to Firebase Storage:
+The Signin form includes two input fields for email and password, each with an `onChange={handleChange}` function. Data is stored in the `formData` array.
+
+### Handle Submit Function
+
+1. **Async/Await**: Use async/await as MongoDB promises take time.
+2. **Try/Catch**: Handle posting data to the signin route.
+3. **Dispatch**: Track various steps using Redux.
+4. **Navigation**: Navigate based on user roles.
+
+### Code Example
+
+```javascript
+const res = await fetch("/api/auth/signin", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(formData),
+});
+
+dispatch(signInStart());
+
+if (!res.ok) {
+  throw new Error("Failed to sign in");
+}
+
+const data = await res.json();
+if (data.success === false) {
+  dispatch(signInFailure(data.errorMessage));
+  return;
+}
+
+dispatch(signInSuccess(data));
+
+if (data.isAdmin) {
+  navigate("/admin-dashboard");
+} else {
+  navigate("/");
+}
+```
+
+## Profile
+
+### Description
+
+The Profile page includes various input fields where data can be retrieved and modified.
+
+### Image Input
+
+1. **Input**: Image input is hidden and accepts only one file.
+2. **OnChange**: Handle image selection with `e.target.files[0]`.
+
+```javascript
+<input
+  type="file"
+  ref={fileRef}
+  hidden
+  accept="image/*"
+  onChange={(e) => setImage(e.target.files[0])}
+/>
+```
+
+### Profile Image Display
+
+1. **Source**: Show user's profile image or a default image if the user does not have one.
+2. **Status Messages**: Display upload progress or error messages based on the upload status.
+
+```javascript
+<p className="text-sm self-center">
+  {imageError ? (
+    <span className="text-red-700">
+      Error uploading image (file size must be less than 2 MB)
+    </span>
+  ) : imagePercent > 0 && imagePercent < 100 ? (
+    <span className="text-slate-700">{`Uploading: ${imagePercent} %`}</span>
+  ) : imagePercent === 100 ? (
+    <span className="text-green-700">Image uploaded successfully</span>
+  ) : (
+    ""
+  )}
+</p>
+```
+
+### Handle File Upload
+
+1. **Firebase Storage**: Upload image to Firebase storage.
+2. **Upload Task**: Track upload progress and handle errors.
+3. **Completion**: Set profile picture URL in form data.
 
 ```javascript
 const handleFileUpload = async (image) => {
@@ -135,20 +200,14 @@ const handleFileUpload = async (image) => {
 };
 ```
 
-- **Purpose**: Handles image file upload and updates the form data with the image URL.
-- **How it Works**: Uses Firebase Storage to upload the image and gets the download URL to update the profile picture.
+### Basic Functions
 
----
-
-## Account Operations
-
-### Updating User Data
-
-To update user information:
+1. **Handle Submit**: Submit updated user data via fetch.
+2. **Handle Delete**: Delete user data via fetch.
+3. **Handle Sign Out**: Sign out user via fetch.
 
 ```javascript
-const handleSubmit = async (e) => {
-  e.preventDefault();
+const handleSubmit = async () => {
   try {
     dispatch(updateUserStart());
     const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -164,22 +223,12 @@ const handleSubmit = async (e) => {
       return;
     }
     dispatch(updateUserSuccess(data));
-    setUpdateSuccess(true);
   } catch (error) {
     dispatch(updateUserFailure(error));
   }
 };
-```
 
-- **Purpose**: Sends updated user information to the server.
-- **How it Works**: Sends a POST request to the `/api/user/update/:id` endpoint with the updated data.
-
-### Deleting User Account
-
-To delete a user account:
-
-```javascript
-const handleDeleteAccount = async () => {
+const handleDelete = async () => {
   try {
     dispatch(deleteUserStart());
     const res = await fetch(`/api/user/delete/${currentUser._id}`, {
@@ -195,16 +244,7 @@ const handleDeleteAccount = async () => {
     dispatch(deleteUserFailure(error));
   }
 };
-```
 
-- **Purpose**: Sends a request to delete the user's account.
-- **How it Works**: Sends a DELETE request to the `/api/user/delete/:id` endpoint.
-
-### Signing Out
-
-To sign out the user:
-
-```javascript
 const handleSignOut = async () => {
   try {
     await fetch("/api/auth/signout");
@@ -215,5 +255,12 @@ const handleSignOut = async () => {
 };
 ```
 
-- **Purpose**: Signs out the user and updates the Redux state.
-- **How it Works**: Sends a request to the `/api/auth/signout` endpoint.
+### Messages
+
+1. **Update Success**: Display a success message if the user data is updated successfully.
+
+```javascript
+<p className="text-green-700 mt-5">
+  {updateSuccess && "User is updated successfully!"}
+</p>
+```
