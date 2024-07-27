@@ -1,6 +1,6 @@
-# PEAMT - Proctored Exam Automation and Monitoring Tool Project
+# PEAMT - Proctored Exam Automation and Monitoring Tool
 
-A full-stack MERN application with a React frontend and an Express backend.
+A comprehensive full-stack application built with the MERN stack (MongoDB, Express, React, Node.js) designed for proctored exam automation and monitoring. The project leverages Firebase for authentication and data storage, ensuring a robust and secure system.
 
 ## Table of Contents
 
@@ -17,9 +17,9 @@ A full-stack MERN application with a React frontend and an Express backend.
 
 ---
 
-## client
+## Frontend
 
-The frontend of this project is built with React and Vite. It includes features for user interaction and integrates with Firebase for authentication and data storage.
+The frontend is developed using React and Vite, providing a responsive and interactive user interface. It integrates with Firebase for authentication and data management.
 
 ### Setup
 
@@ -32,7 +32,7 @@ The frontend of this project is built with React and Vite. It includes features 
 2. **Navigate to the frontend directory:**
 
    ```bash
-   cd peamt/frontend
+   cd peamt/client
    ```
 
 3. **Install dependencies:**
@@ -62,20 +62,20 @@ The frontend of this project is built with React and Vite. It includes features 
 
 ### Usage
 
-Navigate to `http://localhost:5173` in your browser to use the application. Make sure the backend server is running as well.
+Visit `http://localhost:5173` in your browser to access the application. Ensure the backend server is running for a fully functional experience.
 
 ---
 
 ## Backend
 
-The backend of this project is built with Node.js and Express. It provides API endpoints and handles authentication and data storage.
+The backend is constructed with Node.js and Express, offering a RESTful API, authentication, and data management capabilities.
 
 ### Setup
 
-1. **The backend directory is in the route directory itself:**
+1. **Navigate to the root directory:**
 
    ```bash
-   /peamt
+   cd peamt
    ```
 
 2. **Install dependencies:**
@@ -84,7 +84,7 @@ The backend of this project is built with Node.js and Express. It provides API e
    npm install @reduxjs/toolkit axios bcryptjs body-parser cookie-parser cors dotenv express jsonwebtoken lenis mongoose nodemon react-redux three
    ```
 
-3. **Create a `.env` file in the `root` directory and add your environment variables:**
+3. **Create a `.env` file in the root directory and add your environment variables:**
 
    ```plaintext
    MONGO=your_mongodb_connection_string
@@ -100,64 +100,74 @@ The backend of this project is built with Node.js and Express. It provides API e
 
 ### Usage
 
-The backend will run on `http://localhost:3000` by default. Ensure it is running before interacting with the frontend.
+The backend server will be available at `http://localhost:3000` by default. Ensure that it is running to allow communication with the frontend.
 
 ---
 
 ## Environment Variables
 
-Make sure to configure the following environment variables:
+Ensure the following environment variables are set up correctly:
 
-- **client (.env file):**
+- **Frontend (.env file):**
 
-  - `VITE_FIREBASE_API_KEY`
-  - `VITE_FIREBASE_AUTH_DOMAIN`
-  - `VITE_FIREBASE_PROJECT_ID`
-  - `VITE_FIREBASE_STORAGE_BUCKET`
-  - `VITE_FIREBASE_MESSAGING_SENDER_ID`
-  - `VITE_FIREBASE_APP_ID`
-  - `VITE_PRIVATE_DASHBOARD_ID`
-  - `VITE_DASHBOARD_PASSWORD`
+  - `VITE_FIREBASE_API_KEY`: Firebase API key
+  - `VITE_FIREBASE_AUTH_DOMAIN`: Firebase authentication domain
+  - `VITE_FIREBASE_PROJECT_ID`: Firebase project ID
+  - `VITE_FIREBASE_STORAGE_BUCKET`: Firebase storage bucket
+  - `VITE_FIREBASE_MESSAGING_SENDER_ID`: Firebase messaging sender ID
+  - `VITE_FIREBASE_APP_ID`: Firebase app ID
+  - `VITE_PRIVATE_DASHBOARD_ID`: Private dashboard ID for access control
+  - `VITE_DASHBOARD_PASSWORD`: Password for accessing the private dashboard
 
-- **Root Directory (.env file):**
-  - `MONGO` (MongoDB connection string)
-  - `JWT_SECRET` (Secret key for JWT authentication)
-  - `ADMIN` (Admin MongoDB connection string)
+- **Backend (.env file):**
+  - `MONGO`: MongoDB connection string
+  - `JWT_SECRET`: Secret key for JSON Web Token (JWT) authentication
+  - `ADMIN`: Admin MongoDB connection string for administrative tasks
 
 ## Features
 
-- **Frontend:**
+### Frontend
 
-  - User authentication with Firebase
-  - Responsive UI built with React and TailwindCSS
-  - State management with Redux Toolkit and Redux Persist
-  - Routing with React Router DOM
+- **User Authentication:** Secure login and registration using Firebase.
+- **Responsive Design:** Adaptive layout built with React and TailwindCSS.
+- **State Management:** Efficient state management using Redux Toolkit and Redux Persist.
+- **Routing:** Dynamic routing with React Router DOM for seamless navigation.
 
-- **Backend:**
-  - RESTful API with Express
-  - Authentication with JWT
-  - Data storage and retrieval with MongoDB
-  - Middleware for body parsing, cookies, and CORS
+### Backend
+
+- **API Development:** RESTful API endpoints created with Express.
+- **Authentication:** Secure authentication with JWT to protect sensitive routes.
+- **Data Management:** Storage and retrieval of exam data using MongoDB.
+- **Middleware Integration:** Utilizes middleware for body parsing, cookie handling, and Cross-Origin Resource Sharing (CORS).
 
 ## API Documentation
 
-For detailed API documentation, refer to the [API Documentation](#). This includes information on available endpoints, request formats, and response examples.
+For comprehensive API documentation, including endpoints, request formats, and response examples, please refer to [API Documentation](#). This will help you understand how to interact with the backend services.
 
 ## Contributing
 
-We welcome contributions to this project! To contribute:
+Contributions are welcome! To contribute:
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature`).
-3. Make your changes.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push to the branch (`git push origin feature/your-feature`).
-6. Open a Pull Request.
+1. **Fork the repository** to create your own copy.
+2. **Create a new branch** for your feature or fix:
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+3. **Make your changes** and ensure they adhere to the project’s coding standards.
+4. **Commit your changes** with a descriptive message:
+   ```bash
+   git commit -am 'Add new feature or fix'
+   ```
+5. **Push to your branch:**
+   ```bash
+   git push origin feature/your-feature
+   ```
+6. **Open a Pull Request** on GitHub to propose your changes.
 
 ## License
 
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the ISC License. For detailed information, refer to the [LICENSE](LICENSE) file.
 
 ## Contact
 
-For any questions or further information, you can contact the project maintainer through GitHub or the project's support channels.
+For questions or further information, contact the project maintainer via GitHub or the project's support channels. Your feedback and inquiries are highly valued.
