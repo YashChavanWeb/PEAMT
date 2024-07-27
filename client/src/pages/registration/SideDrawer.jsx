@@ -14,14 +14,7 @@ const SideDrawer = ({ currentSection, handleSectionChange }) => {
           >
             Personal Information
           </li>
-          <li
-            className={`cursor-pointer py-2 ${
-              currentSection === "address" ? "font-bold" : ""
-            }`}
-            onClick={() => handleSectionChange("address")}
-          >
-            Address Information
-          </li>
+         
           <li
             className={`cursor-pointer py-2 ${
               currentSection === "other" ? "font-bold" : ""
@@ -45,6 +38,15 @@ const SideDrawer = ({ currentSection, handleSectionChange }) => {
             onClick={() => handleSectionChange("qualification")}
           >
             Past Qualification
+          </li>
+
+          <li
+            className={`cursor-pointer py-2 ${
+              currentSection === "payment" ? "font-bold" : ""
+            }`}
+            onClick={() => handleSectionChange("payment")}
+          >
+            Payment Process
           </li>
         </ul>
       </div>

@@ -52,13 +52,10 @@ const userSlice = createSlice({
             state.error = action.payload;
         },
 
-
         signOut: (state) => {
             state.currentUser = null;
             state.loading = false;
             state.error = false;
-
-
         },
     }
 });

@@ -91,7 +91,7 @@ const PersonalDetails = ({ handleNext }) => {
         }
     };
 
-    const handleApplicantNameChange = (e) => {
+    const handleChange = (e) => {
         const applicantName = e.target.value;
         if (/^[a-zA-Z\s]*$/.test(applicantName)) {
             setFormData({
@@ -103,6 +103,20 @@ const PersonalDetails = ({ handleNext }) => {
                 applicantName: ''
             });
         }
+    };
+
+
+
+    const handleAgeChange = (e) => {
+        const age = e.target.value.replace(/\D/g, '');
+        setFormData({
+            ...formData,
+            age: age,
+        });
+        setErrors({
+            ...errors,
+            age: ''
+        });
     };
 
     const validateForm = () => {
@@ -166,183 +180,183 @@ const PersonalDetails = ({ handleNext }) => {
         return isValid;
     };
 
+
     return (
-        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h2 className="text-xl font-bold mb-2">Personal Information</h2>
-            <hr className="mb-4" />
+        <div className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-5">
+            <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
 
             {showError && (
-                <div className="bg-red-500 text-white p-2 mb-4 rounded">
+                <div className="bg-red-600 text-white p-3 mb-4 rounded-lg">
                     Please fill in all required fields correctly.
                 </div>
             )}
 
-            {/* Personal Details */}
-            <div className="mb-4">
-                <h3 className="text-lg font-bold mb-2">Personal Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Form Fields */}
-                    <div>
-                        <label htmlFor="aadharNumber" className="block text-sm font-medium text-gray-700">
-                            Aadhar Number
-                        </label>
-                        <input
-                            id="aadharNumber"
-                            name="aadharNumber"
-                            type="text"
-                            value={formData.aadharNumber}
-                            onChange={handleAadharNumberChange}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Aadhar Number"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                            Name
-                        </label>
-                        <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            value={formData.name}
-                            onChange={handleNameChange}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Applicant Name"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Email"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
-                            Mobile Number
-                        </label>
-                        <input
-                            id="mobileNumber"
-                            name="mobileNumber"
-                            type="text"
-                            value={formData.mobileNumber}
-                            onChange={handleMobileNumberChange}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Mobile Number"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
-                            Date of Birth
-                        </label>
-                        <input
-                            id="dob"
-                            name="dob"
-                            type="date"
-                            value={formData.dob}
-                            onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="age" className="block text-sm font-medium text-gray-700">
-                            Age
-                        </label>
-                        <input
-                            id="age"
-                            name="age"
-                            type="text"
-                            value={formData.age}
-                            onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Age"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-                            Gender
-                        </label>
-                        <select
-                            id="gender"
-                            name="gender"
-                            value={formData.gender}
-                            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="religion" className="block text-sm font-medium text-gray-700">
-                            Religion
-                        </label>
-                        <input
-                            id="religion"
-                            name="religion"
-                            type="text"
-                            value={formData.religion}
-                            onChange={(e) => setFormData({ ...formData, religion: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Religion"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="casteCategory" className="block text-sm font-medium text-gray-700">
-                            Caste Category
-                        </label>
-                        <input
-                            id="casteCategory"
-                            name="casteCategory"
-                            type="text"
-                            value={formData.casteCategory}
-                            onChange={(e) => setFormData({ ...formData, casteCategory: e.target.value })}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Caste Category"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="applicantName" className="block text-sm font-medium text-gray-700">
-                            Applicant Name
-                        </label>
-                        <input
-                            id="applicantName"
-                            name="applicantName"
-                            type="text"
-                            value={formData.applicantName}
-                            onChange={handleApplicantNameChange}
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Applicant Name"
-                        />
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Aadhar Number */}
+                <div>
+                    <label htmlFor="aadharNumber" className="block text-sm font-medium text-gray-700">
+                        Aadhar Number
+                    </label>
+                    <input
+                        id="aadharNumber"
+                        name="aadharNumber"
+                        type="text"
+                        value={formData.aadharNumber}
+                        onChange={handleAadharNumberChange}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.aadharNumber ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                        placeholder="Enter Aadhar Number"
+                    />
+                   
                 </div>
+
+                {/* Name */}
+                <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        Applicant Name
+                    </label>
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        value={formData.name}
+                        onChange={handleChange}
+                        autoComplete="off"
+                        className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                        placeholder="Enter Name"
+                    />
+                </div>
+
+                {/* Email */}
+                <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                        Email
+                    </label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.email ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                        placeholder="Enter Email"
+                    />
+                </div>
+
+                {/* Mobile Number */}
+                <div>
+                    <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
+                        Mobile Number
+                    </label>
+                    <input
+                        id="mobileNumber"
+                        name="mobileNumber"
+                        type="text"
+                        value={formData.mobileNumber}
+                        onChange={handleMobileNumberChange}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.mobileNumber ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                        placeholder="Enter Mobile Number"
+                    />
+                  
+                </div>
+
+                {/* Date of Birth */}
+                <div>
+                    <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
+                        Date of Birth
+                    </label>
+                    <input
+                        id="dob"
+                        name="dob"
+                        type="date"
+                        value={formData.dob}
+                        onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.dob ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                    />
+                </div>
+
+                {/* Age */}
+                <div>
+                    <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+                        Age
+                    </label>
+                    <input
+                        id="age"
+                        name="age"
+                        type="text"
+                        value={formData.age}
+                        onChange={handleAgeChange}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.age ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                        placeholder="Enter Age"
+                    />
+                </div>
+
+                {/* Gender */}
+                <div>
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                        Gender
+                    </label>
+                    <select
+                        id="gender"
+                        name="gender"
+                        value={formData.gender}
+                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.gender ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                    >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                {/* Religion */}
+                <div>
+                    <label htmlFor="religion" className="block text-sm font-medium text-gray-700">
+                        Religion
+                    </label>
+                    <input
+                        id="religion"
+                        name="religion"
+                        type="text"
+                        value={formData.religion}
+                        onChange={handleChange}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.religion ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                        placeholder="Enter Religion"
+                    />
+                </div>
+
+                {/* Caste Category */}
+                <div>
+                    <label htmlFor="casteCategory" className="block text-sm font-medium text-gray-700">
+                        Caste Category
+                    </label>
+                    <input
+                        id="casteCategory"
+                        name="casteCategory"
+                        type="text"
+                        value={formData.casteCategory}
+                        onChange={handleChange}
+                        autoComplete="off"
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${errors.casteCategory ? 'border-red-500' : 'border-gray-400'} focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm`}
+                        placeholder="Enter Caste Category"
+                    />
+                </div>
+
+              
             </div>
 
-            {/* Add other form sections here */}
-
+            {/* Navigation Button */}
             <div className="mt-6 flex justify-end">
                 <button
                     type="button"
                     onClick={handleNextClick}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                     Next
                 </button>
