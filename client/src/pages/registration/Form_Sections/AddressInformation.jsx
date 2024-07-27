@@ -1,8 +1,113 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AddressInformation = ({ handleNext }) => {
+    const [permanentAddress, setPermanentAddress] = useState({
+        country: '',
+        state: '',
+        district: '',
+        city: '',
+        pincode: ''
+    });
+
+    const [correspondingAddress, setCorrespondingAddress] = useState({
+        country: '',
+        state: '',
+        district: '',
+        city: '',
+        pincode: ''
+    });
+
+    const [countries, setCountries] = useState([]);
+    const [states, setStates] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [error, setError] = useState(false);
+
+    const fetchCountries = async () => {
+        try {
+            const response = await axios.get('https://countriesnow.space/api/v0.1/countries');
+            setCountries(response.data.data);
+        } catch (error) {
+            console.error('Error fetching countries:', error);
+        }
+    };
+
+    const fetchStates = async (country) => {
+        try {
+            const response = await axios.post('https://countriesnow.space/api/v0.1/countries/states', {
+                country
+            });
+            setStates(response.data.data.states);
+        } catch (error) {
+            console.error('Error fetching states:', error);
+        }
+    };
+
+    const fetchCities = async (country, state) => {
+        try {
+            const response = await axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', {
+                country,
+                state
+            });
+            setCities(response.data.data);
+        } catch (error) {
+            console.error('Error fetching cities:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCountries();
+    }, []);
+
+    useEffect(() => {
+        if (permanentAddress.country) {
+            fetchStates(permanentAddress.country);
+        }
+    }, [permanentAddress.country]);
+
+    useEffect(() => {
+        if (permanentAddress.country && permanentAddress.state) {
+            fetchCities(permanentAddress.country, permanentAddress.state);
+        }
+    }, [permanentAddress.state]);
+
+    const handlePermanentChange = (e) => {
+        const { name, value } = e.target;
+        setPermanentAddress(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleCorrespondingChange = (e) => {
+        const { name, value } = e.target;
+        setCorrespondingAddress(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
     const handleNextClick = () => {
-        handleNext();
+        // Check if all required fields are filled
+        if (
+            permanentAddress.country &&
+            permanentAddress.state &&
+            permanentAddress.city &&
+            permanentAddress.pincode &&
+            correspondingAddress.country &&
+            correspondingAddress.state &&
+            correspondingAddress.city &&
+            correspondingAddress.pincode
+        ) {
+            setError(false);
+            handleNext();
+        } else {
+            setError(true);
+            // Hide the error message after 3 seconds
+            setTimeout(() => {
+                setError(false);
+            }, 3000); // 3000 milliseconds = 3 seconds
+        }
     };
 
     return (
@@ -10,61 +115,68 @@ const AddressInformation = ({ handleNext }) => {
             <h2 className="text-xl font-bold mb-2">Address Information</h2>
             <hr className="mb-4" />
 
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    <strong className="font-bold">Error!</strong>
+                    <span className="block sm:inline"> Please fill all required fields.</span>
+                </div>
+            )}
+
             {/* Permanent Address */}
             <div className="mb-4">
                 <h3 className="text-lg font-bold mb-2">Permanent Address</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                        <label htmlFor="permanentCountry" className="block text-sm font-medium text-gray-700">
+                            Country
+                        </label>
+                        <select
+                            id="permanentCountry"
+                            name="country"
+                            value={permanentAddress.country}
+                            onChange={handlePermanentChange}
+                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                        >
+                            <option value="" disabled>Select Country</option>
+                            {countries.map((country, index) => (
+                                <option key={index} value={country.country}>{country.country}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
                         <label htmlFor="permanentState" className="block text-sm font-medium text-gray-700">
                             State
                         </label>
-                        <input
+                        <select
                             id="permanentState"
-                            name="permanentState"
-                            type="text"
-                            autoComplete="off"
+                            name="state"
+                            value={permanentAddress.state}
+                            onChange={handlePermanentChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter State"
-                        />
+                        >
+                            <option value="" disabled>Select State</option>
+                            {states.map((state, index) => (
+                                <option key={index} value={state.name}>{state.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
-                        <label htmlFor="permanentDistrict" className="block text-sm font-medium text-gray-700">
-                            District
+                        <label htmlFor="permanentCity" className="block text-sm font-medium text-gray-700">
+                            City
                         </label>
-                        <input
-                            id="permanentDistrict"
-                            name="permanentDistrict"
-                            type="text"
-                            autoComplete="off"
+                        <select
+                            id="permanentCity"
+                            name="city"
+                            value={permanentAddress.city}
+                            onChange={handlePermanentChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter District"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="permanentTaluka" className="block text-sm font-medium text-gray-700">
-                            Taluka
-                        </label>
-                        <input
-                            id="permanentTaluka"
-                            name="permanentTaluka"
-                            type="text"
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Taluka"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="permanentVillage" className="block text-sm font-medium text-gray-700">
-                            Village
-                        </label>
-                        <input
-                            id="permanentVillage"
-                            name="permanentVillage"
-                            type="text"
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Village"
-                        />
+                        >
+                            <option value="" disabled>Select City</option>
+                            {cities.map((city, index) => (
+                                <option key={index} value={city}>{city}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label htmlFor="permanentPincode" className="block text-sm font-medium text-gray-700">
@@ -72,11 +184,11 @@ const AddressInformation = ({ handleNext }) => {
                         </label>
                         <input
                             id="permanentPincode"
-                            name="permanentPincode"
+                            name="pincode"
                             type="text"
-                            autoComplete="off"
+                            value={permanentAddress.pincode}
+                            onChange={handlePermanentChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Pincode"
                         />
                     </div>
                 </div>
@@ -84,59 +196,58 @@ const AddressInformation = ({ handleNext }) => {
 
             {/* Corresponding Address */}
             <div className="mb-4">
-                <h3 className="text-lg font-bold mb-2">Corresponding Address (if different)</h3>
+                <h3 className="text-lg font-bold mb-2">Corresponding Address</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="correspondingCountry" className="block text-sm font-medium text-gray-700">
+                            Country
+                        </label>
+                        <select
+                            id="correspondingCountry"
+                            name="country"
+                            value={correspondingAddress.country}
+                            onChange={handleCorrespondingChange}
+                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                        >
+                            <option value="" disabled>Select Country</option>
+                            {countries.map((country, index) => (
+                                <option key={index} value={country.country}>{country.country}</option>
+                            ))}
+                        </select>
+                    </div>
                     <div>
                         <label htmlFor="correspondingState" className="block text-sm font-medium text-gray-700">
                             State
                         </label>
-                        <input
+                        <select
                             id="correspondingState"
-                            name="correspondingState"
-                            type="text"
-                            autoComplete="off"
+                            name="state"
+                            value={correspondingAddress.state}
+                            onChange={handleCorrespondingChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter State"
-                        />
+                        >
+                            <option value="" disabled>Select State</option>
+                            {states.map((state, index) => (
+                                <option key={index} value={state.name}>{state.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
-                        <label htmlFor="correspondingDistrict" className="block text-sm font-medium text-gray-700">
-                            District
+                        <label htmlFor="correspondingCity" className="block text-sm font-medium text-gray-700">
+                            City
                         </label>
-                        <input
-                            id="correspondingDistrict"
-                            name="correspondingDistrict"
-                            type="text"
-                            autoComplete="off"
+                        <select
+                            id="correspondingCity"
+                            name="city"
+                            value={correspondingAddress.city}
+                            onChange={handleCorrespondingChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter District"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="correspondingTaluka" className="block text-sm font-medium text-gray-700">
-                            Taluka
-                        </label>
-                        <input
-                            id="correspondingTaluka"
-                            name="correspondingTaluka"
-                            type="text"
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Taluka"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="correspondingVillage" className="block text-sm font-medium text-gray-700">
-                            Village
-                        </label>
-                        <input
-                            id="correspondingVillage"
-                            name="correspondingVillage"
-                            type="text"
-                            autoComplete="off"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Village"
-                        />
+                        >
+                            <option value="" disabled>Select City</option>
+                            {cities.map((city, index) => (
+                                <option key={index} value={city}>{city}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label htmlFor="correspondingPincode" className="block text-sm font-medium text-gray-700">
@@ -144,25 +255,23 @@ const AddressInformation = ({ handleNext }) => {
                         </label>
                         <input
                             id="correspondingPincode"
-                            name="correspondingPincode"
+                            name="pincode"
                             type="text"
-                            autoComplete="off"
+                            value={correspondingAddress.pincode}
+                            onChange={handleCorrespondingChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Pincode"
                         />
                     </div>
                 </div>
             </div>
 
-            {/* Next button */}
-            <div className="mt-6 flex justify-end">
-                <button
-                    onClick={handleNextClick}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500"
-                >
-                    Next
-                </button>
-            </div>
+            <button
+                type="button"
+                onClick={handleNextClick}
+                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+                Next
+            </button>
         </div>
     );
 };

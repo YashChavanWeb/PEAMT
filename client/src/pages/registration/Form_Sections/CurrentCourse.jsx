@@ -1,14 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const CurrentCourse = ({ handleNext }) => {
+    const [formData, setFormData] = useState({
+        isJob: false,
+        jobDetails: '',
+        admissionYear: '',
+        instituteState: '',
+        instituteDistrict: '',
+        instituteTaluka: '',
+        qualificationLevel: '',
+        stream: '',
+        collegeName: '',
+        courseName: '',
+        admissionType: '',
+        marksDetails: '',
+        yearOfStudy: '',
+        studyStatus: '',
+        gapInStudy: '',
+        studyMode: ''
+    });
+
+    const [errors, setErrors] = useState({});
+    const [showError, setShowError] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        // Handle character-only validation for specific fields
+        if ((name === 'instituteState' || name === 'instituteDistrict' || name === 'instituteTaluka' ||
+             name === 'stream' || name === 'collegeName' || name === 'courseName' ||
+             name === 'admissionType' || name === 'studyStatus' || name === 'studyMode') &&
+            !/^[a-zA-Z\s]*$/.test(value) && value !== '') {
+            return; // Ignore invalid input
+        }
+
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value
+        });
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        const requiredFields = [
+            'admissionYear', 'instituteState', 'instituteDistrict', 'instituteTaluka',
+            'qualificationLevel', 'stream', 'collegeName', 'courseName',
+            'admissionType', 'marksDetails', 'yearOfStudy', 'studyStatus', 'gapInStudy', 'studyMode'
+        ];
+
+        requiredFields.forEach(field => {
+            if (!formData[field]) {
+                newErrors[field] = 'This field is required';
+            }
+        });
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setShowError(true);
+            setTimeout(() => setShowError(false), 4000); // Hide the error after 4 seconds
+            return false;
+        }
+
+        setShowError(false);
+        return true;
+    };
+
     const handleNextClick = () => {
-        handleNext();
+        if (validateForm()) {
+            handleNext();
+        }
     };
 
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h2 className="text-xl font-bold mb-2">Current Course Details</h2>
             <hr className="mb-4" />
+
+            {showError && (
+                <div className="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded">
+                    <p className="text-sm">Please fill all required fields.</p>
+                </div>
+            )}
 
             <div className="mb-4">
                 <h3 className="text-lg font-bold mb-2">Job Details</h3>
@@ -21,21 +92,27 @@ const CurrentCourse = ({ handleNext }) => {
                             id="isJob"
                             name="isJob"
                             type="checkbox"
+                            checked={formData.isJob}
+                            onChange={handleChange}
                             className="mt-1 form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
                         />
                     </div>
-                    <div>
-                        <label htmlFor="jobDetails" className="block text-sm font-medium text-gray-700">
-                            Job Details
-                        </label>
-                        <textarea
-                            id="jobDetails"
-                            name="jobDetails"
-                            rows="3"
-                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Job Details"
-                        ></textarea>
-                    </div>
+                    {formData.isJob && (
+                        <div>
+                            <label htmlFor="jobDetails" className="block text-sm font-medium text-gray-700">
+                                Job Details
+                            </label>
+                            <textarea
+                                id="jobDetails"
+                                name="jobDetails"
+                                rows="3"
+                                value={formData.jobDetails}
+                                onChange={handleChange}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Job Details"
+                            ></textarea>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -51,6 +128,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="admissionYear"
                             type="text"
                             autoComplete="off"
+                            value={formData.admissionYear}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Year"
                         />
@@ -64,6 +143,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="instituteState"
                             type="text"
                             autoComplete="off"
+                            value={formData.instituteState}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute State"
                         />
@@ -77,6 +158,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="instituteDistrict"
                             type="text"
                             autoComplete="off"
+                            value={formData.instituteDistrict}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute District"
                         />
@@ -90,6 +173,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="instituteTaluka"
                             type="text"
                             autoComplete="off"
+                            value={formData.instituteTaluka}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Institute Taluka"
                         />
@@ -103,6 +188,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="qualificationLevel"
                             type="text"
                             autoComplete="off"
+                            value={formData.qualificationLevel}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Qualification Level"
                         />
@@ -116,6 +203,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="stream"
                             type="text"
                             autoComplete="off"
+                            value={formData.stream}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Stream"
                         />
@@ -129,6 +218,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="collegeName"
                             type="text"
                             autoComplete="off"
+                            value={formData.collegeName}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter College / School Name"
                         />
@@ -142,6 +233,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="courseName"
                             type="text"
                             autoComplete="off"
+                            value={formData.courseName}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Course Name"
                         />
@@ -155,21 +248,26 @@ const CurrentCourse = ({ handleNext }) => {
                             name="admissionType"
                             type="text"
                             autoComplete="off"
+                            value={formData.admissionType}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Type"
                         />
                     </div>
                     <div>
                         <label htmlFor="marksDetails" className="block text-sm font-medium text-gray-700">
-                            Marks and Details
+                            Marks Details
                         </label>
-                        <textarea
+                        <input
                             id="marksDetails"
                             name="marksDetails"
-                            rows="3"
+                            type="text"
+                            autoComplete="off"
+                            value={formData.marksDetails}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                            placeholder="Enter Marks and Details"
-                        ></textarea>
+                            placeholder="Enter Marks Details"
+                        />
                     </div>
                     <div>
                         <label htmlFor="yearOfStudy" className="block text-sm font-medium text-gray-700">
@@ -180,6 +278,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="yearOfStudy"
                             type="text"
                             autoComplete="off"
+                            value={formData.yearOfStudy}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Year of Study"
                         />
@@ -188,16 +288,16 @@ const CurrentCourse = ({ handleNext }) => {
                         <label htmlFor="studyStatus" className="block text-sm font-medium text-gray-700">
                             Study Status
                         </label>
-                        <select
+                        <input
                             id="studyStatus"
                             name="studyStatus"
+                            type="text"
                             autoComplete="off"
+                            value={formData.studyStatus}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
-                        >
-                            <option value="">Select Study Status</option>
-                            <option value="completed">Completed</option>
-                            <option value="continuing">Continuing</option>
-                        </select>
+                            placeholder="Enter Study Status"
+                        />
                     </div>
                     <div>
                         <label htmlFor="gapInStudy" className="block text-sm font-medium text-gray-700">
@@ -208,6 +308,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="gapInStudy"
                             type="text"
                             autoComplete="off"
+                            value={formData.gapInStudy}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Gap in Study"
                         />
@@ -221,6 +323,8 @@ const CurrentCourse = ({ handleNext }) => {
                             name="studyMode"
                             type="text"
                             autoComplete="off"
+                            value={formData.studyMode}
+                            onChange={handleChange}
                             className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                             placeholder="Enter Study Mode"
                         />
