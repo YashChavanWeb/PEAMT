@@ -47,13 +47,13 @@ function Home() {
             <h1 className='text-6xl p-4 font-extrabold text-white text-center'>Explore Our Cutting-Edge Features</h1>
             <section className='grid grid-rows-2 md:grid-cols-3 gap-10 m-20'>
 
-                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify'>
+                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify overflow-hidden'>
                       <img src={tabCheat} alt='Cheating'></img>
                       <h1 className='text-xl font-bold'>Secure Browser Lockdown</h1>
                       <p className='text-lg'>Prevent cheating with our robust browser lockdown mode, designed to keep exams secure and free from unauthorized access.</p>
                   </div>
 
-                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s col-span-2 rounded-2xl flex flex-row items-center justify-center p-10 text-justify'>
+                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s col-span-2 rounded-2xl flex flex-row items-center justify-center p-10 text-justify overflow-hidden'>
                     <img src={veri} className='w-full'></img>
                     <div>
                       <h1 className='text-xl font-bold'>Authentication and Verification</h1>
@@ -61,26 +61,26 @@ function Home() {
                     </div>
                   </div>
 
-                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify'>
+                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify overflow-hidden'>
                     <img src={realtime}></img>
                     <h1 className='text-xl font-bold'>Real-Time Monitoring</h1>
                     <p className='text-md'>Ensure exam integrity with our real-time monitoring feature, which provides live oversight and instant alerts for any suspicious activity.</p>
                   </div>
 
-                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify'>
+                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify overflow-hidden'>
                     <img src={assessment2img}></img>
                     <h1 className='text-xl font-bold'>Rapid Assessment</h1>
                     <p className='text-md'>Experience rapid assessment and evaluation with our secure browser lockdown, ensuring fast and accurate exam results.</p>
                   </div>
 
-                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s row-span-2 rounded-2xl flex flex-col items-center justify-center p-10 text-justify'>
+                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s row-span-2 rounded-2xl flex flex-col items-center justify-center p-10 text-justify overflow-hidden'>
                     <img src={teacherLaptop}></img>
                     <h1 className='text-xl font-bold'>Create an exam in minutes</h1>
                     <p className='text-md'>Create exams with diverse question types, from multiple choice to fill-in-the-gaps. Choose which questions are automatically scored and which require manual grading. Save time and focus on the next task at hand, even for theory-based questions.</p>
                     <img src={assessmentimg}></img>
                   </div>
 
-                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s col-span-2 rounded-2xl flex flex-row items-center justify-center p-10 text-justify'>
+                  <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s col-span-2 rounded-2xl flex flex-row items-center justify-center p-10 text-justify overflow-hidden'>
                     <img src={easyUseGuy}></img>
                     <div>
                       <h1 className='text-xl font-bold'>Easy to Use</h1>
