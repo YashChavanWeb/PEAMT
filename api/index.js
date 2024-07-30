@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
+import countryRoutes from './routes/countryRoutes.js'
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import formRoutes from './routes/form.route.js';
@@ -29,6 +30,7 @@ app.use(cors()); // Add this line if you are using CORS
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/form', formRoutes);
+app.use('/api', countryRoutes);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));

@@ -30,11 +30,15 @@ export default function Header() {
                             )}
                         </Link>
                     </button>
-                    <button className='button'>
-                        <Link to='/'>
-                            <li>Teacher SignIn</li>
+                    {/* <button className='button'>
+                        <Link to='/profile'>
+                            {currentUser ? (
+                                <img src={currentUser.profilePicture} alt='profile' className='h-7 w-7 rounded-full object-cover' />
+                            ) : (
+                                <li>Sign In</li>
+                            )}
                         </Link>
-                    </button>
+                    </button> */}
                 </ul>
             </div>
         </div>

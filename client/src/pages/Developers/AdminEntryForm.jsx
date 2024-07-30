@@ -5,11 +5,12 @@ function AdminEntryForm() {
         college: '',
         exam: '',
         email: '',
+        password: '',
         phone: '',
         description: ''
     });
     const [showSubmitConfirmation, setShowSubmitConfirmation] = useState(false);
-    const [password, setPassword] = useState('');
+    const [passwordInput, setPasswordInput] = useState('');
     const [passwordError, setPasswordError] = useState(false);
 
     const dashboardPassword = import.meta.env.VITE_DASHBOARD_PASSWORD;
@@ -24,7 +25,7 @@ function AdminEntryForm() {
     };
 
     const handleSubmit = async () => {
-        if (password !== dashboardPassword) {
+        if (passwordInput !== dashboardPassword) {
             setPasswordError(true);
             return;
         }
@@ -45,7 +46,7 @@ function AdminEntryForm() {
             const data = await response.json();
             console.log(data);
             setShowSubmitConfirmation(false);
-            setPassword('');
+            setPasswordInput('');
             setPasswordError(false);
         } catch (error) {
             console.error('Error submitting form:', error.message);
@@ -54,7 +55,7 @@ function AdminEntryForm() {
 
     const cancelSubmit = () => {
         setShowSubmitConfirmation(false);
-        setPassword('');
+        setPasswordInput('');
         setPasswordError(false);
     };
 
@@ -99,6 +100,17 @@ function AdminEntryForm() {
                         />
                     </div>
                     <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
+                        />
+                    </div>
+                    <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
                         <input
                             type="tel"
@@ -137,8 +149,8 @@ function AdminEntryForm() {
                         <p className="text-lg font-semibold mb-4">Please enter the password to submit the form</p>
                         <input
                             type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={passwordInput}
+                            onChange={(e) => setPasswordInput(e.target.value)}
                             placeholder="Enter password"
                             className="border border-gray-300 p-2 rounded-md w-full mb-4"
                         />
