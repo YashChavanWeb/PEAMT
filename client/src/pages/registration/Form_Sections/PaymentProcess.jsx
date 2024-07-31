@@ -1,84 +1,70 @@
-// PaymentProcess.js
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const PaymentProcess = () => {
-  const [paymentDetails, setPaymentDetails] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-  });
+  const { currentUser } = useSelector((state) => state.user); // Access current user details from Redux
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [paymentId, setPaymentId] = useState(null); // State to store the payment ID
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPaymentDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
-  };
+  const handlePayment = () => {
+    setLoading(true);
+    setError(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Payment Details:', paymentDetails);
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Your Razorpay Key ID
+      amount: '9900', // Amount in paise (9900 paise = 99 INR)
+      currency: 'INR',
+      name: 'Registration Fee',
+      description: 'Student Registration Payment',
+      handler: function (response) {
+        setLoading(false);
+        console.log('Payment Response:', response);
+        setPaymentId(response.razorpay_payment_id); // Store the payment ID
+        alert('Payment Successful');
+      },
+      prefill: {
+        name: currentUser.name || 'User Name',
+        email: currentUser.email || 'user@example.com',
+        contact: currentUser.contact || '0000000000',
+      },
+      theme: {
+        color: '#3399cc'
+      },
+      modal: {
+        ondismiss: function () {
+          setLoading(false);
+        }
+      }
+    };
+
+    try {
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      setLoading(false);
+      setError('Payment failed. Please try again.');
+      console.error('Payment Error:', error);
+    }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-4">Payment Process</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">
-            Card Number
-          </label>
-          <input
-            type="text"
-            id="cardNumber"
-            name="cardNumber"
-            value={paymentDetails.cardNumber}
-            onChange={handleChange}
-            className="mt-1 block w-full border-gray-300 rounded-md"
-            placeholder="1234 5678 9012 3456"
-            required
-          />
+    <div className='p-6 max-w-md mx-auto bg-white shadow-lg rounded-lg'>
+      <h2 className='text-2xl font-bold mb-4 text-gray-700'>Student Registration</h2>
+      <p className='mb-6 text-gray-600'>Please complete the payment of ₹99 to complete your registration.</p>
+      {error && <div className='text-red-500 mb-4'>{error}</div>}
+      {paymentId && (
+        <div className='bg-green-100 text-green-800 p-4 rounded-md mb-4'>
+          Payment Successful! Your Payment ID is: <strong>{paymentId}</strong>
         </div>
-        <div className="mb-4 flex space-x-4">
-          <div className="flex-1">
-            <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">
-              Expiry Date
-            </label>
-            <input
-              type="text"
-              id="expiryDate"
-              name="expiryDate"
-              value={paymentDetails.expiryDate}
-              onChange={handleChange}
-              className="mt-1 block w-full border-gray-300 rounded-md"
-              placeholder="MM/YY"
-              required
-            />
-          </div>
-          <div className="flex-1">
-            <label htmlFor="cvv" className="block text-sm font-medium text-gray-700">
-              CVV
-            </label>
-            <input
-              type="text"
-              id="cvv"
-              name="cvv"
-              value={paymentDetails.cvv}
-              onChange={handleChange}
-              className="mt-1 block w-full border-gray-300 rounded-md"
-              placeholder="123"
-              required
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Submit Payment
-        </button>
-      </form>
+      )}
+      <button
+        onClick={handlePayment}
+        className={`bg-blue-500 text-white px-6 py-3 rounded-md font-semibold transition-transform transform ${loading ? 'cursor-wait' : 'hover:scale-105'}`}
+        disabled={loading}
+      >
+        {loading ? 'Processing...' : 'Pay ₹99 with Razorpay'}
+      </button>
     </div>
   );
 };
