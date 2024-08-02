@@ -11,6 +11,7 @@ import PrivateDashboard from "./pages/Developers/PrivateDashboard";
 import AdminEntryForm from "./pages/Developers/AdminEntryForm";
 import './index.css';
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import ExamWindow from "./pages/Exam_Section/ExamWindow";
 
 function App() {
 
@@ -19,7 +20,7 @@ function App() {
   return (
     <BrowserRouter>
       {/* Header component */}
-      <Header />
+      {/* <Header /> */}
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/about' element={<About />} />
@@ -35,6 +36,7 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path='/profile' element={<Profile />} />
           <Route path='/registration-form' element={<RegistrationForm />} />
+          <Route path='/exam-section' element={<ExamWindow />} />
         </Route>
 
       </Routes>

@@ -23,86 +23,21 @@ const PastQualification = () => {
             gap: '',
         }
     ]);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
-    const validate = () => {
-        let errorMsg = '';
-        qualifications.forEach(qualification => {
-            const fieldsWithDigitsAllowed = [
-                'qualificationLevel', 'admissionYear', 'passingYear', 'result',
-                'percentage', 'attempts', 'gap'
-            ];
-            const characterFields = [
-                'stream', 'instituteState', 'district', 'taluka', 'schoolName',
-                'course', 'boardUniversity', 'mode'
-            ];
-
-            // Check fields with digits allowed
-            fieldsWithDigitsAllowed.forEach(field => {
-                if (qualification[field].trim() === '') {
-                    errorMsg = 'Please fill all details';
-                }
-            });
-
-            // Check character-only fields
-            characterFields.forEach(field => {
-                if (qualification[field].trim() === '' || !/^[a-zA-Z\s]*$/.test(qualification[field])) {
-                    errorMsg = 'Please fill all details correctly';
-                }
-            });
-
-            if (errorMsg) return false; // Stop further checks if there's already an error
-        });
-
-        if (errorMsg) {
-            setError(errorMsg);
-            setSuccess('');
-            setTimeout(() => setError(''), 3000); // Clear error after 3 seconds
-            return false;
-        }
-        return true;
-    };
-
-    const canAddQualification = () => {
-        // Check if all fields in the current qualifications are filled
-        return qualifications.every(qualification => {
-            const fieldsWithDigitsAllowed = [
-                'qualificationLevel', 'admissionYear', 'passingYear', 'result',
-                'percentage', 'attempts', 'gap'
-            ];
-            const characterFields = [
-                'stream', 'instituteState', 'district', 'taluka', 'schoolName',
-                'course', 'boardUniversity', 'mode'
-            ];
-
-            const allFieldsFilled = fieldsWithDigitsAllowed.every(field => qualification[field].trim() !== '') &&
-                characterFields.every(field => qualification[field].trim() !== '' && /^[a-zA-Z\s]*$/.test(qualification[field]));
-
-            return allFieldsFilled;
-        });
-    };
-
+    // Function to handle changes in input fields
     const handleChange = (e, id) => {
         const { name, value } = e.target;
         const updatedQualifications = qualifications.map(qual => {
             if (qual.id === id) {
-                // Validate input based on field name
-                if ([
-                    'qualificationLevel', 'admissionYear', 'passingYear', 'result',
-                    'percentage', 'attempts', 'gap'
-                ].includes(name) || /^[a-zA-Z\s]*$/.test(value)) {
-                    return { ...qual, [name]: value };
-                }
-                return qual;
+                return { ...qual, [name]: value };
             }
             return qual;
         });
         setQualifications(updatedQualifications);
     };
 
+    // Function to add a new qualification entry
     const handleAddQualification = () => {
-        if (!validate()) return;
         const newId = qualifications.length + 1;
         const newQualification = {
             id: newId,
@@ -127,75 +62,62 @@ const PastQualification = () => {
         setQualifications([...qualifications, newQualification]);
     };
 
+    // Function to remove a qualification entry
     const handleRemoveQualification = (id) => {
         const updatedQualifications = qualifications.filter(qual => qual.id !== id);
         setQualifications(updatedQualifications);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (validate()) {
-            setSuccess('Form submitted successfully!');
-            setError('');
-            // Add form submission logic here
-        } else {
-            setSuccess('');
-        }
-    };
-
     return (
-        <div    className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-5">
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h2 className="text-xl font-bold mb-2">Past Qualifications</h2>
-            {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                    <strong className="font-bold">Validation Error:</strong>
-                    <span className="block sm:inline">{error}</span>
-                </div>
-            )}
-            {success && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                    <strong className="font-bold">Success:</strong>
-                    <span className="block sm:inline">{success}</span>
-                </div>
-            )}
             <hr className="mb-4" />
 
             {qualifications.map(qualification => (
                 <div key={qualification.id} className="mb-6">
                     <h3 className="text-lg font-bold mb-2">Qualification {qualification.id}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Add form fields here */}
-                      
+                        <div>
+                            <label htmlFor={`qualificationLevel-${qualification.id}`} className="block text-sm font-medium text-gray-700">
+                                Qualification Level
+                            </label>
+                            <input
+                                id={`qualificationLevel-${qualification.id}`}
+                                name={`qualificationLevel-${qualification.id}`}
+                                type="text"
+                                value={qualification.qualificationLevel}
+                                onChange={(e) => handleChange(e, qualification.id)}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Qualification Level"
+                            />
+                        </div>
                         <div>
                             <label htmlFor={`stream-${qualification.id}`} className="block text-sm font-medium text-gray-700">
                                 Stream
                             </label>
                             <input
                                 id={`stream-${qualification.id}`}
-                                name="stream"
+                                name={`stream-${qualification.id}`}
                                 type="text"
                                 value={qualification.stream}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Stream"
                             />
                         </div>
-                        {/* Add remaining fields similarly */}
                         <div>
                             <label htmlFor={`completed-${qualification.id}`} className="block text-sm font-medium text-gray-700">
                                 Completed
                             </label>
-                            <select
+                            <input
                                 id={`completed-${qualification.id}`}
-                                name="completed"
+                                name={`completed-${qualification.id}`}
+                                type="text"
                                 value={qualification.completed}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
-                            >
-                                <option value="">Select</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Completed Status"
+                            />
                         </div>
                         <div>
                             <label htmlFor={`instituteState-${qualification.id}`} className="block text-sm font-medium text-gray-700">
@@ -203,11 +125,11 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`instituteState-${qualification.id}`}
-                                name="instituteState"
+                                name={`instituteState-${qualification.id}`}
                                 type="text"
                                 value={qualification.instituteState}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Institute State"
                             />
                         </div>
@@ -217,26 +139,39 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`district-${qualification.id}`}
-                                name="district"
+                                name={`district-${qualification.id}`}
                                 type="text"
                                 value={qualification.district}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter District"
                             />
                         </div>
-                       
+                        <div>
+                            <label htmlFor={`taluka-${qualification.id}`} className="block text-sm font-medium text-gray-700">
+                                Taluka
+                            </label>
+                            <input
+                                id={`taluka-${qualification.id}`}
+                                name={`taluka-${qualification.id}`}
+                                type="text"
+                                value={qualification.taluka}
+                                onChange={(e) => handleChange(e, qualification.id)}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Taluka"
+                            />
+                        </div>
                         <div>
                             <label htmlFor={`schoolName-${qualification.id}`} className="block text-sm font-medium text-gray-700">
                                 School Name
                             </label>
                             <input
                                 id={`schoolName-${qualification.id}`}
-                                name="schoolName"
+                                name={`schoolName-${qualification.id}`}
                                 type="text"
                                 value={qualification.schoolName}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter School Name"
                             />
                         </div>
@@ -246,11 +181,11 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`course-${qualification.id}`}
-                                name="course"
+                                name={`course-${qualification.id}`}
                                 type="text"
                                 value={qualification.course}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Course"
                             />
                         </div>
@@ -260,26 +195,39 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`boardUniversity-${qualification.id}`}
-                                name="boardUniversity"
+                                name={`boardUniversity-${qualification.id}`}
                                 type="text"
                                 value={qualification.boardUniversity}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Board/University"
                             />
                         </div>
-                       
+                        <div>
+                            <label htmlFor={`mode-${qualification.id}`} className="block text-sm font-medium text-gray-700">
+                                Mode
+                            </label>
+                            <input
+                                id={`mode-${qualification.id}`}
+                                name={`mode-${qualification.id}`}
+                                type="text"
+                                value={qualification.mode}
+                                onChange={(e) => handleChange(e, qualification.id)}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Mode"
+                            />
+                        </div>
                         <div>
                             <label htmlFor={`admissionYear-${qualification.id}`} className="block text-sm font-medium text-gray-700">
                                 Admission Year
                             </label>
                             <input
                                 id={`admissionYear-${qualification.id}`}
-                                name="admissionYear"
+                                name={`admissionYear-${qualification.id}`}
                                 type="text"
                                 value={qualification.admissionYear}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Admission Year"
                             />
                         </div>
@@ -289,26 +237,39 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`passingYear-${qualification.id}`}
-                                name="passingYear"
+                                name={`passingYear-${qualification.id}`}
                                 type="text"
                                 value={qualification.passingYear}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Passing Year"
                             />
                         </div>
-                      
+                        <div>
+                            <label htmlFor={`result-${qualification.id}`} className="block text-sm font-medium text-gray-700">
+                                Result
+                            </label>
+                            <input
+                                id={`result-${qualification.id}`}
+                                name={`result-${qualification.id}`}
+                                type="text"
+                                value={qualification.result}
+                                onChange={(e) => handleChange(e, qualification.id)}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Result"
+                            />
+                        </div>
                         <div>
                             <label htmlFor={`percentage-${qualification.id}`} className="block text-sm font-medium text-gray-700">
                                 Percentage
                             </label>
                             <input
                                 id={`percentage-${qualification.id}`}
-                                name="percentage"
+                                name={`percentage-${qualification.id}`}
                                 type="text"
                                 value={qualification.percentage}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Percentage"
                             />
                         </div>
@@ -318,26 +279,12 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`attempts-${qualification.id}`}
-                                name="attempts"
+                                name={`attempts-${qualification.id}`}
                                 type="text"
                                 value={qualification.attempts}
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter Attempts"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor={`gap-${qualification.id}`} className="block text-sm font-medium text-gray-700">
-                                Gap
-                            </label>
-                            <input
-                                id={`gap-${qualification.id}`}
-                                name="gap"
-                                type="text"
-                                value={qualification.gap}
-                                onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
-                                placeholder="Enter Gap"
                             />
                         </div>
                         <div>
@@ -346,42 +293,50 @@ const PastQualification = () => {
                             </label>
                             <input
                                 id={`uploadMarksheet-${qualification.id}`}
-                                name="uploadMarksheet"
+                                name={`uploadMarksheet-${qualification.id}`}
                                 type="file"
+                                accept=".pdf,.jpg,.png"
                                 onChange={(e) => handleChange(e, qualification.id)}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor={`gap-${qualification.id}`} className="block text-sm font-medium text-gray-700">
+                                Gap in Study
+                            </label>
+                            <input
+                                id={`gap-${qualification.id}`}
+                                name={`gap-${qualification.id}`}
+                                type="text"
+                                value={qualification.gap}
+                                onChange={(e) => handleChange(e, qualification.id)}
+                                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500 sm:text-sm"
+                                placeholder="Enter Gap in Study"
                             />
                         </div>
                     </div>
-                    <div className="flex justify-between mt-4">
+
+                    {/* Delete button */}
+                    <div className="mt-4 flex justify-end">
                         <button
-                            type="button"
                             onClick={() => handleRemoveQualification(qualification.id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:bg-red-500"
                         >
-                            Remove Qualification
+                            Delete
                         </button>
-                        {qualifications.length < 5 && (
-                            <button
-                                type="button"
-                                onClick={handleAddQualification}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                                disabled={!canAddQualification()}
-                            >
-                                Add Another Qualification
-                            </button>
-                        )}
                     </div>
                 </div>
             ))}
 
-            <button
-                type="submit"
-                onClick={handleSubmit}
-                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-            >
-                Submit
-            </button>
+            {/* Add button */}
+            <div className="mt-6 flex justify-end">
+                <button
+                    onClick={handleAddQualification}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-500 focus:outline-none focus:bg-green-500"
+                >
+                    Add Qualification
+                </button>
+            </div>
         </div>
     );
 };
