@@ -17,7 +17,7 @@ const RegistrationForm = () => {
     const handleNext = () => {
         switch (currentSection) {
             case 'personal':
-                setCurrentSection('address');
+                setCurrentSection('other');
                 break;
             // case 'address':
             //     setCurrentSection('other');

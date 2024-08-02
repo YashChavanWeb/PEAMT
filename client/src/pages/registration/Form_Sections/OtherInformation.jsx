@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const CombinedForm = ({ handleNext }) => {
+const OtherInformation = ({ handleNext }) => {
   const [formData, setFormData] = useState({
     // Permanent Address
     permanentAddress: {
@@ -93,6 +93,19 @@ const CombinedForm = ({ handleNext }) => {
       );
     }
   }, [formData.permanentAddress.state]);
+
+  useEffect(() => {
+    // Load data from local storage when component mounts
+    const storedData = localStorage.getItem("otherInformation");
+    if (storedData) {
+      setFormData(JSON.parse(storedData));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save formData to local storage whenever it changes
+    localStorage.setItem("otherInformation", JSON.stringify(formData));
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -490,4 +503,4 @@ const CombinedForm = ({ handleNext }) => {
   );
 };
 
-export default CombinedForm;
+export default OtherInformation;

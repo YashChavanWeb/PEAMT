@@ -51,15 +51,15 @@ function ExamWindow() {
     const selectedOption = responses[selectedQuestionIndex];
 
     return (
-        <div className="flex h-screen mt-10">
-            <div className="w-1/4 p-4 bg-gray-100">
+        <div className="flex mt-10 p-10" style={{ height: '80vh' }}> {/* Set fixed height */}
+            <div className="w-1/4 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
                 <ExamQuestions
                     questions={questions}
                     onQuestionSelect={handleQuestionSelect}
                     selectedIndex={selectedQuestionIndex}
                 />
             </div>
-            <div className="w-3/4 p-4">
+            <div className="w-3/4 p-2" style={{ height: '100%', overflowY: 'auto' }}>
                 <QuestionsDisplay
                     question={currentQuestion}
                     selectedOption={selectedOption}

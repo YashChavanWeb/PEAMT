@@ -10,10 +10,10 @@ function QuestionsDisplay({ question, selectedOption, onSave, onPrevious, onNext
     }
 
     return (
-        <div className="flex flex-col h-full p-0 bg-white rounded-lg shadow-md">
-            <h3 className="text-2xl font-semibold mb-4">Question {question.number + 1}</h3>
-            <p className="text-lg mb-4">{question.text}</p>
-            <div className="space-y-2 mb-4">
+        <div className="flex flex-col h-full  p-0 bg-white rounded-lg shadow-md">
+            <h3 className=" ml-10  text-2xl font-semibold mb-4">Question {question.number + 1}</h3>
+            <p className=" ml-10  text-lg mb-4">{question.text}</p>
+            <div className="space-y-2 ml-10 mb-4">
                 {question.options.map((option, index) => (
                     <div key={index} className="flex items-center space-x-2">
                         <input
