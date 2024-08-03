@@ -10,6 +10,8 @@ import RegistrationForm from "./pages/registration/RegistrationForm";
 import PrivateDashboard from "./pages/Developers/PrivateDashboard";
 import AdminEntryForm from "./pages/Developers/AdminEntryForm";
 import './index.css';
+import 'intersection-observer';
+
 
 function App() {
 
