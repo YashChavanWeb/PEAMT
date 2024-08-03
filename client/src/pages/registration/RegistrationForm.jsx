@@ -25,6 +25,7 @@ function RegistrationForm() {
     const [paymentId, setPaymentId] = useState(null);
     const [paymentSuccessful, setPaymentSuccessful] = useState(false);
 
+
     const handlePayment = () => {
         setLoading(true);
         setError(null);
@@ -159,14 +160,26 @@ function RegistrationForm() {
             return;
         }
 
+        if (!formData.name || !formData.adhar || !formData.email || !formData.phone || !formData.permanentAddress.country || !formData.permanentAddress.state || !formData.permanentAddress.city || !formData.permanentAddress.pincode) {
+            alert('Please fill all the required fields.');
+            return;
+        }
+
+        const submissionData = {
+            ...formData,
+            paymentId
+        };
+
         try {
-            await axios.post('/api/register', formData);
-            alert('Form submitted successfully!');
+            const response = await axios.post('/api/regform', submissionData);
+            alert('Form submitted successfully');
+            // Optionally, clear the form or redirect the user
         } catch (error) {
             console.error('Error submitting form:', error);
-            alert('There was an error submitting the form. Please try again.');
+            alert('Error submitting form. Please try again.');
         }
     };
+
 
 
     return (
