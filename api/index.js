@@ -8,7 +8,7 @@ import countryRoutes from './routes/countryRoutes.js'
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import formRoutes from './routes/form.route.js';
-import paymentRoutes from './routes/paymentRoutes.js';
+import regformRoutes from './routes/regform.route.js';  // Updated import
 
 dotenv.config();
 
@@ -32,7 +32,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/form', formRoutes);
 app.use('/api', countryRoutes);
-app.use('/api/payment', paymentRoutes);
+app.use('/api/regform', regformRoutes); // Updated route
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
