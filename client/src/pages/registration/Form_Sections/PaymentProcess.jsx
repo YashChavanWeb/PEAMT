@@ -1,6 +1,3 @@
-// this part is done
-
-
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -9,6 +6,10 @@ const PaymentProcess = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [paymentId, setPaymentId] = useState(null); // State to store the payment ID
+  const [paymentCompleted, setPaymentCompleted] = useState(false); // State to track payment completion
+
+  // Debug log to check currentUser
+  console.log('Current User:', currentUser);
 
   const handlePayment = () => {
     setLoading(true);
@@ -22,14 +23,14 @@ const PaymentProcess = () => {
       description: 'Student Registration Payment',
       handler: function (response) {
         setLoading(false);
-        console.log('Payment Response:', response);
         setPaymentId(response.razorpay_payment_id); // Store the payment ID
+        setPaymentCompleted(true); // Update payment status
         alert('Payment Successful');
       },
       prefill: {
-        name: currentUser.name || 'User Name',
-        email: currentUser.email || 'user@example.com',
-        contact: currentUser.contact || '0000000000',
+        name: currentUser?.name || 'User Name',
+        email: currentUser?.email || 'user@example.com',
+        contact: currentUser?.contact || '0000000000',
       },
       theme: {
         color: '#3399cc'
@@ -59,14 +60,16 @@ const PaymentProcess = () => {
       {paymentId && (
         <div className='bg-green-100 text-green-800 p-4 rounded-md mb-4'>
           Payment Successful! Your Payment ID is: <strong>{paymentId}</strong>
+          <br />
+          <strong>Email:</strong> {currentUser?.email || 'Not available'}
         </div>
       )}
       <button
         onClick={handlePayment}
-        className={`bg-blue-500 text-white px-6 py-3 rounded-md font-semibold transition-transform transform ${loading ? 'cursor-wait' : 'hover:scale-105'}`}
-        disabled={loading}
+        className={`bg-blue-500 text-white px-6 py-3 rounded-md font-semibold transition-transform transform ${loading ? 'cursor-wait' : 'hover:scale-105'} ${paymentCompleted ? 'cursor-not-allowed opacity-50' : ''}`}
+        disabled={loading || paymentCompleted}
       >
-        {loading ? 'Processing...' : 'Pay ₹99 with Razorpay'}
+        {loading ? 'Processing...' : paymentCompleted ? 'Payment Completed' : 'Pay ₹99 with Razorpay'}
       </button>
     </div>
   );

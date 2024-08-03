@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 const PersonalDetails = ({ handleNext }) => {
     const [formData, setFormData] = useState({
@@ -11,20 +12,6 @@ const PersonalDetails = ({ handleNext }) => {
         gender: '',
         religion: '',
         casteCategory: '',
-        isDomicile: false,
-        haveCertificate: false,
-        relationshipType: '',
-        certificateNo: '',
-        applicantName: '',
-        authority: '',
-        certificatePdf: '',
-        workingOrStudent: '',
-        disabled: false,
-        adharLinkedWithBank: false,
-        phoneLinkedWithBank: false,
-        bankAccNo: '',
-        ifsCode: '',
-        branch: '',
     });
 
     useEffect(() => {
@@ -35,10 +22,18 @@ const PersonalDetails = ({ handleNext }) => {
         }
     }, []);
 
-    const handleNextClick = () => {
-        // Save form data to local storage without validation
+    const handleNextClick = async () => {
+        // Save form data to local storage
         localStorage.setItem('personalDetails', JSON.stringify(formData));
-        handleNext(); // Move to the next section
+
+        try {
+            // Save form data to the database
+            await axios.post('/api/regform', formData);
+            handleNext(); // Move to the next section
+        } catch (error) {
+            console.error('Error saving form data:', error);
+            // Optionally, show an error message to the user
+        }
     };
 
     const formatAadharNumber = (value) => {
