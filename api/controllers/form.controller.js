@@ -1,17 +1,22 @@
 import Admin from '../models/admin.model.js';
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs'; // For password hashing
 
 // Submit form function
 export const submitForm = async (req, res) => {
     try {
-        const { college, exam, email, phone, description } = req.body;
+        const { college, exam, email, phone, description, password } = req.body;
+
+        // Hash the password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newAdmin = new Admin({
             college,
             exam,
             email,
             phone,
-            description
+            description,
+            password: hashedPassword
         });
 
         await newAdmin.save();
@@ -47,16 +52,17 @@ export const getAdminById = async (req, res, next) => {
 
 export const updateAdmin = async (req, res, next) => {
     const { id } = req.params;
-    const { college, exam, email, phone, description } = req.body;
+    const { college, exam, email, phone, description, password } = req.body;
 
     try {
-        const updatedAdmin = await Admin.findByIdAndUpdate(id, {
-            college,
-            exam,
-            email,
-            phone,
-            description
-        }, { new: true });
+        const updateData = { college, exam, email, phone, description };
+
+        // Hash the new password if provided
+        if (password) {
+            updateData.password = await bcrypt.hash(password, 10);
+        }
+
+        const updatedAdmin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!updatedAdmin) {
             return res.status(404).json({ success: false, message: 'Admin not found' });

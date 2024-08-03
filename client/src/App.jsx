@@ -9,9 +9,12 @@ import PrivateRoute from "./components/PrivateRoute";
 import RegistrationForm from "./pages/registration/RegistrationForm";
 import PrivateDashboard from "./pages/Developers/PrivateDashboard";
 import AdminEntryForm from "./pages/Developers/AdminEntryForm";
-import './index.css';
-import 'intersection-observer';
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import StartPage from './pages/Exam_Section/StartPage';
+import ExamWindow from "./pages/Exam_Section/ExamWindow";
+import SubmitConfirmation from "./pages/Exam_Section/SubmitConfirmation";
 
+import './index.css';
 
 function App() {
 
@@ -26,6 +29,7 @@ function App() {
         <Route path='/about' element={<About />} />
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
+        <Route path='/admin-dashboard' element={<AdminDashboard />} />
 
 
         <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
@@ -35,6 +39,9 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path='/profile' element={<Profile />} />
           <Route path='/registration-form' element={<RegistrationForm />} />
+          <Route path="/start" element={<StartPage />} />
+          <Route path='/exam-section' element={<ExamWindow />} />
+          <Route path='/submit-confirmation' element={<SubmitConfirmation/>}/>
         </Route>
 
       </Routes>

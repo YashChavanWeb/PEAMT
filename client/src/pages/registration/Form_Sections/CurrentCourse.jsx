@@ -8,27 +8,36 @@ const CurrentCourse = ({ handleNext }) => {
         instituteState: '',
         instituteDistrict: '',
         instituteTaluka: '',
-        qualificationLevel: '',
         stream: '',
         collegeName: '',
         courseName: '',
-        admissionType: '',
         marksDetails: '',
         yearOfStudy: '',
-        studyStatus: '',
         gapInStudy: '',
-        studyMode: ''
     });
 
     const [errors, setErrors] = useState({});
     const [showError, setShowError] = useState(false);
 
+    // Load form data from local storage when component mounts
+    useEffect(() => {
+        const savedData = localStorage.getItem('currentCourseFormData');
+        if (savedData) {
+            setFormData(JSON.parse(savedData));
+        }
+    }, []);
+
+    // Save form data to local storage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('currentCourseFormData', JSON.stringify(formData));
+    }, [formData]);
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         // Handle character-only validation for specific fields
         if ((name === 'instituteState' || name === 'instituteDistrict' || name === 'instituteTaluka' ||
-             name === 'stream' || name === 'collegeName' || name === 'courseName' ||
-             name === 'admissionType' || name === 'studyStatus' || name === 'studyMode') &&
+            name === 'stream' || name === 'collegeName' || name === 'courseName' ||
+            name === 'admissionType' || name === 'studyStatus' || name === 'studyMode') &&
             !/^[a-zA-Z\s]*$/.test(value) && value !== '') {
             return; // Ignore invalid input
         }
@@ -42,9 +51,7 @@ const CurrentCourse = ({ handleNext }) => {
     const validateForm = () => {
         const newErrors = {};
         const requiredFields = [
-            'admissionYear', 'instituteState', 'instituteDistrict', 'instituteTaluka',
-            'qualificationLevel', 'stream', 'collegeName', 'courseName',
-            'admissionType', 'marksDetails', 'yearOfStudy', 'studyStatus', 'gapInStudy', 'studyMode'
+            'admissionYear', 'instituteState', 'instituteDistrict', 'instituteTaluka', 'stream', 'collegeName', 'courseName', 'marksDetails', 'yearOfStudy', 'gapInStudy'
         ];
 
         requiredFields.forEach(field => {
@@ -70,10 +77,8 @@ const CurrentCourse = ({ handleNext }) => {
         }
     };
 
-    // className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto"
-
     return (
-        <div    className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-5">
+        <div className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto mt-5">
             <h2 className="text-xl font-bold mb-2">Current Course Details</h2>
             <hr className="mb-4" />
 
@@ -110,7 +115,7 @@ const CurrentCourse = ({ handleNext }) => {
                                 rows="3"
                                 value={formData.jobDetails}
                                 onChange={handleChange}
-                               className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                                 placeholder="Enter Job Details"
                             ></textarea>
                         </div>
@@ -132,7 +137,7 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.admissionYear}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Admission Year"
                         />
                     </div>
@@ -147,7 +152,7 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.instituteState}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Institute State"
                         />
                     </div>
@@ -162,11 +167,10 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.instituteDistrict}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Institute District"
                         />
                     </div>
-                   
                     <div>
                         <label htmlFor="instituteTaluka" className="block text-sm font-medium text-gray-700">
                             Institute Taluka
@@ -178,12 +182,10 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.instituteTaluka}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Institute Taluka"
                         />
                     </div>
-                   
-                   
                     <div>
                         <label htmlFor="stream" className="block text-sm font-medium text-gray-700">
                             Stream
@@ -195,7 +197,7 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.stream}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Stream"
                         />
                     </div>
@@ -210,7 +212,7 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.collegeName}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter College / School Name"
                         />
                     </div>
@@ -225,11 +227,10 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.courseName}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Course Name"
                         />
                     </div>
-                   
                     <div>
                         <label htmlFor="marksDetails" className="block text-sm font-medium text-gray-700">
                             Marks Details
@@ -241,7 +242,7 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.marksDetails}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Marks Details"
                         />
                     </div>
@@ -256,11 +257,10 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.yearOfStudy}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Year of Study"
                         />
                     </div>
-                   
                     <div>
                         <label htmlFor="gapInStudy" className="block text-sm font-medium text-gray-700">
                             Gap in Study
@@ -272,11 +272,10 @@ const CurrentCourse = ({ handleNext }) => {
                             autoComplete="off"
                             value={formData.gapInStudy}
                             onChange={handleChange}
-                           className={"mt-1 block w-full px-3 py-2 border rounded-md shadow-sm  'border-gray-400' focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"}
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                             placeholder="Enter Gap in Study"
                         />
                     </div>
-                   
                 </div>
             </div>
 

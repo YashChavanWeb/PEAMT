@@ -25,6 +25,7 @@ export default function Profile() {
             handleFileUpload(image);
         }
     }, [image]);
+
     const handleFileUpload = async (image) => {
         const storage = getStorage(app);
         const fileName = new Date().getTime() + image.name;
@@ -47,6 +48,7 @@ export default function Profile() {
             }
         );
     };
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
@@ -74,7 +76,6 @@ export default function Profile() {
         }
     };
 
-
     const handleDeleteAccount = async () => {
         try {
             dispatch(deleteUserStart());
@@ -98,47 +99,47 @@ export default function Profile() {
             dispatch(signOut())
         } catch (error) {
             console.log(error);
-            
         }
     };
+
     return (
-        <div className='p-3 max-w-lg mx-auto'>
-            <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
-            <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-                <input
-                    type='file'
-                    ref={fileRef}
-                    hidden
-                    accept='image/*'
-                    onChange={(e) => setImage(e.target.files[0])}
-                />
-
-
-                <img
-                    src={formData.profilePicture || currentUser.profilePicture}
-                    alt='profile'
-                    className='h-24 w-24 self-center cursor-pointer rounded-full object-cover mt-2'
-                    onClick={() => fileRef.current.click()}
-                />
-                <p className='text-sm self-center'>
-                    {imageError ? (
-                        <span className='text-red-700'>
-                            Error uploading image (file size must be less than 2 MB)
-                        </span>
-                    ) : imagePercent > 0 && imagePercent < 100 ? (
-                        <span className='text-slate-700'>{`Uploading: ${imagePercent} %`}</span>
-                    ) : imagePercent === 100 ? (
-                        <span className='text-green-700'>Image uploaded successfully</span>
-                    ) : (
-                        ''
-                    )}
-                </p>
+        <div className='p-6 max-w-md mx-auto bg-white shadow-lg rounded-lg'>
+            <h1 className='text-3xl font-semibold text-center mb-8'>Profile</h1>
+            <form onSubmit={handleSubmit} className='space-y-6'>
+                <div className='relative'>
+                    <input
+                        type='file'
+                        ref={fileRef}
+                        hidden
+                        accept='image/*'
+                        onChange={(e) => setImage(e.target.files[0])}
+                    />
+                    <img
+                        src={formData.profilePicture || currentUser.profilePicture}
+                        alt='profile'
+                        className='h-32 w-32 mx-auto rounded-full border-4 border-gray-300 object-cover cursor-pointer hover:border-gray-500 transition-all'
+                        onClick={() => fileRef.current.click()}
+                    />
+                    <p className='text-center mt-2'>
+                        {imageError ? (
+                            <span className='text-red-600'>
+                                Error uploading image (file size must be less than 2 MB)
+                            </span>
+                        ) : imagePercent > 0 && imagePercent < 100 ? (
+                            <span className='text-gray-600'>{`Uploading: ${imagePercent}%`}</span>
+                        ) : imagePercent === 100 ? (
+                            <span className='text-green-600'>Image uploaded successfully</span>
+                        ) : (
+                            ''
+                        )}
+                    </p>
+                </div>
                 <input
                     defaultValue={currentUser.username}
                     type='text'
                     id='username'
                     placeholder='Username'
-                    className='bg-slate-100 rounded-lg p-3'
+                    className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                     onChange={handleChange}
                 />
                 <input
@@ -146,36 +147,39 @@ export default function Profile() {
                     type='email'
                     id='email'
                     placeholder='Email'
-                    className='bg-slate-100 rounded-lg p-3'
+                    className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                     onChange={handleChange}
                 />
                 <input
                     type='password'
                     id='password'
                     placeholder='Password'
-                    className='bg-slate-100 rounded-lg p-3'
+                    className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                     onChange={handleChange}
                 />
-                <button className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>
+                <button 
+                    type='submit'
+                    className='w-full bg-blue-600 text-white p-3 rounded-lg uppercase hover:bg-blue-700 transition-colors disabled:opacity-80'
+                >
                     {loading ? 'Loading...' : 'Update'}
                 </button>
             </form>
-            <div className='flex justify-between mt-5'>
+            <div className='flex justify-between mt-6'>
                 <span
                     onClick={handleDeleteAccount}
-                    className='text-red-700 cursor-pointer'
+                    className='text-red-600 cursor-pointer hover:underline'
                 >
                     Delete Account
                 </span>
-                <span onClick={handleSignOut} className='text-red-700 cursor-pointer'>
+                <span 
+                    onClick={handleSignOut} 
+                    className='text-red-600 cursor-pointer hover:underline'
+                >
                     Sign out
                 </span>
             </div>
-            <p className='text-red-700 mt-5'>{error && 'Something went wrong!'}</p>
-            <p className='text-green-700 mt-5'>
-                {updateSuccess && 'User is updated successfully!'}
-            </p>
+            {error && <p className='text-red-600 mt-4 text-center'>{'Something went wrong!'}</p>}
+            {updateSuccess && <p className='text-green-600 mt-4 text-center'>{'User updated successfully!'}</p>}
         </div>
     );
-
-};
+}

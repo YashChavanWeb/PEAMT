@@ -21,24 +21,15 @@ export default function Header() {
                             <li>About</li>
                         </Link>
                     </button>
-                    <button className='button'>
+                    <button className='bg-sky-800 w-13 h-13 rounded-3xl p-1 hover:bg-cyan-600 hover:shadow-cyan-800/50 hover:font-bold transition transform hover:-translate-y-1 hover:scale-105'>
                         <Link to='/profile'>
                             {currentUser ? (
-                                <img src={currentUser.profilePicture} alt='profile' className='h-7 w-7 rounded-full object-cover' />
+                                <img src={currentUser.profilePicture} alt='profile' className='h-10 w-10 rounded-full object-cover' />
                             ) : (
                                 <li>Sign In</li>
                             )}
                         </Link>
                     </button>
-                    {/* <button className='button'>
-                        <Link to='/profile'>
-                            {currentUser ? (
-                                <img src={currentUser.profilePicture} alt='profile' className='h-7 w-7 rounded-full object-cover' />
-                            ) : (
-                                <li>Sign In</li>
-                            )}
-                        </Link>
-                    </button> */}
                 </ul>
             </div>
         </div>
