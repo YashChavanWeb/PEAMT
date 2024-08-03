@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
+<<<<<<< Updated upstream
 @tailwind utilities;
+=======
+@tailwind utilities;
+
+body {
+    @apply font-poppins
+}
+
+.button {
+    @apply bg-sky-800 w-40 shadow-lg text-white font-poppins p-3 rounded-3xl hover:bg-cyan-500 hover:shadow-cyan-800/50 hover:font-bold transition transform hover:-translate-y-1 hover:scale-105;
+}
+>>>>>>> Stashed changes
