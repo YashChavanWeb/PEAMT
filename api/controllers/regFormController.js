@@ -2,17 +2,45 @@ import RegForm from '../models/RegForm.js';
 
 export const createRegForm = async (req, res) => {
     try {
-        const { name, adhar, email, phone, permanentAddress, paymentId } = req.body;
+        const {
+            name,
+            adhar,
+            email,
+            phone,
+            fatherName,
+            motherName,
+            currentCourse,
+            subjects,
+            dateOfBirth,
+            gender,
+            nationality,
+            emergencyContact,
+            previousEducation,
+            permanentAddress,
+            paymentId
+        } = req.body;
 
-        if (!name || !adhar || !email || !phone || !permanentAddress || !paymentId) {
+        if (!name || !adhar || !email || !phone || !fatherName || !motherName || !currentCourse || !subjects || !dateOfBirth || !gender || !nationality || !emergencyContact || !previousEducation || !permanentAddress || !paymentId) {
             return res.status(400).json({ message: 'All fields are required' });
         }
+
+        // Ensure `subjects` is an array
+        const subjectsArray = Array.isArray(subjects) ? subjects : [];
 
         const newRegForm = new RegForm({
             name,
             adhar,
             email,
             phone,
+            fatherName,
+            motherName,
+            currentCourse,
+            subjects: subjectsArray,
+            dateOfBirth,
+            gender,
+            nationality,
+            emergencyContact,
+            previousEducation,
             permanentAddress,
             paymentId
         });
@@ -40,7 +68,14 @@ export const getRegFormById = async (req, res) => {
 export const updateRegForm = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedRegForm = await RegForm.findByIdAndUpdate(id, req.body, { new: true });
+        const updateData = req.body;
+
+        // Ensure `subjects` is an array if it exists in the updateData
+        if (updateData.subjects) {
+            updateData.subjects = Array.isArray(updateData.subjects) ? updateData.subjects : [];
+        }
+
+        const updatedRegForm = await RegForm.findByIdAndUpdate(id, updateData, { new: true });
         if (!updatedRegForm) {
             return res.status(404).json({ message: 'Form not found' });
         }

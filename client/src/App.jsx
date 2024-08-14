@@ -29,7 +29,7 @@ function App() {
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/admin-dashboard' element={<AdminDashboard />} />
 
-
+        {/* for owners */}
         <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
         <Route path={`/private-dashboard/${privatePassId}/admin-entry`} element={<AdminEntryForm />} />
 

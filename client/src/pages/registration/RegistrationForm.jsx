@@ -8,6 +8,18 @@ function RegistrationForm() {
         adhar: '',
         email: '',
         phone: '',
+        fatherName: '',
+        motherName: '',
+        currentCourse: '', // Existing field
+        subjects: [],     // Existing field (array for subjects)
+        dateOfBirth: '',  // New field
+        gender: '',       // New field
+        nationality: '',  // New field
+        emergencyContact: {
+            name: '',      // Emergency contact's name
+            phone: ''      // Emergency contact's phone number
+        },
+        previousEducation: '', // New field
         permanentAddress: {
             country: '',
             state: '',
@@ -15,6 +27,8 @@ function RegistrationForm() {
             pincode: ''
         }
     });
+
+
 
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
@@ -66,6 +80,32 @@ function RegistrationForm() {
             console.error('Payment Error:', error);
         }
     };
+
+
+    const handleSubjectChange = (e, index) => {
+        const newSubjects = [...formData.subjects];
+        newSubjects[index] = e.target.value;
+        setFormData((prevState) => ({
+            ...prevState,
+            subjects: newSubjects,
+        }));
+    };
+
+    const addSubject = () => {
+        setFormData((prevState) => ({
+            ...prevState,
+            subjects: [...prevState.subjects, '']
+        }));
+    };
+
+    const removeSubject = (index) => {
+        const newSubjects = formData.subjects.filter((_, i) => i !== index);
+        setFormData((prevState) => ({
+            ...prevState,
+            subjects: newSubjects,
+        }));
+    };
+
 
     const fetchCountries = async () => {
         try {
@@ -234,6 +274,31 @@ function RegistrationForm() {
                         required
                     />
                 </div>
+                <div>
+                    <label htmlFor="fatherName" className="block text-sm font-medium text-gray-700">Father Name</label>
+                    <input
+                        type="text"
+                        id="fatherName"
+                        name="fatherName" // Updated
+                        value={formData.fatherName} // Updated
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="motherName" className="block text-sm font-medium text-gray-700">Mother Name</label>
+                    <input
+                        type="text"
+                        id="motherName"
+                        name="motherName" // Updated
+                        value={formData.motherName} // Updated
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                </div>
+
                 {/* Permanent Address */}
                 <div className="mb-4">
                     <h3 className="text-lg font-bold mb-2">Permanent Address</h3>
@@ -322,6 +387,150 @@ function RegistrationForm() {
                         </div>
                     </div>
                 </div>
+
+
+
+                <div>
+                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                    <input
+                        type="date"
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        value={formData.dateOfBirth}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                </div>
+
+
+                <div>
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender</label>
+                    <select
+                        id="gender"
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    >
+                        <option value="" disabled>Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+
+                <div>
+                    <label htmlFor="nationality" className="block text-sm font-medium text-gray-700">Nationality</label>
+                    <input
+                        type="text"
+                        id="nationality"
+                        name="nationality"
+                        value={formData.nationality}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                </div>
+
+
+                <div>
+                    <label htmlFor="emergencyContact.name" className="block text-sm font-medium text-gray-700">Emergency Contact Name</label>
+                    <input
+                        type="text"
+                        id="emergencyContact.name"
+                        name="emergencyContact.name"
+                        value={formData.emergencyContact.name}
+                        onChange={handleAddressChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                </div>
+
+
+                <div>
+                    <label htmlFor="emergencyContact.phone" className="block text-sm font-medium text-gray-700">Emergency Contact Phone</label>
+                    <input
+                        type="text"
+                        id="emergencyContact.phone"
+                        name="emergencyContact.phone"
+                        value={formData.emergencyContact.phone}
+                        onChange={handleAddressChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                </div>
+
+
+                <div>
+                    <label htmlFor="previousEducation" className="block text-sm font-medium text-gray-700">Previous Education</label>
+                    <textarea
+                        id="previousEducation"
+                        name="previousEducation"
+                        value={formData.previousEducation}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        rows="3"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label
+                        htmlFor="currentCourse"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Current Course
+                    </label>
+                    <input
+                        id="currentCourse"
+                        name="currentCourse"
+                        type="text"
+                        value={formData.currentCourse}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                        required
+                    />
+                </div>
+
+
+                <div>
+                    <label
+                        htmlFor="subjects"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Subjects
+                    </label>
+                    {formData.subjects.map((subject, index) => (
+                        <div key={index} className="flex items-center space-x-2 mb-2">
+                            <input
+                                type="text"
+                                name="subjects"
+                                value={subject}
+                                onChange={(e) => handleSubjectChange(e, index)}
+                                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                                placeholder={`Subject ${index + 1}`}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => removeSubject(index)}
+                                className="bg-red-500 text-white px-3 py-1 rounded-md"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={addSubject}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    >
+                        Add Subject
+                    </button>
+                </div>
+
 
                 <div className='p-6 max-w-md mx-auto bg-white shadow-lg rounded-lg'>
                     <h2 className='text-2xl font-bold mb-4 text-gray-700'>Student Registration</h2>
