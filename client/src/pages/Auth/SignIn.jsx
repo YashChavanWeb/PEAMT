@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signInStart, signInFailure, signInSuccess } from '../../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import OAuth from '../../components/OAuth';
-// import pc from '../../assets/login.jpeg';
+import pc from '../../assets/login.jpeg';
 import '../../styles/pages/Signin.css';
 
 export default function SignIn() {

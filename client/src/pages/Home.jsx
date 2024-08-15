@@ -99,7 +99,7 @@ function Home() {
           <img src={veri} className='w-full' alt='Authentication and Verification' />
           <div>
             <h1 className='text-xl font-bold'>Authentication and Verification</h1>
-            <p className='text-lg'>At TestOps, we ensure exam integrity with our advanced registration and verification system. Our thorough authentication process confirms each candidate’s identity, preventing unauthorized access and ensuring a secure testing environment.</p>
+            <p className='text-lg'>At TestOps, we ensure exam integrity with our advanced registration and verification system. Our thorough authentication process confirms each candidate's identity, preventing unauthorized access and ensuring a secure testing environment.</p>
           </div>
         </div>
 

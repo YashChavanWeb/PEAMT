@@ -1,6 +1,7 @@
-// src/pages/Exam_Section/ExamWindow.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ExamQuestions from './ExamQuestions';
+import QuestionsDisplay from './QuestionsDisplay';
 
 function ExamWindow() {
     const [questions, setQuestions] = useState([]);
@@ -13,6 +14,7 @@ function ExamWindow() {
 
     useEffect(() => {
         const fetchData = async () => {
+            // Example demo data with 10 questions
             const demoQuestions = [
                 { number: 0, text: 'What is the capital of France?', options: ['Paris', 'London', 'Berlin', 'Madrid'] },
                 { number: 1, text: 'What is 2 + 2?', options: ['3', '4', '5', '6'] },
