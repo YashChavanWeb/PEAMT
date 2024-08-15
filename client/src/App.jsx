@@ -14,6 +14,7 @@ import StartPage from './pages/Exam_Section/StartPage';
 import ExamWindow from "./pages/Exam_Section/ExamWindow";
 import SubmitConfirmation from "./pages/Exam_Section/SubmitConfirmation";
 
+
 import './index.css';
 
 function App() {
@@ -30,18 +31,16 @@ function App() {
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/admin-dashboard' element={<AdminDashboard />} />
-
-
         <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
         <Route path={`/private-dashboard/${privatePassId}/admin-entry`} element={<AdminEntryForm />} />
-
 
         <Route element={<PrivateRoute />}>
           <Route path='/profile' element={<Profile />} />
           <Route path='/registration-form' element={<RegistrationForm />} />
           <Route path="/start" element={<StartPage />} />
           <Route path='/exam-section' element={<ExamWindow />} />
-          <Route path='/submit-confirmation' element={<SubmitConfirmation/>}/>
+          <Route path='/submit-confirmation' element={<SubmitConfirmation />} />
+        
         </Route>
 
       </Routes>
