@@ -52,7 +52,7 @@ export default function SignIn() {
     };
 
     return (
-        <section className='bg-gradient-to-r from-cyan-600 to-indigo-300 p-28' style={{ width: '100%', height: '100vh' }}>
+        <section className='bg-gradient-to-r from-cyan-600 to-indigo-300 p-10' style={{ width: '100%', height: '100vh' }}>
             <section className='signInBox flex row max-w-screen-lg mx-auto my-auto rounded-3xl bg-white'
                 data-aos="flip-left"
                 data-aos-easing="ease-out-cubic"
