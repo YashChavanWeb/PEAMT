@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ExamQuestions from './ExamQuestions';
-import QuestionsDisplay from './QuestionsDisplay';
+
 
 function ExamWindow() {
     const [questions, setQuestions] = useState([]);

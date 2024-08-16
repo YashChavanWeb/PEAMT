@@ -1,3 +1,4 @@
+// index.js
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -7,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import formRoutes from './routes/form.route.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import countryRoutes from './routes/countryRoutes.js';
+import examRoutes from './routes/examRoutes.js';
 
 dotenv.config();
 
@@ -23,19 +26,8 @@ const __dirname = path.resolve();
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, '/client/dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
-});
-
 app.use(express.json());
-
 app.use(cookieParser());
-
-app.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
 
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
@@ -43,8 +35,12 @@ app.use('/api/form', formRoutes);
 app.use('/api', countryRoutes);
 app.use('/api/payment', paymentRoutes);
 
+app.use('/api/exams', examRoutes);
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
 
 app.use((err, req, res, next) => {
@@ -55,4 +51,8 @@ app.use((err, req, res, next) => {
     message,
     statusCode,
   });
+});
+
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
 });

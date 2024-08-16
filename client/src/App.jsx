@@ -13,11 +13,12 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import StartPage from './pages/Exam_Section/StartPage';
 import ExamWindow from "./pages/Exam_Section/ExamWindow";
 import SubmitConfirmation from "./pages/Exam_Section/SubmitConfirmation";
+// import AdminDashboard
+
 
 
 import './index.css';
-import AdminDashboard from "./pages/Admin/AdminDashboard";
-import ExamWindow from "./pages/Exam_Section/ExamWindow";
+
 
 function App() {
 
