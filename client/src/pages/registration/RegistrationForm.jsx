@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import PopupModel from './PopupModel';
 
 function RegistrationForm() {
     const [formData, setFormData] = useState({
@@ -38,9 +39,52 @@ function RegistrationForm() {
     const [error, setError] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [paymentSuccessful, setPaymentSuccessful] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false); // State for modal
+    const [paymentCompleted, setPaymentCompleted] = useState(false); // New state for tracking payment status
+
+    useEffect(() => {
+        const checkPaymentStatus = async () => {
+            try {
+                // Check if a payment ID is present in localStorage
+                const storedPaymentId = localStorage.getItem('paymentId');
+                if (storedPaymentId) {
+                    setPaymentId(storedPaymentId);
+                    setPaymentCompleted(true); // Mark payment as completed
+                    return;
+                }
+
+                // Replace with your API endpoint to check payment status
+                const response = await axios.get(`/api/check-payment-status/${currentUser.id}`);
+                if (response.data.paymentCompleted) {
+                    localStorage.setItem('paymentId', response.data.paymentId);
+                    setPaymentId(response.data.paymentId);
+                    setPaymentCompleted(true);
+                }
+            } catch (error) {
+                console.error('Error fetching payment status:', error);
+            }
+        };
+
+        checkPaymentStatus();
+    }, [currentUser.id]);
+
+
+    useEffect(() => {
+        const storedFormData = localStorage.getItem('formData');
+        if (storedFormData) {
+            setFormData(JSON.parse(storedFormData));
+        }
+    }, []);
+
+
 
 
     const handlePayment = () => {
+        if (paymentCompleted) {
+            alert('Payment already completed.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
@@ -54,6 +98,8 @@ function RegistrationForm() {
                 setLoading(false);
                 setPaymentId(response.razorpay_payment_id);
                 setPaymentSuccessful(true);
+                setPaymentCompleted(true); // Mark payment as completed
+                localStorage.setItem('paymentId', response.razorpay_payment_id); // Store payment ID
                 alert('Payment Successful');
             },
             prefill: {
@@ -80,6 +126,8 @@ function RegistrationForm() {
             console.error('Payment Error:', error);
         }
     };
+
+
 
 
     const handleSubjectChange = (e, index) => {
@@ -165,40 +213,47 @@ function RegistrationForm() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
+        const updatedFormData = {
+            ...formData,
+            [name]: value
+        };
+        setFormData(updatedFormData);
+        localStorage.setItem('formData', JSON.stringify(updatedFormData));
     };
 
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
         const [key, subKey] = name.split('.');
 
+        let updatedFormData;
         if (subKey) {
-            setFormData((prevState) => ({
-                ...prevState,
+            updatedFormData = {
+                ...formData,
                 [key]: {
-                    ...prevState[key],
+                    ...formData[key],
                     [subKey]: value
                 }
-            }));
+            };
         } else {
-            setFormData((prevState) => ({
-                ...prevState,
+            updatedFormData = {
+                ...formData,
                 [key]: value
-            }));
+            };
         }
+
+        setFormData(updatedFormData);
+        localStorage.setItem('formData', JSON.stringify(updatedFormData));
     };
+
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!paymentSuccessful) {
-            alert('Please complete the payment before submitting the form.');
-            return;
-        }
+        // if (!paymentSuccessful) {
+        //     alert('Please complete the payment before submitting the form.');
+        //     return;
+        // }
 
         if (!formData.name || !formData.adhar || !formData.email || !formData.phone || !formData.permanentAddress.country || !formData.permanentAddress.state || !formData.permanentAddress.city || !formData.permanentAddress.pincode) {
             alert('Please fill all the required fields.');
@@ -212,8 +267,8 @@ function RegistrationForm() {
 
         try {
             const response = await axios.post('/api/regform', submissionData);
-            alert('Form submitted successfully');
-            // Optionally, clear the form or redirect the user
+            setModalOpen(true); // Open the modal
+            localStorage.removeItem('formData'); // Clear localStorage on successful submission
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Error submitting form. Please try again.');
@@ -223,7 +278,7 @@ function RegistrationForm() {
 
 
     return (
-        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md max-w-max">
             <h2 className="text-2xl font-bold mb-6">Registration Form</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -536,19 +591,26 @@ function RegistrationForm() {
                     <h2 className='text-2xl font-bold mb-4 text-gray-700'>Student Registration</h2>
                     <p className='mb-6 text-gray-600'>Please complete the payment of ₹99 to complete your registration.</p>
                     {error && <div className='text-red-500 mb-4'>{error}</div>}
-                    {paymentId && (
+                    {paymentSuccessful && (
                         <div className='bg-green-100 text-green-800 p-4 rounded-md mb-4'>
                             Payment Successful! Your Payment ID is: <strong>{paymentId}</strong>
                         </div>
                     )}
-                    <button
-                        onClick={handlePayment}
-                        className={`bg-blue-500 text-white px-6 py-3 rounded-md font-semibold transition-transform transform ${loading ? 'cursor-wait' : 'hover:scale-105'}`}
-                        disabled={loading}
-                    >
-                        {loading ? 'Processing...' : 'Pay ₹99 with Razorpay'}
-                    </button>
+                    {paymentCompleted ? (
+                        <div className='bg-gray-100 text-gray-600 p-4 rounded-md'>
+                            Payment has already been completed. Thank you!
+                        </div>
+                    ) : (
+                        <button
+                            onClick={handlePayment}
+                            className={`bg-blue-500 text-white px-6 py-3 rounded-md font-semibold transition-transform transform ${loading ? 'cursor-wait' : 'hover:scale-105'}`}
+                            disabled={loading}
+                        >
+                            {loading ? 'Processing...' : 'Pay ₹99 with Razorpay'}
+                        </button>
+                    )}
                 </div>
+
                 <button
                     type="submit"
                     className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -556,6 +618,12 @@ function RegistrationForm() {
                     Submit
                 </button>
             </form>
+            {/* Modal Component */}
+            <PopupModel
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                formData={formData} // Pass form data to the modal
+            />
         </div>
     );
 }

@@ -26,7 +26,7 @@ const AdminDashboard = () => {
 
     return (
         <div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo, porro corrupti. Odio asperiores labore debitis magnam fuga laudantium provident quos! Mollitia, aut esse. Inventore aspernatur minima eos distinctio ipsum enim exercitationem, similique nisi fuga, quaerat temporibus atque suscipit eligendi nulla vitae eveniet. Voluptas numquam magni aperiam dolorum nulla illo at veritatis quod voluptatibus assumenda possimus, earum quos? Natus ea vero explicabo dignissimos amet, earum voluptatem sunt necessitatibus! Porro atque ratione harum officia magni officiis sit eum nulla quia ab aliquam voluptatibus debitis excepturi est quidem eveniet, doloribus dolores aperiam explicabo commodi odit dicta consectetur architecto corrupti? Numquam blanditiis dicta aut!
+
             <h1>Fetch Registration Form by Aadhar</h1>
             <form onSubmit={handleSubmit}>
                 <label htmlFor="adhar">Aadhar Number:</label>

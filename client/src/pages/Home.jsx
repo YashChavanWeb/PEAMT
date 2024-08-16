@@ -9,7 +9,6 @@ import assessmentimg from '../assets/assessment.png';
 import assessment2img from '../assets/assessment2.png';
 import teacherLaptop from '../assets/teacher.png';
 import easyUseGuy from '../assets/guyonlaptop.png';
-import '../styles/pages/Home.css'
 
 function Home() {
   const [visible, setVisible] = useState([]);
@@ -68,9 +67,9 @@ function Home() {
   };
 
   return (
-    <div className='bg-gradient-to-r from-cyan-600 to-indigo-300' style={{ height: '100vh', width: '100vw', overflowX: 'hidden', overflowY: 'hidden' }}>
+    <div className='bg-gradient-to-r from-cyan-600 to-indigo-300' style={{ height: '100%', width: '100vw', overflowX: 'hidden' }}>
       <section className='intro p-20 text-white flex flex-row justify-between'>
-        <section className='animate'
+        <section className=' animate'
           style={visible.includes(0) ? { ...slideInStyle('right'), ...slideInActiveStyle } : slideInStyle('right')}>
           <h2 className='text-6xl p-4'>
             <b>Secure Exams, Guaranteed Success.</b>
@@ -88,25 +87,18 @@ function Home() {
               </Link>
             )}
           </div>
-          {/* Down Arrow */}
-          <div className='flex justify-center mt-8'>
-            <a href='#features' className='text-white text-3xl animate-bounce'>
-              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" clipRule="evenodd" d="M12 4.293l-5.707 5.707 1.414 1.414L12 7.121l4.293 4.293 1.414-1.414L12 4.293z" /></svg>
-            </a>
-          </div>
         </section>
         <img src={home1} className='w-1/2 m-auto mt-4 animate' alt='Home illustration'
           style={visible.includes(1) ? { ...zoomInStyle, ...zoomInActiveStyle } : zoomInStyle} />
       </section>
 
-      <h1 id='features' className='text-6xl p-4 font-extrabold text-white text-center animate'
+      <h1 className='text-6xl p-4 font-extrabold text-white text-center animate'
         style={visible.includes(2) ? { ...slideInStyle('bottom'), ...slideInActiveStyle } : slideInStyle('bottom')}>
         Explore Our Cutting-Edge Features
       </h1>
 
       <section className='grid grid-rows-2 md:grid-cols-3 gap-10 m-20'>
 
-        {/* Feature Cards */}
         <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify overflow-hidden animate'
           style={visible.includes(3) ? { ...slideInStyle('top'), ...slideInActiveStyle } : slideInStyle('top')}>
           <img src={tabCheat} alt='Secure Browser Lockdown' />
@@ -124,7 +116,7 @@ function Home() {
         </div>
 
         <div className='bg-white/45 w-full border-2 shadow-md hover:shadow-black transition-all-0.3s rounded-2xl flex flex-col items-center justify-center p-10 text-justify overflow-hidden animate'
-          style={visible.includes(5) ? { ...zoomInStyle, ...zoomInActiveStyle } : zoomInStyle}>
+          style={visible.includes(5) ? { ...slideInStyle('left'), ...slideInActiveStyle } : slideInStyle('left')}>
           <img src={realtime} alt='Real-Time Monitoring' />
           <h1 className='text-xl font-bold'>Real-Time Monitoring</h1>
           <p className='text-md'>Ensure exam integrity with our real-time monitoring feature, which provides live oversight and instant alerts for any suspicious activity.</p>

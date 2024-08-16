@@ -157,7 +157,7 @@ export default function Profile() {
                     className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                     onChange={handleChange}
                 />
-                <button 
+                <button
                     type='submit'
                     className='w-full bg-blue-600 text-white p-3 rounded-lg uppercase hover:bg-blue-700 transition-colors disabled:opacity-80'
                 >
@@ -171,8 +171,8 @@ export default function Profile() {
                 >
                     Delete Account
                 </span>
-                <span 
-                    onClick={handleSignOut} 
+                <span
+                    onClick={handleSignOut}
                     className='text-red-600 cursor-pointer hover:underline'
                 >
                     Sign out

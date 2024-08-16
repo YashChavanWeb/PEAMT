@@ -1,127 +1,98 @@
-import React, { useState, useEffect, useRef } from 'react';
-import teamMember1 from '../assets/team1.jpg';
-import teamMember2 from '../assets/team2.jpg';
-import teamMember3 from '../assets/team3.jpg';
+import React from 'react';
+import examManagementImg from '../assets/exam-management.png';
+import secureAuthenticationImg from '../assets/secure-authentication.jpg';
+import applicationFormsImg from '../assets/application-forms.png';
+import aiProctoringImg from '../assets/ai-proctoring.png';
+import adminDashboardImg from '../assets/admin-dashboard.png';
+import securityFeaturesImg from '../assets/security-features.png'; // Add this image to your assets folder
+import innovationImg from '../assets/innovation.png'; // Add this image to your assets folder
 
 const features = [
     {
         title: 'Comprehensive Exam Management',
-        description: 'Manage competitive, online, and offline exams seamlessly. Our platform provides tools to schedule exams, assign proctors, and monitor exam activities in real-time, ensuring a smooth and efficient examination process for both administrators and students.',
-        imgSrc: 'https://media.istockphoto.com/id/1398462038/photo/online-exam-or-test.webp?b=1&s=170667a&w=0&k=20&c=rPmfkbaVJ5zY_WcFe5TV9LfLGaamTIW6F-YGrC1jzmc=',
-        imagePosition: 'left'
-    },
-    {
-        title: 'Student Application Forms',
-        description: 'Easy-to-fill forms for students to register and apply for exams. The application forms are designed to be user-friendly, guiding students through the necessary steps to ensure they provide all required information accurately and efficiently.',
-        imgSrc: 'https://www.shutterstock.com/image-photo/application-online-college-form-concept-600nw-483345682.jpg',
-        imagePosition: 'right'
+        description: 'Seamlessly manage competitive, online, and offline exams with real-time monitoring and automated proctoring.',
+        imgSrc: examManagementImg,
     },
     {
         title: 'Secure Authentication',
-        description: 'Ensures security with robust authentication methods. Our platform uses advanced encryption and multi-factor authentication to protect sensitive data and verify user identities, providing a secure environment for both students and administrators.',
-        imgSrc: 'https://i.pinimg.com/564x/42/80/7a/42807ae5e6eb79fbcf53ec8ef3f9d40e.jpg',
-        imagePosition: 'left'
+        description: 'Ensure the security of exams with advanced encryption, multi-factor authentication, and AI-powered identity verification.',
+        imgSrc: secureAuthenticationImg,
     },
     {
-        title: 'Result Declaration',
-        description: 'View and manage exam results directly on the platform. Students can easily access their results, while administrators have tools to publish and analyze exam performance, making the results process transparent and efficient.',
-        imgSrc: 'https://i.pinimg.com/564x/a7/e4/ce/a7e4cea37478f8668b13312ab22ff442.jpg',
-        imagePosition: 'right'
-    }
+        title: 'Student Application Forms',
+        description: 'User-friendly forms that guide students through the registration process with automated data validation.',
+        imgSrc: applicationFormsImg,
+    },
+    {
+        title: 'AI-Powered Proctoring',
+        description: 'Leverage AI to monitor exams and detect suspicious activities in real-time, ensuring exam integrity.',
+        imgSrc: aiProctoringImg,
+    },
+    {
+        title: 'Admin Dashboard',
+        description: 'Admins can easily create and manage exams, track progress, and analyze performance through a comprehensive dashboard.',
+        imgSrc: adminDashboardImg,
+    },
 ];
 
-function About() {
-    const [currentImage, setCurrentImage] = useState(null);
-    const imageRefs = useRef([]);
-
-    useEffect(() => {
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1,
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                const index = entry.target.dataset.index;
-                if (entry.isIntersecting) {
-                    setCurrentImage(index);
-                } else if (currentImage === index) {
-                    setCurrentImage(null);
-                }
-            });
-        }, observerOptions);
-
-        imageRefs.current.forEach((ref) => {
-            if (ref) observer.observe(ref);
-        });
-
-        return () => {
-            imageRefs.current.forEach((ref) => {
-                if (ref) observer.unobserve(ref);
-            });
-        };
-    }, [currentImage]);
-
+const About = () => {
     return (
-        <div className="p-8 mt-20 animate-fadeIn bg-gradient-to-r from-cyan-600 to-indigo-300">
-            <section className="intro text-center mb-12">
-                <h1 className="text-3xl font-bold mb-4">About Our Platform</h1>
-                <p className="text-lg mx-auto animate-fadeIn">
-                    Our proctoring exam automation and monitoring platform allows institutes to create and manage exams effortlessly. Students can fill application forms, participate in various types of exams (competitive, online, offline), and receive results all on this secure and user-friendly platform.
-                </p>
-            </section>
+        <div className="bg-gradient-to-r from-cyan-600 to-indigo-300 p-10">
+            <h1 className="text-center text-4xl font-bold text-white mb-12 mt-10 animate-fadeIn">About Our Platform</h1>
+            <p className="text-center text-lg text-white mb-16 max-w-3xl mx-auto animate-fadeIn">
+                Our proctored exam automation and monitoring platform offers a comprehensive solution for institutions to conduct exams securely and efficiently. From student registration to result declaration, every aspect of the examination process is streamlined.
+            </p>
 
-            <section className="features mb-12">
-                <h2 className="text-2xl font-semibold mb-6 text-center text-white py-2 px-4 rounded">
-                    Key Features
-                </h2>
-                <div className="flex flex-col gap-8">
-                    {features.map((feature, index) => {
-                        const imageAnimation = currentImage === index ? 'animate-slideIn' : (currentImage === null ? 'animate-slideOut' : '');
-                        return (
-                            <div key={index} className={`flex flex-col ${feature.imagePosition === 'left' ? 'md:flex-row' : 'md:flex-row-reverse'} items-center justify-between bg-white rounded-lg p-4 shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-xl`}>
-                                <div className="flex-1 p-4">
-                                    <h3 className="text-lg sm:text-xl font-bold mb-2">{feature.title}</h3>
-                                    <p className="animate-fadeIn">{feature.description}</p>
-                                </div>
-                                <div className="flex-1 p-4 overflow-hidden">
-                                    <img
-                                        src={feature.imgSrc}
-                                        alt={feature.title}
-                                        data-index={index}
-                                        ref={(el) => imageRefs.current[index] = el}
-                                        className={`w-50 h-auto rounded-lg transition-transform duration-300 ${imageAnimation}`}
-                                    />
-                                </div>
+            <div className="grid gap-8 md:grid-cols-3">
+                {features.map((feature, index) => (
+                    <div
+                        key={index}
+                        className="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-transform duration-300 animate-fadeIn"
+                    >
+                        <img
+                            src={feature.imgSrc}
+                            alt={feature.title}
+                            className="w-full h-64 object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div className="p-6 text-center text-[#C9DABF] transform transition-transform duration-500 translate-y-10 hover:translate-y-0">
+                                <h2 className="text-xl font-bold mb-4">{feature.title}</h2>
+                                <p>{feature.description}</p>
                             </div>
-                        );
-                    })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <section className="platform-security text-center mt-16">
+                <h2 className="text-3xl font-bold text-[#C9DABF] mb-8 animate-fadeIn">Platform Security</h2>
+                <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+                    <img
+                        src={securityFeaturesImg}
+                        alt="Platform Security Features"
+                        className="w-full h-64 object-cover rounded-lg mb-6"
+                    />
+                    <p className="text-lg text-gray-700">
+                        Our platform is built with top-notch security features to protect exam integrity and user data. We employ robust encryption methods, continuous monitoring, and advanced fraud detection to ensure a secure testing environment.
+                    </p>
                 </div>
             </section>
 
-            <section className="team text-center">
-                <h2 className="text-2xl font-semibold mb-6 animate-bounce">Meet Our Team</h2>
-                <div className="flex flex-wrap justify-center">
-                    <div className="flex-1 min-w-[200px] m-4 bg-white rounded-lg p-4 text-center shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-xl animate-fadeIn">
-                        <img src={teamMember1} alt="Team Member 1" className="w-52 h-52 rounded-full mb-4 mx-auto object-cover" />
-                        <h3 className="text-lg font-bold mb-2">Yash Chavan</h3>
-                        <p>Role Description</p>
-                    </div>
-                    <div className="flex-1 min-w-[200px] m-4 bg-white rounded-lg p-4 text-center shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-xl animate-fadeIn">
-                        <img src={teamMember2} alt="Team Member 2" className="w-52 h-52 rounded-full mb-4 mx-auto object-cover" />
-                        <h3 className="text-lg font-bold mb-2">Krisha Chikka</h3>
-                        <p>Role Description</p>
-                    </div>
-                    <div className="flex-1 min-w-[200px] m-4 bg-white rounded-lg p-4 text-center shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-xl animate-fadeIn">
-                        <img src={teamMember3} alt="Team Member 3" className="w-52 h-52 rounded-full mb-4 mx-auto object-cover" />
-                        <h3 className="text-lg font-bold mb-2">Anjali Gupta</h3>
-                        <p>Role Description</p>
-                    </div>
+            <section className="innovation text-center mt-16">
+                <h2 className="text-3xl font-bold text-[#C9DABF] mb-8 animate-fadeIn">Innovative Technology</h2>
+                <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+                    <img
+                        src={innovationImg}
+                        alt="Innovative Technology"
+                        className="w-full h-64 object-cover rounded-lg mb-6"
+                    />
+                    <p className="text-lg text-gray-700">
+                        Our platform integrates cutting-edge technologies to enhance the examination experience. From AI-powered proctoring to real-time analytics, we are committed to pushing the boundaries of exam automation and monitoring.
+                    </p>
                 </div>
             </section>
         </div>
     );
-}
+};
 
 export default About;
