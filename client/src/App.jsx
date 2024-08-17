@@ -12,8 +12,19 @@ import AdminEntryForm from "./pages/Developers/AdminEntryForm";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import StartPage from './pages/Exam_Section/StartPage';
 import SubmitConfirmation from "./pages/Exam_Section/SubmitConfirmation";
+
+
+
+
+import './index.css';
+
+
 import ExamWindow from "./pages/Exam_Section/ExamWindow";
 import UserDashboard from "./pages/Users/UserDashboard";
+<<<<<<< HEAD
+=======
+>>>>>>> efc0b81f565b39bb6fe1abdda61e07fbebb8dc89
+>>>>>>> 5ef0dcc6b6b36032c8f90b43518718b35175957e
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;

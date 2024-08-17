@@ -10,7 +10,9 @@ function AdminDashboard() {
         totalMarks: '',
         passingMarks: '',
     });
+
     const [exams, setExams] = useState([]); // State to store the list of exams
+    const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
         // Fetch the list of exams from the database when the component mounts
@@ -30,6 +32,14 @@ function AdminDashboard() {
             console.error('Error fetching exams:', error);
         }
     };
+
+    useEffect(() => {
+        // Load success message from local storage
+        const storedMessage = localStorage.getItem('successMessage');
+        if (storedMessage) {
+            setSuccessMessage(storedMessage);
+        }
+    }, []);
 
     const handleButtonClick = () => {
         setShowPopup(true);
@@ -53,6 +63,11 @@ function AdminDashboard() {
 
             if (response.ok) {
                 alert('Exam created successfully!');
+
+                const message = `Exam "${examDetails.examName}" created successfully!`;
+                setSuccessMessage(message);
+                localStorage.setItem('successMessage', message);
+
                 setShowPopup(false);
                 setExamDetails({
                     examName: '',
@@ -62,6 +77,7 @@ function AdminDashboard() {
                     totalMarks: '',
                     passingMarks: '',
                 });
+
                 fetchExams(); // Fetch the updated list of exams after successful creation
             } else {
                 alert('Failed to create exam.');
@@ -71,16 +87,32 @@ function AdminDashboard() {
         }
     };
 
+    const handleClearMessage = () => {
+        setSuccessMessage('');
+        localStorage.removeItem('successMessage');
+    };
+
     return (
         <div className="admin-dashboard flex flex-col items-center justify-center h-screen p-4">
-            <div className="mb-4">
-                <button
-                    onClick={handleButtonClick}
-                    className="bg-blue-500 text-white py-2 px-4 rounded shadow-lg hover:bg-blue-600 transition-colors"
-                >
-                    Create New Exam
-                </button>
-            </div>
+            {successMessage && (
+                <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 relative">
+                    {successMessage}
+                    <button
+                        onClick={handleClearMessage}
+                        className="absolute top-1 right-1 text-gray-500 hover:text-gray-700"
+                        aria-label="Clear message"
+                    >
+                        &times;
+                    </button>
+                </div>
+            )}
+
+            <button
+                onClick={handleButtonClick}
+                className="bg-blue-500 text-white py-2 px-4 rounded shadow-lg hover:bg-blue-600 transition-colors"
+            >
+                Create New Exam
+            </button>
 
             {showPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

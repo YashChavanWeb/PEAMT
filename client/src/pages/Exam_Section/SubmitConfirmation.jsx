@@ -1,4 +1,4 @@
-// src/pages/Exam_section/SubmitConfirmation.jsx
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,7 +6,7 @@ function SubmitConfirmation() {
     const navigate = useNavigate();
 
     const handleHome = () => {
-        navigate('/'); // Adjust if you have a specific route to navigate after submission
+        navigate('/'); 
     };
 
     return (

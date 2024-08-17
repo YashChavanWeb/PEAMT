@@ -15,6 +15,7 @@ router.post('/', async (req, res) => {
 });
 
 
+
 // Fetch all exams
 router.get('/', async (req, res) => {
     try {
@@ -26,3 +27,5 @@ router.get('/', async (req, res) => {
 });
 
 export default router;
+
+
