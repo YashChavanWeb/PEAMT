@@ -1,3 +1,4 @@
+
 import express from 'express';
 import Exam from '../models/Exam.js';
 
@@ -27,5 +28,3 @@ router.get('/', async (req, res) => {
 });
 
 export default router;
-
-

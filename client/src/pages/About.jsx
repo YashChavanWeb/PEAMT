@@ -45,7 +45,6 @@ const About = () => {
 
             <div className="grid gap-8 md:grid-cols-3">
                 {features.map((feature, index) => (
-<<<<<<< HEAD
                     <div
                         key={index}
                         className="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-transform duration-300 animate-fadeIn"
@@ -53,15 +52,6 @@ const About = () => {
                         <img
                             src={feature.imgSrc}
                             alt={feature.title}
-=======
-                    <div 
-                        key={index} 
-                        className="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-transform duration-300 animate-fadeIn"
-                    >
-                        <img 
-                            src={feature.imgSrc} 
-                            alt={feature.title} 
->>>>>>> 5ef0dcc6b6b36032c8f90b43518718b35175957e
                             className="w-full h-64 object-cover"
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -77,15 +67,9 @@ const About = () => {
             <section className="platform-security text-center mt-16">
                 <h2 className="text-3xl font-bold text-[#C9DABF] mb-8 animate-fadeIn">Platform Security</h2>
                 <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-<<<<<<< HEAD
                     <img
                         src={securityFeaturesImg}
                         alt="Platform Security Features"
-=======
-                    <img 
-                        src={securityFeaturesImg} 
-                        alt="Platform Security Features" 
->>>>>>> 5ef0dcc6b6b36032c8f90b43518718b35175957e
                         className="w-full h-64 object-cover rounded-lg mb-6"
                     />
                     <p className="text-lg text-gray-700">
@@ -97,15 +81,9 @@ const About = () => {
             <section className="innovation text-center mt-16">
                 <h2 className="text-3xl font-bold text-[#C9DABF] mb-8 animate-fadeIn">Innovative Technology</h2>
                 <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-<<<<<<< HEAD
                     <img
                         src={innovationImg}
                         alt="Innovative Technology"
-=======
-                    <img 
-                        src={innovationImg} 
-                        alt="Innovative Technology" 
->>>>>>> 5ef0dcc6b6b36032c8f90b43518718b35175957e
                         className="w-full h-64 object-cover rounded-lg mb-6"
                     />
                     <p className="text-lg text-gray-700">

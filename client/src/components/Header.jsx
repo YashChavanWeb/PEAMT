@@ -13,7 +13,7 @@ export default function Header() {
         <div className='bg-cyan-600 bg-opacity-70 h-20 fixed top-0 left-0 right-0 z-10 transition-colors duration-300 hover:bg-cyan-500 hover:bg-opacity-80'>
             <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
                 <Link to='/'>
-                    <h1 className='font-bold text-4xl text-white'>TestOPs</h1>
+                    <h1 className='font-bold text-4xl text-white'>Scorezy</h1>
                 </Link>
                 <ul className='flex gap-12 items-end'>
                     <Link to='/'>
