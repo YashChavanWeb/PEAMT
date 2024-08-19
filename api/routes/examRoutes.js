@@ -14,4 +14,18 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+
+// Fetch all exams
+router.get('/', async (req, res) => {
+    try {
+        const exams = await Exam.find(); // Retrieve all exams from the database
+        res.status(200).json(exams);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch exams', error });
+    }
+});
+
 export default router;
+
+

@@ -29,6 +29,7 @@ const examSchema = new mongoose.Schema({
     timestamps: true, // Automatically add createdAt and updatedAt timestamps
 });
 
+
 const adminUri = process.env.ADMIN;
 // Create connection to the ADMIN database
 const adminConnection = mongoose.createConnection(adminUri);
@@ -36,3 +37,5 @@ const adminConnection = mongoose.createConnection(adminUri);
 const Exam = adminConnection.model('Exam', examSchema);
 
 export default Exam;
+
+

@@ -121,7 +121,7 @@ export default function Profile() {
         : formData.profilePicture || currentUser.profilePicture;
 
     return (
-        <section className='bg-gradient-to-r from-cyan-600 to-indigo-300 p-10' style={{ width: '100%', height: '100vh' }}>
+        <section className='bg-gradient-to-r from-cyan-600 to-indigo-300 p-10' style={{ width: '900', height: '100vh' }}>
             <div className='max-w-screen-lg mx-auto p-6 bg-white rounded-3xl shadow-lg'>
                 <h1 className='text-3xl text-center font-semibold mb-7'>Profile</h1>
                 <form onSubmit={handleSubmit} className='space-y-6'>
