@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import PopupModel from './PopupModel';
+import { useLocation } from 'react-router-dom';
 
 function RegistrationForm() {
     const [formData, setFormData] = useState({
@@ -30,6 +31,9 @@ function RegistrationForm() {
     });
 
 
+    // the exam details are passed
+    const location = useLocation();
+    const exam = location.state?.exam; // Access the passed state
 
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
@@ -41,6 +45,34 @@ function RegistrationForm() {
     const [paymentSuccessful, setPaymentSuccessful] = useState(false);
     const [modalOpen, setModalOpen] = useState(false); // State for modal
     const [paymentCompleted, setPaymentCompleted] = useState(false); // New state for tracking payment status
+    const [regData, setRegData] = useState(null);  // State for holding the fetched registration data
+    const [fetchLoading, setFetchLoading] = useState(false);  // State for handling fetch loading
+    const [fetchError, setFetchError] = useState(null);  // State for handling fetch errors
+
+
+    const fetchRegistrationData = async (adharNumber) => {
+        setFetchLoading(true);
+        setFetchError(null);
+
+        try {
+            const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
+            setRegData(response.data);
+
+            // Update form fields with the fetched data
+            setFormData((prevState) => ({
+                ...prevState,
+                ...response.data,
+                permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
+                emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
+                subjects: response.data.subjects || prevState.subjects
+            }));
+        } catch (error) {
+            setFetchError(error.response ? error.response.data.message : error.message);
+        } finally {
+            setFetchLoading(false);
+        }
+    };
+
 
     useEffect(() => {
         const checkPaymentStatus = async () => {
@@ -217,9 +249,15 @@ function RegistrationForm() {
             ...formData,
             [name]: value
         };
+
+        if (name === 'adhar' && value.length === 12) { // Assuming Aadhar number length is 12
+            fetchRegistrationData(value);
+        }
+
         setFormData(updatedFormData);
         localStorage.setItem('formData', JSON.stringify(updatedFormData));
     };
+
 
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
@@ -276,11 +314,60 @@ function RegistrationForm() {
     };
 
 
+    const handleFetchDetails = async () => {
+        if (formData.adhar.length !== 12) { // Assuming Aadhar number length is 12
+            alert('Please enter a valid Aadhar number.');
+            return;
+        }
+
+        setFetchLoading(true);
+        setFetchError(null);
+
+        try {
+            const response = await axios.get(`/api/regform/adhar/${formData.adhar}`);
+            setFormData((prevState) => ({
+                ...prevState,
+                ...response.data,
+                permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
+                emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
+                subjects: response.data.subjects || prevState.subjects
+            }));
+        } catch (error) {
+            setFetchError(error.response ? error.response.data.message : error.message);
+        } finally {
+            setFetchLoading(false);
+        }
+    };
+
+
 
     return (
         <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md max-w-max">
             <h2 className="text-2xl font-bold mb-6">Registration Form</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label htmlFor="adhar" className="block text-sm font-medium text-gray-700">Aadhar Number</label>
+                    <input
+                        type="text"
+                        id="adhar"
+                        name="adhar"
+                        value={formData.adhar}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        required
+                    />
+                    <button
+                        type="button"
+                        onClick={handleFetchDetails}
+                        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    >
+                        Fetch Details
+                    </button>
+                    {fetchLoading && <p>Loading...</p>}
+                    {fetchError && <p className="text-red-500">{fetchError}</p>}
+                </div>
+
+
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                     <input

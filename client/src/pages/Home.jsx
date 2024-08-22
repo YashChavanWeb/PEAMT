@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux'; // Import useSelector
 import home1 from '../assets/2woman.png';
@@ -13,6 +13,9 @@ import easyUseGuy from '../assets/guyonlaptop.png';
 function Home() {
   const [visible, setVisible] = useState([]);
   const { currentUser } = useSelector((state) => state.user); // Get currentUser from the Redux store
+
+  const featuresRef = useRef(null); // Create a ref for the heading section
+  const topreference = useRef(null); // Create a ref for the heading section
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +35,18 @@ function Home() {
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToFeatures = () => {
+    if (featuresRef.current) {
+      featuresRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const scrollToTop = () => {
+    if (topreference.current) {
+      topreference.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const slideInStyle = (direction = 'left') => ({
     opacity: 0,
@@ -67,32 +82,47 @@ function Home() {
   };
 
   return (
-    <div className='bg-gradient-to-r from-cyan-600 to-indigo-300' style={{ height: '100%', width: '100vw', overflowX: 'hidden' }}>
+    <div ref={topreference} className='bg-gradient-to-r from-cyan-600 to-indigo-300' style={{ height: '100%', width: '100vw', overflowX: 'hidden' }}>
       <section className='intro p-20 text-white flex flex-row justify-between'>
-        <section className=' animate'
+        <section className='animate'
           style={visible.includes(0) ? { ...slideInStyle('right'), ...slideInActiveStyle } : slideInStyle('right')}>
           <h2 className='text-6xl p-4'>
             <b>Secure Exams, Guaranteed Success.</b>
           </h2>
-          <h4 className='text-3xl m-auto mt-10 p-3 font-bold'>Welcome to TestOps :) </h4>
+          <h4 className='text-3xl m-auto mt-10 p-3 font-bold'>Welcome to Scorezy ! </h4>
           <p className='p-3'>
-            Your Trusted Online Exam Proctoring Solution! At TestOps, we understand that maintaining the integrity of online exams is crucial. That's why we've created an easy-to-use, reliable tool that helps ensure a fair testing environment. Whether you're a student taking an important test or an educator administering one, TestOps is here to make the process smooth and secure.
+            Your Trusted Online Exam Proctoring Solution! At Scorezy, we understand that maintaining the integrity of online exams is crucial. That's why we've created an easy-to-use, reliable tool that helps ensure a fair testing environment. Whether you're a student taking an important test or an educator administering one, Scorezy is here to make the process smooth and secure.
           </p>
-          <div className='flex items-center p-4'>
-            {currentUser && ( // Conditionally render the button
+          <div className='flex items-center'>
+            {!currentUser?.isAdmin && ( // Conditionally render the button only if the user is not an admin
               <Link to='/registration-form'>
                 <button className='button'>
                   Registration Form
                 </button>
               </Link>
             )}
+
+            {currentUser && ( // Conditionally render the button
+              <Link to={currentUser.isAdmin ? '/admin-dashboard' : '/user-dashboard'}>
+                <button className='button m-10'>
+                  Go to Dashboard
+                </button>
+              </Link>
+            )}
+
+            <div className='flex flex-col items-center mt-10 pl-48 cursor-pointer' onClick={scrollToFeatures}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white animate-bounce" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 14a.75.75 0 01-.53-.22L5.22 9.53a.75.75 0 011.06-1.06L10 12.44l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-.53.22z" clipRule="evenodd" />
+              </svg>
+              <p className='text-white mt-2'>Explore More</p>
+            </div>
           </div>
         </section>
         <img src={home1} className='w-1/2 m-auto mt-4 animate' alt='Home illustration'
           style={visible.includes(1) ? { ...zoomInStyle, ...zoomInActiveStyle } : zoomInStyle} />
       </section>
 
-      <h1 className='text-6xl p-4 font-extrabold text-white text-center animate'
+      <h1 ref={featuresRef} className='text-6xl p-4 font-extrabold text-white text-center animate'
         style={visible.includes(2) ? { ...slideInStyle('bottom'), ...slideInActiveStyle } : slideInStyle('bottom')}>
         Explore Our Cutting-Edge Features
       </h1>
@@ -111,7 +141,7 @@ function Home() {
           <img src={veri} className='w-full' alt='Authentication and Verification' />
           <div>
             <h1 className='text-xl font-bold'>Authentication and Verification</h1>
-            <p className='text-lg'>At TestOps, we ensure exam integrity with our advanced registration and verification system. Our thorough authentication process confirms each candidate's identity, preventing unauthorized access and ensuring a secure testing environment.</p>
+            <p className='text-lg'>At Scorezy, we ensure exam integrity with our advanced registration and verification system. Our thorough authentication process confirms each candidate's identity, preventing unauthorized access and ensuring a secure testing environment.</p>
           </div>
         </div>
 
@@ -146,6 +176,13 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <div className='flex flex-col items-center mt-10 cursor-pointer mb-20' onClick={scrollToTop}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white animate-bounce" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fillRule="evenodd" d="M10 6a.75.75 0 01.53.22l4.25 4.25a.75.75 0 01-1.06 1.06L10 8.56 5.22 11.84a.75.75 0 01-1.06-1.06L9.47 6.22A.75.75 0 0110 6z" clipRule="evenodd" />
+        </svg>
+        <p className='text-white mt-2'>Go to Top</p>
+      </div>
     </div>
   );
 }

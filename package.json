@@ -29,10 +29,7 @@
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.4",
-<<<<<<< HEAD
     "razorpay": "^2.9.4",
-=======
->>>>>>> 5ef0dcc6b6b36032c8f90b43518718b35175957e
     "react-redux": "^9.1.2",
     "three": "^0.166.1"
   }

@@ -1,86 +1,112 @@
-import React from 'react';
-import '../../styles/pages/ExamCardDisplay.css'; // Import custom CSS for additional styles
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../../styles/pages/ExamCardDisplay.css';
 
-const ExamCardDisplay = () => {
-    // Predefined exam data
-    const examData = {
-        examName: 'JEE',
-        duration: '180',
-        eligibility: '12th',
-        examDate: '2024-08-11T00:00:00.000+00:00',
-        totalMarks: 180,
-        passingMarks: 75,
-        registrationEndDate: '2024-07-31T00:00:00.000+00:00', // Assuming a registration end date
+const ExamCardDisplay = ({ exams }) => {
+    const [selectedExam, setSelectedExam] = useState(null);
+    const navigate = useNavigate();
+
+    const handleApplyClick = (exam) => {
+        setSelectedExam(exam);
     };
 
-    const {
-        examName,
-        duration,
-        eligibility,
-        examDate,
-        totalMarks,
-        passingMarks,
-        registrationEndDate,
-    } = examData;
-
-    const currentDate = new Date();
-    const endDate = new Date(registrationEndDate);
-    const examDateObj = new Date(examDate);
-
-    // Calculate time left for registration
-    const timeLeft = endDate - currentDate;
-    const totalTime = endDate - new Date('2024-01-01T00:00:00.000+00:00'); // Arbitrary start date for full period
-    const progress = (timeLeft / totalTime) * 100;
-
-    // Format the exam date to a more readable format
-    const formattedDate = examDateObj.toLocaleDateString();
+    const handleClosePopup = () => {
+        if (selectedExam) {
+            navigate('/registration-form', { state: { exam: selectedExam } });
+        }
+    };
 
     return (
-        <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
-            <div className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">{examName}</h2>
-                <div className="flex justify-between mb-2">
-                    <span className="font-medium text-gray-600">Duration:</span>
-                    <span>{duration} minutes</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                    <span className="font-medium text-gray-600">Eligibility:</span>
-                    <span>{eligibility}</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                    <span className="font-medium text-gray-600">Exam Date:</span>
-                    <span className="blinking">{formattedDate}</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                    <span className="font-medium text-gray-600">Total Marks:</span>
-                    <span>{totalMarks}</span>
-                </div>
-                <div className="flex justify-between mb-4">
-                    <span className="font-medium text-gray-600">Passing Marks:</span>
-                    <span>{passingMarks}</span>
-                </div>
+        <div className="exam-card-container">
+            {exams.map((exam, index) => {
+                const {
+                    examName,
+                    duration,
+                    eligibility,
+                    examDate,
+                    totalMarks,
+                    passingMarks,
+                    registrationEndDate,
+                } = exam;
 
-                {/* Progress Bar */}
-                <div className="relative pt-1">
-                    <div className="flex mb-2 items-center justify-between">
-                        <div className="text-xs font-medium text-gray-600">Time left for registration</div>
-                        <div className="text-xs font-medium text-gray-600">{Math.max(Math.ceil(timeLeft / (1000 * 60 * 60 * 24)), 0)} days</div>
-                    </div>
-                    <div className="flex h-2 overflow-hidden rounded bg-gray-200">
-                        <div
-                            style={{ width: `${progress}%` }}
-                            className="bg-green-500 transition-all duration-500 ease-in-out"
-                        ></div>
-                    </div>
-                </div>
+                const currentDate = new Date();
+                const endDate = new Date(registrationEndDate);
+                const examDateObj = new Date(examDate);
 
-                {/* Apply Button */}
-                <div className="mt-4">
-                    <button className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
-                        Apply
-                    </button>
+                const timeLeft = endDate - currentDate;
+                const totalTime = endDate - new Date('2024-01-01T00:00:00.000+00:00');
+                const progress = (timeLeft / totalTime) * 100;
+
+                const formattedDate = examDateObj.toLocaleDateString();
+
+                return (
+                    <div key={index} className="exam-card">
+                        <div className="exam-card-header">
+                            <h2 className="text-xl font-bold">{examName}</h2>
+                        </div>
+                        <div className="exam-card-body">
+                            <div className="exam-card-info">
+                                <span className="info-label">Duration:</span>
+                                <span>{duration} minutes</span>
+                            </div>
+                            <div className="exam-card-info">
+                                <span className="info-label">Eligibility:</span>
+                                <span>{eligibility}</span>
+                            </div>
+                            <div className="exam-card-info">
+                                <span className="info-label">Exam Date:</span>
+                                <span>{formattedDate}</span>
+                            </div>
+                            <div className="exam-card-info">
+                                <span className="info-label">Total Marks:</span>
+                                <span>{totalMarks}</span>
+                            </div>
+                            <div className="exam-card-info">
+                                <span className="info-label">Passing Marks:</span>
+                                <span>{passingMarks}</span>
+                            </div>
+
+                            <div className="progress-container">
+                                <div className="progress-info">
+                                    <span>Time left for registration:</span>
+                                    <span>{Math.max(Math.ceil(timeLeft / (1000 * 60 * 60 * 24)), 0)} days</span>
+                                </div>
+                                <div className="progress-bar">
+                                    <div
+                                        style={{ width: `${progress}%` }}
+                                        className="progress-fill"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div className="apply-button">
+                                <button className="btn-apply" onClick={() => handleApplyClick(exam)}>
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+
+            {selectedExam && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <h3 className="popup-header">Exam Details</h3>
+                        <div className="popup-body">
+                            <p><strong>Exam Name:</strong> {selectedExam.examName}</p>
+                            <p><strong>Duration:</strong> {selectedExam.duration} minutes</p>
+                            <p><strong>Eligibility:</strong> {selectedExam.eligibility}</p>
+                            <p><strong>Exam Date:</strong> {new Date(selectedExam.examDate).toLocaleDateString()}</p>
+                            <p><strong>Total Marks:</strong> {selectedExam.totalMarks}</p>
+                            <p><strong>Passing Marks:</strong> {selectedExam.passingMarks}</p>
+                            <p><strong>Registration End Date:</strong> {new Date(selectedExam.registrationEndDate).toLocaleDateString()}</p>
+                        </div>
+
+                        <button className="popup-close" onClick={handleClosePopup}>Register</button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

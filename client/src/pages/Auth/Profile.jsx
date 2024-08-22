@@ -19,7 +19,6 @@ import {
 } from '../../redux/user/userSlice';
 import '../../styles/pages/Signin.css';
 
-
 const ADMIN_PROFILE_PIC_URL = 'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2264922221.jpg';
 
 export default function Profile() {
@@ -32,6 +31,8 @@ export default function Profile() {
     const [updateSuccess, setUpdateSuccess] = useState(false);
 
     const { currentUser, loading, error } = useSelector((state) => state.user);
+    const isAdmin = currentUser?.isAdmin; // Check if the user is an admin
+
 
     useEffect(() => {
         if (image) {
@@ -68,50 +69,57 @@ export default function Profile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            dispatch(updateUserStart());
-            const res = await fetch(`/api/user/update/${currentUser._id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-            const data = await res.json();
-            if (data.success === false) {
-                dispatch(updateUserFailure(data));
-                return;
+        if (window.confirm('Are you sure you want to update your profile?')) {
+            try {
+                dispatch(updateUserStart());
+                const updateData = isAdmin ? { profilePicture: formData.profilePicture } : formData;
+                const res = await fetch(`/api/user/update/${currentUser._id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData),
+                });
+                const data = await res.json();
+                if (data.success === false) {
+                    dispatch(updateUserFailure(data));
+                    return;
+                }
+                dispatch(updateUserSuccess(data));
+                setUpdateSuccess(true);
+            } catch (error) {
+                dispatch(updateUserFailure(error));
             }
-            dispatch(updateUserSuccess(data));
-            setUpdateSuccess(true);
-        } catch (error) {
-            dispatch(updateUserFailure(error));
         }
     };
 
     const handleDeleteAccount = async () => {
-        try {
-            dispatch(deleteUserStart());
-            const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-                method: 'DELETE',
-            });
-            const data = await res.json();
-            if (data.success === false) {
-                dispatch(deleteUserFailure(data));
-                return;
+        if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            try {
+                dispatch(deleteUserStart());
+                const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+                    method: 'DELETE',
+                });
+                const data = await res.json();
+                if (data.success === false) {
+                    dispatch(deleteUserFailure(data));
+                    return;
+                }
+                dispatch(deleteUserSuccess(data));
+            } catch (error) {
+                dispatch(deleteUserFailure(error));
             }
-            dispatch(deleteUserSuccess(data));
-        } catch (error) {
-            dispatch(deleteUserFailure(error));
         }
     };
 
     const handleSignOut = async () => {
-        try {
-            await fetch('/api/auth/signout');
-            dispatch(signOut());
-        } catch (error) {
-            console.log(error);
+        if (window.confirm('Are you sure you want to sign out?')) {
+            try {
+                await fetch('/api/auth/signout');
+                dispatch(signOut());
+            } catch (error) {
+                console.log(error);
+            }
         }
     };
 
@@ -160,6 +168,7 @@ export default function Profile() {
                         placeholder='Username'
                         className='inputBox w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                         onChange={handleChange}
+                        disabled={isAdmin} // Disable if admin
                     />
                     <input
                         defaultValue={currentUser.email}
@@ -168,6 +177,7 @@ export default function Profile() {
                         placeholder='Email'
                         className='inputBox w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                         onChange={handleChange}
+                        disabled={isAdmin} // Disable if admin
                     />
                     <input
                         type='password'
@@ -175,7 +185,9 @@ export default function Profile() {
                         placeholder='Password'
                         className='inputBox w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors'
                         onChange={handleChange}
+                        disabled={isAdmin} // Disable if admin
                     />
+
                     <button
                         type='submit'
                         className='formButton w-full  text-white p-3 rounded-lg uppercase transition-colors disabled:opacity-80'
