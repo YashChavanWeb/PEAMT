@@ -1,12 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import OAuth from '../../components/OAuth'
+import { useSelector } from 'react-redux';
+import OAuth from '../../components/OAuth';
 
 export default function SignUp() {
     const [formData, setFormData] = useState({});
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { currentUser } = useSelector((state) => state.user);
+
+    // Redirect to home if the user is already signed in
+    useEffect(() => {
+        if (currentUser) {
+            navigate('/'); // Redirect to home page if user is already signed in
+        }
+    }, [currentUser, navigate]);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
     };
@@ -36,6 +46,7 @@ export default function SignUp() {
             setError(true);
         }
     };
+
     return (
         <section className='bg-gradient-to-r from-cyan-600 to-indigo-300 p-10' style={{ width: '100%', height: '100vh' }}>
             <section className='signUpBox flex row max-w-screen-lg mx-auto my-auto rounded-3xl bg-white'
@@ -84,6 +95,7 @@ export default function SignUp() {
                     <p className='text-red-700 mt-5'>{error && 'Something went wrong!'}</p>
                 </div>
                 <div className='SignUpimageSection'>
+                    {/* Image or other content */}
                 </div>
             </section>
         </section>

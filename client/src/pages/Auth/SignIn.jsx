@@ -1,17 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInStart, signInFailure, signInSuccess } from '../../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInFailure, signInSuccess } from '../../redux/user/userSlice';
 import OAuth from '../../components/OAuth';
-import pc from '../../assets/login.jpeg';
 import '../../styles/pages/Signin.css';
 
 export default function SignIn() {
     const [formData, setFormData] = useState({});
-    const { loading, error } = useSelector((state) => state.user);
-
+    const { loading, error, currentUser } = useSelector((state) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    // Check if user is already signed in
+    useEffect(() => {
+        if (currentUser) {
+            navigate('/'); // Redirect to home page if user is already signed in
+        }
+    }, [currentUser, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -59,6 +64,7 @@ export default function SignIn() {
                 data-aos-duration="1000"
             >
                 <div className='SignInimageSection'>
+                    {/* Image or other content */}
                 </div>
                 <div className='mx-auto my-auto p-4'>
                     <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>

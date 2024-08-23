@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -16,7 +15,7 @@ import SubmitConfirmation from "./pages/Exam_Section/SubmitConfirmation";
 import './index.css';
 import ExamWindow from "./pages/Exam_Section/ExamWindow";
 import UserDashboard from "./pages/Users/UserDashboard";
-
+import AdminRoute from "./components/private/AdminRoute";
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
@@ -30,11 +29,12 @@ function App() {
           <Route path='/about' element={<About />} />
           <Route path='/sign-in' element={<SignIn />} />
           <Route path='/sign-up' element={<SignUp />} />
-          <Route path='/admin-dashboard' element={<AdminDashboard />} />
 
-          {/* for owners */}
-          <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
-          <Route path={`/private-dashboard/${privatePassId}/admin-entry`} element={<AdminEntryForm />} />
+          {/* Admin-only routes */}
+          <Route element={<AdminRoute />}>
+            <Route path='/admin-dashboard' element={<AdminDashboard />} />
+          </Route>
+
 
           <Route element={<PrivateRoute />}>
             {/* For the user */}
@@ -47,6 +47,13 @@ function App() {
             <Route path='/exam-section' element={<ExamWindow />} />
             <Route path='/submit-confirmation' element={<SubmitConfirmation />} />
           </Route>
+
+
+
+          {/* For owners */}
+          <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
+          <Route path={`/private-dashboard/${privatePassId}/admin-entry`} element={<AdminEntryForm />} />
+
         </Routes>
       </div>
     </BrowserRouter>
