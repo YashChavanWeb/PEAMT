@@ -26,7 +26,7 @@ const ExamCardDisplay = ({ exams }) => {
                     examDate,
                     totalMarks,
                     passingMarks,
-                    registrationEndDate,
+                    registrationEndDate, // Ensure this field is part of the data returned by your API
                 } = exam;
 
                 const currentDate = new Date();

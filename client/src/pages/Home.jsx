@@ -89,7 +89,7 @@ function Home() {
           <h2 className='text-6xl p-4'>
             <b>Secure Exams, Guaranteed Success.</b>
           </h2>
-          <h4 className='text-3xl m-auto mt-10 p-3 font-bold'>Welcome to Scorezy ! </h4>
+          <h4 className='text-3xl m-auto p-3 font-bold'>Welcome to Scorezy ! </h4>
           <p className='p-3'>
             Your Trusted Online Exam Proctoring Solution! At Scorezy, we understand that maintaining the integrity of online exams is crucial. That's why we've created an easy-to-use, reliable tool that helps ensure a fair testing environment. Whether you're a student taking an important test or an educator administering one, Scorezy is here to make the process smooth and secure.
           </p>
