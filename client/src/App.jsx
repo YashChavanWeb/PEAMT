@@ -10,6 +10,7 @@ import RegistrationForm from "./pages/registration/RegistrationForm";
 import PrivateDashboard from "./pages/Developers/PrivateDashboard";
 import AdminEntryForm from "./pages/Developers/AdminEntryForm";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import ExamBuilder from "./pages/Admin/ExamBuilder";
 import StartPage from './pages/Exam_Section/StartPage';
 import SubmitConfirmation from "./pages/Exam_Section/SubmitConfirmation";
 import './index.css';
@@ -33,6 +34,7 @@ function App() {
           {/* Admin-only routes */}
           <Route element={<AdminRoute />}>
             <Route path='/admin-dashboard' element={<AdminDashboard />} />
+            <Route path='/exam-builder' element={<ExamBuilder />} />
           </Route>
 
 
