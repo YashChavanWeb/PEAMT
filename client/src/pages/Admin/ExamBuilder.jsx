@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import CustomRadioButton from './CustomRadioButton';
 
@@ -8,11 +9,11 @@ function ExamBuilder() {
     const newQuestion = {
       id: questions.length + 1, // Unique ID for each question
       text: '',
-      type: 'MCQ', // Default question type (MCQ or Theory)
-      options: ['', '', '', ''], // Default options for multiple-choice
+      type: 'MCQ', // Default type
+      options: ['', '', '', ''], // Default options
       correctAnswer: null, // To be set later if MCQ
-      marks: 0, // Default marks
-      difficulty: 'Medium', // Default difficulty level (Easy, Medium, Hard)
+      marks: 0, // Default 
+      difficulty: 'Medium', // Default 
     };
 
     setQuestions([...questions, newQuestion]);
@@ -68,10 +69,23 @@ function ExamBuilder() {
 
   return (
     <div>
-      <h2>Create Exam</h2>
-      <button className='button' 
-        onClick={addQuestion}>Add Question
-      </button>
+        <section className='flex flex-row justify-between m-2'>
+            <h2 className='font-bold text-2xl'>Prepare Exam Paper</h2>
+                <button className='button' 
+                    onClick={addQuestion}>Add Question
+                </button>
+            {/* <div className='flex justify-around w-1/2'>
+                <button className='button' 
+                    onClick={addQuestion}>Add Question
+                </button>
+                <button className='button'>
+                    Upload Paper
+                </button>
+                <button className='button'>
+                    Save Paper
+                </button>
+            </div> */}
+        </section>
 
       <section className='flex flex-col flex-wrap w-[90%] mx-auto'>
         {questions.map((question, index) => (
@@ -81,7 +95,7 @@ function ExamBuilder() {
                 {/* Question Text */}
                 <input
                     type="text"
-                    className='w-[75%] m-1 p-2 bg-sky-500/10 rounded-xl border-2'
+                    className='w-[75%] m-1 p-2 bg-sky-500/10 rounded-xl border-4'
                     placeholder="Enter question text"
                     value={question.text}
                     onChange={(e) => updateQuestionText(question.id, e.target.value)}
@@ -112,9 +126,9 @@ function ExamBuilder() {
                     question.difficulty === 'Medium' ? 'text-yellow-600' :
                     'text-red-600'
                   }`}              >
-                <option className='bg-green-100 w-full text-black' value="Easy">Easy</option>
-                <option className='bg-yellow-100 w-full text-black' value="Medium">Medium</option>
-                <option className='bg-red-100 w-full text-black' value="Hard">Hard</option>
+                <option className='bg-green-200 w-full text-black' value="Easy">Easy</option>
+                <option className='bg-yellow-200 w-full text-black' value="Medium">Medium</option>
+                <option className='bg-red-200 w-full text-black' value="Hard">Hard</option>
               </select>
             </label>
             {/* Marks Input */}
