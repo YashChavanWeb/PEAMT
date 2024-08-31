@@ -1,14 +1,15 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux'; // Import useSelector
-import home1 from '../assets/2woman.png';
-import tabCheat from '../assets/cheat.png';
-import veri from '../assets/verification.gif';
-import realtime from '../assets/realtime.gif';
-import assessmentimg from '../assets/assessment.png';
-import assessment2img from '../assets/assessment2.png';
-import teacherLaptop from '../assets/teacher.png';
-import easyUseGuy from '../assets/guyonlaptop.png';
+import home1 from '../assets/homepage/2woman.png';
+import tabCheat from '../assets/homepage/cheat.png';
+import veri from '../assets/homepage/verification.gif';
+import realtime from '../assets/homepage/realtime.gif';
+import assessmentimg from '../assets/homepage/assessment.png';
+import assessment2img from '../assets/homepage/assessment2.png';
+import teacherLaptop from '../assets/homepage/teacher.png';
+import easyUseGuy from '../assets/homepage/guyonlaptop.png';
 
 function Home() {
   const [visible, setVisible] = useState([]);
