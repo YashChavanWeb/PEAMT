@@ -1,11 +1,12 @@
 import React from 'react';
-import examManagementImg from '../assets/exam-management.png';
-import secureAuthenticationImg from '../assets/secure-authentication.jpg';
-import applicationFormsImg from '../assets/application-forms.png';
-import aiProctoringImg from '../assets/ai-proctoring.png';
-import adminDashboardImg from '../assets/admin-dashboard.png';
-import securityFeaturesImg from '../assets/security-features.png'; // Add this image to your assets folder
-import innovationImg from '../assets/innovation.png'; // Add this image to your assets folder
+import examManagementImg from '../assets/aboutpage/management.gif';
+import secureAuthenticationImg from '../assets/aboutpage/security.gif';
+import applicationFormsImg from '../assets/aboutpage/applicationform.png';
+import aiProctoringImg from '../assets/aboutpage/ai.gif';
+import adminDashboardImg from '../assets/aboutpage/dashboard.gif';
+import securityFeaturesImg from '../assets/aboutpage/secureplatform.gif';
+import securityFeatures2Img from '../assets/aboutpage/secureplatform2.gif'; // Add this image to your assets folder
+import innovationImg from '../assets/aboutpage/innovativeTech.gif'; // Add this image to your assets folder
 
 const features = [
     {
@@ -52,7 +53,7 @@ const About = () => {
                         <img
                             src={feature.imgSrc}
                             alt={feature.title}
-                            className="w-full h-64 object-cover"
+                            className="w-full h-96 bg-sky-800"
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                             <div className="p-6 text-center text-[#C9DABF] transform transition-transform duration-500 translate-y-10 hover:translate-y-0">
@@ -67,11 +68,18 @@ const About = () => {
             <section className="platform-security text-center mt-16">
                 <h2 className="text-3xl font-bold text-[#C9DABF] mb-8 animate-fadeIn">Platform Security</h2>
                 <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+                    <div className='rounded-lg flex flex-row'>
                     <img
                         src={securityFeaturesImg}
                         alt="Platform Security Features"
-                        className="w-full h-64 object-cover rounded-lg mb-6"
+                        className="h-64 rounded-lg mb-6 mx-auto"
                     />
+                    <img
+                        src={securityFeatures2Img}
+                        alt="Platform Security Features"
+                        className="h-64 rounded-lg mb-6 mx-auto"
+                    />
+                    </div>
                     <p className="text-lg text-gray-700">
                         Our platform is built with top-notch security features to protect exam integrity and user data. We employ robust encryption methods, continuous monitoring, and advanced fraud detection to ensure a secure testing environment.
                     </p>
@@ -84,7 +92,7 @@ const About = () => {
                     <img
                         src={innovationImg}
                         alt="Innovative Technology"
-                        className="w-full h-64 object-cover rounded-lg mb-6"
+                        className="w-96 h-64 object-cover rounded-lg mb-6 mx-auto"
                     />
                     <p className="text-lg text-gray-700">
                         Our platform integrates cutting-edge technologies to enhance the examination experience. From AI-powered proctoring to real-time analytics, we are committed to pushing the boundaries of exam automation and monitoring.
