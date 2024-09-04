@@ -10,6 +10,7 @@ import path from 'path';
 import formRoutes from './routes/form.route.js';
 import regformRoutes from './routes/regform.route.js';  // Updated import
 import examRoutes from './routes/examRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use('/api', countryRoutes);
 app.use('/api/regform', regformRoutes); // Updated route
 
 app.use('/api/exams', examRoutes);
+app.use('/api/convert', uploadRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));

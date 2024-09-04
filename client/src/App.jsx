@@ -17,6 +17,7 @@ import './index.css';
 import ExamWindow from "./pages/Exam_Section/ExamWindow";
 import UserDashboard from "./pages/Users/UserDashboard";
 import AdminRoute from "./components/private/AdminRoute";
+import FileUploader from "./pages/Admin/FileUploader";
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
@@ -35,6 +36,7 @@ function App() {
           <Route element={<AdminRoute />}>
             <Route path='/admin-dashboard' element={<AdminDashboard />} />
             <Route path='/exam-builder' element={<ExamBuilder />} />
+            <Route path='/converter' element={<FileUploader />}/>
           </Route>
 
 
