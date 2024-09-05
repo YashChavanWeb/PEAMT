@@ -13,6 +13,7 @@ export default function Header() {
 
     // Check if the current route is /exam-builder
     const isExamBuilder = location.pathname === '/exam-builder';
+    const converter = location.pathname === '/converter';
 
     return (
         <div className='bg-cyan-600 bg-opacity-70 h-20 fixed top-0 left-0 right-0 z-10 transition-colors duration-300 hover:bg-cyan-500 hover:bg-opacity-80'>
@@ -22,7 +23,7 @@ export default function Header() {
                     {/* <h1 className='font-bold text-4xl text-white'></h1> */}
                 </Link>
                 <ul className='flex gap-12 items-end p-3'>
-                    {!isExamBuilder && (
+                    {!isExamBuilder && !converter && (
                         <>
                             <Link to='/'>
                                 <button className='button'>
@@ -38,14 +39,17 @@ export default function Header() {
                     )}
                     {isExamBuilder && (
                         <div className='flex gap-4'>
+                            <Link to='/converter'>
                             <button className='button'>
                                 <li>Upload Paper</li>
                             </button>
+                            </Link>
                             <button className='button'>
                                 <li>Save Paper</li>
                             </button>
                         </div>
                     )}
+
                     <Link to='/profile'>
                         <button className='bg-sky-800 w-13 h-13 rounded-3xl p-1 hover:bg-cyan-600 hover:shadow-cyan-800/50 hover:font-bold transition transform hover:-translate-y-1 hover:scale-105'>
                             {currentUser ? (
