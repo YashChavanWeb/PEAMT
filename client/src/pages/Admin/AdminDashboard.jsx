@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 function AdminDashboard() {
     const [showPopup, setShowPopup] = useState(false);
@@ -14,6 +15,8 @@ function AdminDashboard() {
 
     const [exams, setExams] = useState([]);
     const [successMessage, setSuccessMessage] = useState('');
+
+    const { currentUser } = useSelector((state) => state.user); // Access the currentUser from Redux
 
     useEffect(() => {
         fetchExams();
@@ -57,7 +60,10 @@ function AdminDashboard() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(examDetails),
+                body: JSON.stringify({
+                    ...examDetails,
+                    adminEmail: currentUser?.email // Include admin email in the request body
+                }),
             });
 
             if (response.ok) {
@@ -92,9 +98,12 @@ function AdminDashboard() {
         localStorage.removeItem('successMessage');
     };
 
+    // Filter exams based on the current admin's email
+    const adminExams = exams.filter(exam => exam.adminEmail === currentUser?.email);
+
     return (
         <div className="admin-dashboard bg-gradient-to-r from-cyan-600 to-indigo-300 flex flex-col items-center justify-center h-screen p-4 overflow-x-hidden">
-            {successMessage && (
+            {/* {successMessage && (
                 <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 relative">
                     {successMessage}
                     <button
@@ -105,7 +114,13 @@ function AdminDashboard() {
                         &times;
                     </button>
                 </div>
-            )}
+            )} */}
+
+            <div className="w-full max-w-4xl mb-8">
+                {/* <p className="text-lg font-semibold text-white">
+                    Signed in as: <span className="font-bold">{currentUser?.email}</span>
+                </p> */}
+            </div>
 
             <button
                 onClick={handleButtonClick}
@@ -119,6 +134,7 @@ function AdminDashboard() {
                     <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
                         <h2 className="text-2xl font-bold mb-4">Create New Exam</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Form fields */}
                             <div className="flex flex-col">
                                 <label className="mb-1 font-semibold">Exam Name:</label>
                                 <input
@@ -214,7 +230,7 @@ function AdminDashboard() {
             )}
 
             <div className="w-full max-w-4xl mt-8 overflow-x-auto">
-                {exams.length > 0 ? (
+                {adminExams.length > 0 ? (
                     <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                         <thead className="bg-gray-200 text-gray-800">
                             <tr>
@@ -228,7 +244,7 @@ function AdminDashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            {exams.map((exam, index) => (
+                            {adminExams.map((exam, index) => (
                                 <tr key={index} className="hover:bg-gray-100 transition-colors duration-300">
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.examName}</td>
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.duration}</td>

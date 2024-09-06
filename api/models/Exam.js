@@ -17,6 +17,10 @@ const examSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    registrationEndDate: {
+        type: Date,
+        required: true,
+    },
     totalMarks: {
         type: Number,
         required: true,
@@ -25,10 +29,13 @@ const examSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    adminEmail: { // New field to store the admin's email
+        type: String,
+        required: true,
+    },
 }, {
     timestamps: true, // Automatically add createdAt and updatedAt timestamps
 });
-
 
 const adminUri = process.env.ADMIN;
 // Create connection to the ADMIN database
@@ -37,5 +44,3 @@ const adminConnection = mongoose.createConnection(adminUri);
 const Exam = adminConnection.model('Exam', examSchema);
 
 export default Exam;
-
-
