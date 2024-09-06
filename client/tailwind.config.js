@@ -11,10 +11,15 @@ export default {
       fontFamily: {
         'poppins': ['"Poppins"', ...defaultTheme.fontFamily.sans]
       },
+
+      
       animation: {
         slideIn: 'slideIn 1s ease-in-out infinite',
         slideOut: 'slideOut 1s ease-in-out infinite',
       },
+
+
+      
       keyframes: {
         slideIn: {
           '0%': { transform: 'translateX(-100%)', opacity: '0' },
