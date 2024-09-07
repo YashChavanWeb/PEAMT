@@ -24,7 +24,12 @@ function AdminDashboard() {
             const response = await fetch('/api/exams'); // Adjust the endpoint as needed
             if (response.ok) {
                 const data = await response.json();
-                setExams(data);
+                const formattedData = data.map((exam) => ({
+                    ...exam,
+                    examDate: new Date(exam.examDate).toLocaleDateString(),
+                    registrationEndDate: new Date(exam.registrationEndDate).toLocaleDateString(),
+                }));
+                setExams(formattedData);
             } else {
                 console.error('Failed to fetch exams.');
             }
@@ -95,7 +100,7 @@ function AdminDashboard() {
     return (
         <div className="admin-dashboard bg-gradient-to-r from-cyan-600 to-indigo-300 flex flex-col items-center justify-center h-screen p-4 overflow-x-hidden">
             {successMessage && (
-                <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 relative">
+                <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 relative shadow-lg">
                     {successMessage}
                     <button
                         onClick={handleClearMessage}
@@ -109,15 +114,15 @@ function AdminDashboard() {
 
             <button
                 onClick={handleButtonClick}
-                className="button"
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-transform transform hover:scale-105"
             >
                 Create New Exam
             </button>
 
             {showPopup && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
-                        <h2 className="text-2xl font-bold mb-4">Create New Exam</h2>
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                    <div className="bg-white p-8 rounded-lg shadow-2xl max-w-lg w-full">
+                        <h2 className="text-2xl font-bold mb-4 text-center">Create New Exam</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="flex flex-col">
                                 <label className="mb-1 font-semibold">Exam Name:</label>
@@ -126,7 +131,7 @@ function AdminDashboard() {
                                     name="examName"
                                     value={examDetails.examName}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
@@ -137,7 +142,7 @@ function AdminDashboard() {
                                     name="duration"
                                     value={examDetails.duration}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
@@ -148,7 +153,7 @@ function AdminDashboard() {
                                     name="eligibility"
                                     value={examDetails.eligibility}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
@@ -159,7 +164,7 @@ function AdminDashboard() {
                                     name="examDate"
                                     value={examDetails.examDate}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
@@ -170,7 +175,7 @@ function AdminDashboard() {
                                     name="registrationEndDate"
                                     value={examDetails.registrationEndDate}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
@@ -181,7 +186,7 @@ function AdminDashboard() {
                                     name="totalMarks"
                                     value={examDetails.totalMarks}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
@@ -192,18 +197,18 @@ function AdminDashboard() {
                                     name="passingMarks"
                                     value={examDetails.passingMarks}
                                     onChange={handleChange}
-                                    className="border border-gray-300 p-2 rounded"
+                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
                                     required
                                 />
                             </div>
                             <div className="flex justify-end space-x-2 mt-4">
-                                <button type="submit" className="button">
+                                <button type="submit" className="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-transform transform hover:scale-105">
                                     Create Exam
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowPopup(false)}
-                                    className="bg-red-600 w-40 shadow-lg text-white font-poppins p-3 rounded-3xl hover:bg-red-700 hover:shadow-red-800/50 hover:font-bold transition transform hover:-translate-y-1 hover:scale-105"
+                                    className="bg-red-600 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-red-700 hover:shadow-xl transition-transform transform hover:scale-105"
                                 >
                                     Cancel
                                 </button>
@@ -213,39 +218,38 @@ function AdminDashboard() {
                 </div>
             )}
 
-            <div className="w-full max-w-4xl mt-8 overflow-x-auto">
+            <div className="w-full max-w-5xl mt-8 overflow-x-auto">
                 {exams.length > 0 ? (
-                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                        <thead className="bg-gray-200 text-gray-800">
+                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+                        <thead className="bg-indigo-600 text-white">
                             <tr>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Exam Name</th>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Duration</th>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Eligibility</th>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Exam Date</th>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Registration End Date</th>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Total Marks</th>
-                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Passing Marks</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Exam Name</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Duration</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Eligibility</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Exam Date</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Registration End Date</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Total Marks</th>
+                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Passing Marks</th>
                             </tr>
                         </thead>
                         <tbody>
                             {exams.map((exam, index) => (
                                 <tr key={index} className="hover:bg-gray-100 transition-colors duration-300">
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.examName}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.duration}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.eligibility}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{new Date(exam.examDate).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{new Date(exam.registrationEndDate).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.totalMarks}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.passingMarks}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.examName}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.duration}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.eligibility}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.examDate}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.registrationEndDate}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.totalMarks}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300">{exam.passingMarks}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 ) : (
-                    <p className="text-gray-500 text-center">No exams available.</p>
+                    <p className="text-gray-600">No exams available yet.</p>
                 )}
             </div>
-
         </div>
     );
 }
