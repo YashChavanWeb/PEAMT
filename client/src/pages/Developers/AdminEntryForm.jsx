@@ -60,83 +60,101 @@ function AdminEntryForm() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto mt-12 bg-white p-8 rounded-lg shadow-md">
-            <h1 className="text-3xl font-semibold text-center mb-8">Admin Entry Form</h1>
-            <form className="space-y-6" onSubmit={confirmSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="max-w-4xl mx-auto mt-16 bg-gradient-to-br from-gray-100 to-white p-10 rounded-2xl shadow-2xl transform transition duration-500 hover:scale-105">
+            <h1 className="text-4xl font-extrabold text-center text-blue-800 tracking-wide mb-10">
+                Admin Entry Form
+            </h1>
+            <form className="space-y-8" onSubmit={confirmSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label htmlFor="college" className="block text-sm font-medium text-gray-700">College/Institution/Organization Name</label>
+                        <label htmlFor="college" className="block text-lg font-semibold text-gray-700 mb-2">
+                            College/Institution/Organization Name
+                        </label>
                         <input
                             type="text"
                             id="college"
                             name="college"
                             value={formData.college}
                             onChange={handleChange}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
+                            className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
                         />
                     </div>
                     <div>
-                        <label htmlFor="exam" className="block text-sm font-medium text-gray-700">Exam Name</label>
+                        <label htmlFor="exam" className="block text-lg font-semibold text-gray-700 mb-2">
+                            Exam Name
+                        </label>
                         <input
                             type="text"
                             id="exam"
                             name="exam"
                             value={formData.exam}
                             onChange={handleChange}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
+                            className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
                         />
                     </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+                        <label htmlFor="email" className="block text-lg font-semibold text-gray-700 mb-2">
+                            Email Address
+                        </label>
                         <input
                             type="email"
                             id="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
+                            className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
                         />
                     </div>
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                        <label htmlFor="password" className="block text-lg font-semibold text-gray-700 mb-2">
+                            Password
+                        </label>
                         <input
                             type="password"
                             id="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
+                            className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
                         />
                     </div>
                 </div>
+
                 <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                    <label htmlFor="phone" className="block text-lg font-semibold text-gray-700 mb-2">
+                        Phone Number
+                    </label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="description" className="block text-lg font-semibold text-gray-700 mb-2">
+                        Description
+                    </label>
                     <textarea
                         id="description"
                         name="description"
-                        rows="3"
+                        rows="5"
                         value={formData.description}
                         onChange={handleChange}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm"
+                        className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
                     ></textarea>
                 </div>
+
                 <div className="text-right">
                     <button
                         type="submit"
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-lg font-bold rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-transform duration-300 transform hover:scale-105"
                     >
                         Confirm Submission
                     </button>
@@ -144,22 +162,28 @@ function AdminEntryForm() {
             </form>
 
             {showSubmitConfirmation && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-                    <div className="bg-white p-8 rounded-lg shadow-md">
-                        <p className="text-lg font-semibold mb-4">Please enter the password to submit the form</p>
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
+                    <div className="bg-white p-8 rounded-xl shadow-xl max-w-md w-full space-y-6">
+                        <h2 className="text-xl font-bold text-gray-800 text-center">Please enter the password to submit</h2>
                         <input
                             type="password"
                             value={passwordInput}
                             onChange={(e) => setPasswordInput(e.target.value)}
                             placeholder="Enter password"
-                            className="border border-gray-300 p-2 rounded-md w-full mb-4"
+                            className="w-full border border-gray-300 rounded-lg py-3 px-5 shadow-sm focus:ring-4 focus:ring-blue-300 focus:border-transparent transition duration-200"
                         />
-                        {passwordError && <p className="text-red-600 mb-4">Incorrect password. Please try again.</p>}
-                        <div className="flex justify-end">
-                            <button onClick={cancelSubmit} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md mr-4">
+                        {passwordError && <p className="text-red-500 text-center font-semibold">Incorrect password. Try again.</p>}
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={cancelSubmit}
+                                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-5 rounded-lg transition duration-200"
+                            >
                                 Cancel
                             </button>
-                            <button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md">
+                            <button
+                                onClick={handleSubmit}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition-transform duration-300 transform hover:scale-105"
+                            >
                                 Submit
                             </button>
                         </div>
