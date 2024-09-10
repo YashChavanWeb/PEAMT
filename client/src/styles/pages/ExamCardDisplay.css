@@ -1,88 +1,116 @@
-/* ExamCardDisplay.css */
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f9;
+    /* Light background for the entire page */
+}
 
+/* Container for exam cards */
 .exam-card-container {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
-    padding: 20px;
+    padding: 40px;
     justify-content: center;
-    background-color: #f9f9f9;
-    /* Light gray background */
 }
 
+/* Individual exam card */
 .exam-card {
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
     background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     padding: 24px;
     margin-bottom: 24px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    position: relative;
 }
 
 .exam-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+    background-color: #fafafa;
+    /* Light grey background on hover */
 }
 
+/* Header for the exam card */
 .exam-card-header {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .exam-card-header h2 {
-    font-size: 1.5rem;
+    font-size: 1.875rem;
     font-weight: 700;
-    color: #333;
+    color: #2c3e50;
+    margin: 0;
+    transition: color 0.3s ease;
 }
 
+.exam-card-header:hover h2 {
+    color: #007bff;
+    /* Highlight color on hover */
+}
+
+/* Body of the exam card */
 .exam-card-body {
     display: flex;
     flex-direction: column;
 }
 
+/* Information rows within the card */
 .exam-card-info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     font-size: 1rem;
+    color: #666;
 }
 
 .info-label {
     font-weight: 600;
-    color: #555;
+    color: #444;
 }
 
 .exam-card-info span {
-    color: #777;
+    color: #555;
 }
 
+/* Progress bar styling */
 .progress-container {
     margin-top: 20px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
 }
 
 .progress-info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-size: 0.875rem;
     color: #666;
 }
 
 .progress-bar {
-    height: 6px;
+    height: 10px;
     background-color: #e0e0e0;
-    border-radius: 3px;
+    border-radius: 5px;
     overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
     background-color: #4caf50;
-    transition: width 0.5s ease;
+    transition: width 0.4s ease;
 }
 
+/* Button to apply for the exam */
 .apply-button {
     margin-top: 20px;
 }
@@ -93,76 +121,112 @@
     background-color: #007bff;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 12px;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-apply:hover {
     background-color: #0056b3;
     transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .btn-apply:active {
     background-color: #004494;
+    transform: scale(0.98);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-
-/* ExamCardDisplay.css */
-
-/* Popup Styles */
+/* Popup styles */
 .popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.4s ease;
 }
 
 .popup-content {
     background-color: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    max-width: 500px;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 550px;
     width: 90%;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
     position: relative;
+    animation: scaleUp 0.4s ease;
 }
 
 .popup-header {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    color: #2c3e50;
+    margin-bottom: 20px;
 }
 
 .popup-body p {
-    margin: 8px 0;
+    margin: 10px 0;
     font-size: 1rem;
-    color: #333;
+    color: #555;
 }
 
 .popup-close {
     background-color: #007bff;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
+    border-radius: 12px;
+    padding: 12px 24px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 600;
     position: absolute;
     bottom: 20px;
     right: 20px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .popup-close:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.popup-close:active {
+    background-color: #004494;
+    transform: scale(0.98);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Keyframes for animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
