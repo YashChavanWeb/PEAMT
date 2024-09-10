@@ -21,7 +21,7 @@ function AdminDashboard() {
 
     const fetchExams = async () => {
         try {
-            const response = await fetch('/api/exams'); // Adjust the endpoint as needed
+            const response = await fetch('/api/exams');
             if (response.ok) {
                 const data = await response.json();
                 const formattedData = data.map((exam) => ({
@@ -66,8 +66,7 @@ function AdminDashboard() {
             });
 
             if (response.ok) {
-                alert('Exam created successfully!');
-
+                alert(`Exam "${examDetails.examName}" created successfully!`);
                 const message = `Exam "${examDetails.examName}" created successfully!`;
                 setSuccessMessage(message);
                 localStorage.setItem('successMessage', message);
@@ -83,7 +82,7 @@ function AdminDashboard() {
                     passingMarks: '',
                 });
 
-                fetchExams(); // Fetch the updated list of exams after successful creation
+                fetchExams(); // Re-fetch the exams to show the newly created one.
             } else {
                 alert('Failed to create exam.');
             }
@@ -98,13 +97,20 @@ function AdminDashboard() {
     };
 
     return (
-        <div className="admin-dashboard bg-gradient-to-r from-cyan-600 to-indigo-300 flex flex-col items-center justify-center h-screen p-4 overflow-x-hidden">
+        <div 
+            className="admin-dashboard min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden"
+            style={{
+                backgroundImage: 'url("https://i.pinimg.com/236x/51/eb/6c/51eb6c48ffd090c8df792d55928c0f3d.jpg")', // Replace with your image URL
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >
             {successMessage && (
-                <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 relative shadow-lg">
+                <div className="bg-green-50 text-green-700 border border-green-400 p-4 rounded-lg mb-4 relative shadow-md transition-all duration-300">
                     {successMessage}
                     <button
                         onClick={handleClearMessage}
-                        className="absolute top-1 right-1 text-gray-500 hover:text-gray-700"
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
                         aria-label="Clear message"
                     >
                         &times;
@@ -114,101 +120,130 @@ function AdminDashboard() {
 
             <button
                 onClick={handleButtonClick}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-transform transform hover:scale-105"
+                style={{
+                    background: 'linear-gradient(to right, #3b82f6, #14b8a6)',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '12px',
+                    boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.05)';
+                    e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff';
+                }}
+                onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff';
+                }}
             >
                 Create New Exam
             </button>
 
             {showPopup && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-                    <div className="bg-white p-8 rounded-lg shadow-2xl max-w-lg w-full">
-                        <h2 className="text-2xl font-bold mb-4 text-center">Create New Exam</h2>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Exam Name:</label>
-                                <input
-                                    type="text"
-                                    name="examName"
-                                    value={examDetails.examName}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Duration:</label>
-                                <input
-                                    type="text"
-                                    name="duration"
-                                    value={examDetails.duration}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Eligibility:</label>
-                                <input
-                                    type="text"
-                                    name="eligibility"
-                                    value={examDetails.eligibility}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Exam Date:</label>
-                                <input
-                                    type="date"
-                                    name="examDate"
-                                    value={examDetails.examDate}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Registration End Date:</label>
-                                <input
-                                    type="date"
-                                    name="registrationEndDate"
-                                    value={examDetails.registrationEndDate}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Total Marks:</label>
-                                <input
-                                    type="number"
-                                    name="totalMarks"
-                                    value={examDetails.totalMarks}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label className="mb-1 font-semibold">Passing Marks:</label>
-                                <input
-                                    type="number"
-                                    name="passingMarks"
-                                    value={examDetails.passingMarks}
-                                    onChange={handleChange}
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end space-x-2 mt-4">
-                                <button type="submit" className="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-transform transform hover:scale-105">
+                <div
+                    style={{
+                        position: 'fixed',
+                        inset: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        zIndex: '10',
+                    }}
+                >
+                    <div
+                        style={{
+                            padding: '24px',
+                            borderRadius: '16px',
+                            boxShadow: 'none', // Removed shadow from outer border
+                            backgroundColor: '#e0e0e0',
+                            maxWidth: '600px',
+                            width: '100%',
+                            maxHeight: '90vh',
+                            overflowY: 'auto',
+                        }}
+                    >
+                        <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#555', marginBottom: '16px' }}>
+                            Create New Exam
+                        </h2>
+                        <form onSubmit={handleSubmit}>
+                            {Object.keys(examDetails).map((key) => (
+                                <div key={key} style={{ marginBottom: '16px' }}>
+                                    <label
+                                        style={{
+                                            display: 'block',
+                                            marginBottom: '8px',
+                                            color: '#666',
+                                            textTransform: 'capitalize',
+                                        }}
+                                    >
+                                        {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                    </label>
+                                    <input
+                                        type={key.includes('Date') ? 'date' : key.includes('Marks') ? 'number' : 'text'}
+                                        name={key}
+                                        value={examDetails[key]}
+                                        onChange={handleChange}
+                                        style={{
+                                            padding: '12px',
+                                            borderRadius: '8px',
+                                            backgroundColor: '#e0e0e0',
+                                            boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                                            border: 'none',
+                                            outline: 'none',
+                                            width: '100%',
+                                            transition: 'box-shadow 0.3s ease',
+                                        }}
+                                        onFocus={(e) => (e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff')}
+                                        onBlur={(e) => (e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff')}
+                                        required
+                                    />
+                                </div>
+                            ))}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+                                <button
+                                    type="submit"
+                                    style={{
+                                        background: '#14b8a6',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                        padding: '12px 24px',
+                                        borderRadius: '8px',
+                                        boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(1.05)';
+                                        e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff';
+                                    }}
+                                >
                                     Create Exam
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowPopup(false)}
-                                    className="bg-red-600 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-red-700 hover:shadow-xl transition-transform transform hover:scale-105"
+                                    style={{
+                                        background: '#f87171',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                        padding: '12px 24px',
+                                        borderRadius: '8px',
+                                        boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(1.05)';
+                                        e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff';
+                                    }}
                                 >
                                     Cancel
                                 </button>
@@ -218,36 +253,40 @@ function AdminDashboard() {
                 </div>
             )}
 
-            <div className="w-full max-w-5xl mt-8 overflow-x-auto">
+            {/* Display All Exams */}
+            <div className="w-full max-w-4xl mt-8 overflow-x-auto">
                 {exams.length > 0 ? (
-                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
-                        <thead className="bg-indigo-600 text-white">
+                    <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-sm table-auto">
+                        <thead className="bg-[#50B498] text-white">
                             <tr>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Exam Name</th>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Duration</th>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Eligibility</th>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Exam Date</th>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Registration End Date</th>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Total Marks</th>
-                                <th className="px-6 py-4 border-b-2 border-indigo-500 text-left text-md font-semibold">Passing Marks</th>
+                                {['Exam Name', 'Duration', 'Eligibility', 'Exam Date', 'Registration End Date', 'Total Marks', 'Passing Marks'].map((header) => (
+                                    <th key={header} className="px-4 py-3 text-left text-sm font-semibold">
+                                        {header}
+                                    </th>
+                                ))}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style={{ color: '#6D4C41' }}> {/* Brown color */}
                             {exams.map((exam, index) => (
-                                <tr key={index} className="hover:bg-gray-100 transition-colors duration-300">
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.examName}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.duration}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.eligibility}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.examDate}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.registrationEndDate}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.totalMarks}</td>
-                                    <td className="px-6 py-4 border-b border-gray-300">{exam.passingMarks}</td>
+                                <tr
+                                    key={index}
+                                    className={`border-b hover:bg-gray-100 transition-colors ${
+                                        index % 2 === 0 ? 'bg-gray-50' : ''
+                                    }`}
+                                >
+                                    <td className="px-4 py-3">{exam.examName}</td>
+                                    <td className="px-4 py-3">{exam.duration}</td>
+                                    <td className="px-4 py-3">{exam.eligibility}</td>
+                                    <td className="px-4 py-3">{exam.examDate}</td>
+                                    <td className="px-4 py-3">{exam.registrationEndDate}</td>
+                                    <td className="px-4 py-3">{exam.totalMarks}</td>
+                                    <td className="px-4 py-3">{exam.passingMarks}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 ) : (
-                    <p className="text-gray-600">No exams available yet.</p>
+                    <p className="text-gray-500 mt-4">No exams available.</p>
                 )}
             </div>
         </div>
