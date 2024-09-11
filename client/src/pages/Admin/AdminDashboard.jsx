@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 function AdminDashboard() {
     const [showPopup, setShowPopup] = useState(false);
@@ -13,10 +15,15 @@ function AdminDashboard() {
     });
 
     const [exams, setExams] = useState([]);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [remainingExams, setRemainingExams] = useState(3); // Default limit
+
+    const { currentUser } = useSelector((state) => state.user);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         fetchExams();
+        fetchRemainingExams(); // Fetch remaining exams on component mount
     }, []);
 
     const fetchExams = async () => {
@@ -24,12 +31,7 @@ function AdminDashboard() {
             const response = await fetch('/api/exams');
             if (response.ok) {
                 const data = await response.json();
-                const formattedData = data.map((exam) => ({
-                    ...exam,
-                    examDate: new Date(exam.examDate).toLocaleDateString(),
-                    registrationEndDate: new Date(exam.registrationEndDate).toLocaleDateString(),
-                }));
-                setExams(formattedData);
+                setExams(data);
             } else {
                 console.error('Failed to fetch exams.');
             }
@@ -38,12 +40,35 @@ function AdminDashboard() {
         }
     };
 
-    useEffect(() => {
-        const storedMessage = localStorage.getItem('successMessage');
-        if (storedMessage) {
-            setSuccessMessage(storedMessage);
+    const fetchRemainingExams = async () => {
+        try {
+            const response = await fetch('/api/exams');
+            if (response.ok) {
+                const data = await response.json();
+                const startOfMonth = new Date();
+                startOfMonth.setDate(1);
+                startOfMonth.setHours(0, 0, 0, 0);
+
+                const endOfMonth = new Date();
+                endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+                endOfMonth.setDate(0);
+                endOfMonth.setHours(23, 59, 59, 999);
+
+                const count = data.filter(exam => {
+                    const createdAt = new Date(exam.createdAt);
+                    return exam.adminEmail === currentUser?.email &&
+                        createdAt >= startOfMonth &&
+                        createdAt <= endOfMonth;
+                }).length;
+
+                setRemainingExams(3 - count); // Update remaining exams count
+            } else {
+                console.error('Failed to fetch exams.');
+            }
+        } catch (error) {
+            console.error('Error fetching exams:', error);
         }
-    }, []);
+    };
 
     const handleButtonClick = () => {
         setShowPopup(true);
@@ -62,13 +87,17 @@ function AdminDashboard() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(examDetails),
+                body: JSON.stringify({
+                    ...examDetails,
+                    adminEmail: currentUser?.email,
+                }),
             });
 
+            const result = await response.json();
+
             if (response.ok) {
-                alert(`Exam "${examDetails.examName}" created successfully!`);
                 const message = `Exam "${examDetails.examName}" created successfully!`;
-                setSuccessMessage(message);
+                alert(message);
                 localStorage.setItem('successMessage', message);
 
                 setShowPopup(false);
@@ -82,60 +111,40 @@ function AdminDashboard() {
                     passingMarks: '',
                 });
 
-                fetchExams(); // Re-fetch the exams to show the newly created one.
+                fetchExams();
+                fetchRemainingExams(); // Update remaining exams count
             } else {
-                alert('Failed to create exam.');
+                setErrorMessage(result.message || 'Failed to create exam.');
+                console.error(result.message || 'Failed to create exam.');
             }
         } catch (error) {
+            setErrorMessage('Error creating exam.');
             console.error('Error creating exam:', error);
         }
     };
 
-    const handleClearMessage = () => {
-        setSuccessMessage('');
-        localStorage.removeItem('successMessage');
+    const handleQuestionListClick = (examId) => {
+        navigate(`/exam-builder`); // Redirect to the exam-builder route with examId
     };
 
+    const adminExams = exams.filter(exam => exam.adminEmail === currentUser?.email);
+
     return (
-        <div 
-            className="admin-dashboard min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden"
+        <div className="admin-dashboard bg-white flex flex-col items-center justify-start h-screen p-4 overflow-x-hidden"
             style={{
-                backgroundImage: 'url("https://i.pinimg.com/236x/51/eb/6c/51eb6c48ffd090c8df792d55928c0f3d.jpg")', // Replace with your image URL
+                backgroundImage: 'url("https://i.pinimg.com/236x/b5/69/85/b5698579540881089e74f9e994ba8885.jpg")',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
+                paddingTop: '1rem' // Adjusted to reduce top space
             }}
         >
-            {successMessage && (
-                <div className="bg-green-50 text-green-700 border border-green-400 p-4 rounded-lg mb-4 relative shadow-md transition-all duration-300">
-                    {successMessage}
-                    <button
-                        onClick={handleClearMessage}
-                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                        aria-label="Clear message"
-                    >
-                        &times;
-                    </button>
-                </div>
-            )}
+            <div className="mb-4">
+                <p className="text-lg font-semibold">Remaining exams this month: {remainingExams}</p>
+            </div>
 
             <button
                 onClick={handleButtonClick}
-                style={{
-                    background: 'linear-gradient(to right, #3b82f6, #14b8a6)',
-                    color: 'white',
-                    padding: '12px 24px',
-                    borderRadius: '12px',
-                    boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.05)';
-                    e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff';
-                }}
-                onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
-                    e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff';
-                }}
+                className="bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:bg-gradient-to-l"
             >
                 Create New Exam
             </button>
@@ -156,7 +165,7 @@ function AdminDashboard() {
                         style={{
                             padding: '24px',
                             borderRadius: '16px',
-                            boxShadow: 'none', // Removed shadow from outer border
+                            boxShadow: 'none',
                             backgroundColor: '#e0e0e0',
                             maxWidth: '600px',
                             width: '100%',
@@ -171,6 +180,7 @@ function AdminDashboard() {
                             {Object.keys(examDetails).map((key) => (
                                 <div key={key} style={{ marginBottom: '16px' }}>
                                     <label
+                                        htmlFor={key}
                                         style={{
                                             display: 'block',
                                             marginBottom: '8px',
@@ -181,6 +191,7 @@ function AdminDashboard() {
                                         {key.replace(/([A-Z])/g, ' $1').trim()}:
                                     </label>
                                     <input
+                                        id={key}
                                         type={key.includes('Date') ? 'date' : key.includes('Marks') ? 'number' : 'text'}
                                         name={key}
                                         value={examDetails[key]}
@@ -249,44 +260,50 @@ function AdminDashboard() {
                                 </button>
                             </div>
                         </form>
+                        {errorMessage && <p style={{ color: 'red', textAlign: 'center', marginTop: '16px' }}>{errorMessage}</p>}
                     </div>
                 </div>
             )}
 
-            {/* Display All Exams */}
             <div className="w-full max-w-4xl mt-8 overflow-x-auto">
-                {exams.length > 0 ? (
-                    <table className="min-w-full bg-white border border-gray-200 rounded-md shadow-sm table-auto">
-                        <thead className="bg-[#50B498] text-white">
+                {adminExams.length > 0 ? (
+                    <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                        <thead className="bg-gradient-to-r from-blue-400 to-blue-600 text-white">
                             <tr>
-                                {['Exam Name', 'Duration', 'Eligibility', 'Exam Date', 'Registration End Date', 'Total Marks', 'Passing Marks'].map((header) => (
-                                    <th key={header} className="px-4 py-3 text-left text-sm font-semibold">
-                                        {header}
-                                    </th>
-                                ))}
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Exam Name</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Duration</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Eligibility</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Exam Date</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Registration End Date</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Total Marks</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Passing Marks</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Actions</th> {/* New column */}
                             </tr>
                         </thead>
-                        <tbody style={{ color: '#6D4C41' }}> {/* Brown color */}
-                            {exams.map((exam, index) => (
-                                <tr
-                                    key={index}
-                                    className={`border-b hover:bg-gray-100 transition-colors ${
-                                        index % 2 === 0 ? 'bg-gray-50' : ''
-                                    }`}
-                                >
-                                    <td className="px-4 py-3">{exam.examName}</td>
-                                    <td className="px-4 py-3">{exam.duration}</td>
-                                    <td className="px-4 py-3">{exam.eligibility}</td>
-                                    <td className="px-4 py-3">{exam.examDate}</td>
-                                    <td className="px-4 py-3">{exam.registrationEndDate}</td>
-                                    <td className="px-4 py-3">{exam.totalMarks}</td>
-                                    <td className="px-4 py-3">{exam.passingMarks}</td>
+                        <tbody>
+                            {adminExams.map((exam, index) => (
+                                <tr key={index} className="hover:bg-gray-100 transition-colors duration-300">
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.examName}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.duration}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.eligibility}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{new Date(exam.examDate).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{new Date(exam.registrationEndDate).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.totalMarks}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.passingMarks}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">
+                                        <button
+                                            onClick={() => handleQuestionListClick(exam._id)} // Pass exam ID
+                                            className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-600"
+                                        >
+                                            Question List
+                                        </button>
+                                    </td> {/* New cell */}
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 ) : (
-                    <p className="text-gray-500 mt-4">No exams available.</p>
+                    <p className="text-white text-center">No exams available.</p>
                 )}
             </div>
         </div>

@@ -17,6 +17,7 @@ import './index.css';
 import ExamWindow from "./pages/Exam_Section/ExamWindow";
 import UserDashboard from "./pages/Users/UserDashboard";
 import AdminRoute from "./components/private/AdminRoute";
+import UserRoute from "./components/private/UserRoute";
 import FileUploader from "./pages/Admin/FileUploader";
 
 function App() {
@@ -27,37 +28,39 @@ function App() {
       <Header />
       <div className='pt-20'> {/* Adjusted padding-top to match header height */}
         <Routes>
+          {/* Public Routes */}
           <Route path='/' element={<Home />} />
           <Route path='/about' element={<About />} />
           <Route path='/sign-in' element={<SignIn />} />
           <Route path='/sign-up' element={<SignUp />} />
 
-          {/* Admin-only routes */}
+          {/* Admin-only Routes */}
           <Route element={<AdminRoute />}>
             <Route path='/admin-dashboard' element={<AdminDashboard />} />
             <Route path='/exam-builder' element={<ExamBuilder />} />
-            <Route path='/converter' element={<FileUploader />}/>
+            <Route path='/converter' element={<FileUploader />} />
           </Route>
 
+          {/* User-only Routes */}
+          <Route element={<UserRoute />}>
+            <Route path='/user-dashboard' element={<UserDashboard />} />
+          </Route>
 
+          {/* Private Routes (authenticated users) */}
           <Route element={<PrivateRoute />}>
-            {/* For the user */}
             <Route path='/profile' element={<Profile />} />
             <Route path='/registration-form' element={<RegistrationForm />} />
-            <Route path='/user-dashboard' element={<UserDashboard />} />
-
-            {/* Exam section part */}
-            <Route path="/start" element={<StartPage />} />
+            <Route path='/start' element={<StartPage />} />
             <Route path='/exam-section' element={<ExamWindow />} />
             <Route path='/submit-confirmation' element={<SubmitConfirmation />} />
           </Route>
 
-
-
-          {/* For owners */}
+          {/* For Owners */}
           <Route path={`/private-dashboard/${privatePassId}`} element={<PrivateDashboard />} />
           <Route path={`/private-dashboard/${privatePassId}/admin-entry`} element={<AdminEntryForm />} />
 
+          {/* Catch-all Route for 404 */}
+          <Route path='*' element={<Home />} /> {/* Optionally, you might want to use a 404 page */}
         </Routes>
       </div>
     </BrowserRouter>
@@ -65,4 +68,3 @@ function App() {
 }
 
 export default App;
-
