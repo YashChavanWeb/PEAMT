@@ -5,6 +5,13 @@ import PopupModel from './PopupModel';
 import { useLocation } from 'react-router-dom';
 
 function RegistrationForm() {
+    // Retrieve data from location state if coming from another route
+    const location = useLocation();
+    const { exam } = location.state || {};  // Assuming exam details are passed through location state
+
+    // OR if using Redux to fetch examName from global state
+    const examFromRedux = useSelector((state) => state.exam);
+
     const [formData, setFormData] = useState({
         name: '',
         adhar: '',
@@ -27,13 +34,19 @@ function RegistrationForm() {
             state: '',
             city: '',
             pincode: ''
-        }
+        },
+        examNames: '', // Safe fallback for examName
     });
 
 
-    // the exam details are passed
-    const location = useLocation();
-    const exam = location.state?.exam; // Access the passed state
+
+    // const location = useLocation();
+    // const { exam } = location.state || {}; // Access the exam name from the state
+
+
+    // // the exam details are passed
+    // const location = useLocation();
+    // const exam = location.state?.exam; // Access the passed state
 
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
@@ -50,28 +63,28 @@ function RegistrationForm() {
     const [fetchError, setFetchError] = useState(null);  // State for handling fetch errors
 
 
-    const fetchRegistrationData = async (adharNumber) => {
-        setFetchLoading(true);
-        setFetchError(null);
+    // const fetchRegistrationData = async (adharNumber) => {
+    //     setFetchLoading(true);
+    //     setFetchError(null);
 
-        try {
-            const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
-            setRegData(response.data);
+    //     try {
+    //         const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
+    //         setRegData(response.data);
 
-            // Update form fields with the fetched data
-            setFormData((prevState) => ({
-                ...prevState,
-                ...response.data,
-                permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
-                emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
-                subjects: response.data.subjects || prevState.subjects
-            }));
-        } catch (error) {
-            setFetchError(error.response ? error.response.data.message : error.message);
-        } finally {
-            setFetchLoading(false);
-        }
-    };
+    //         // Update form fields with the fetched data
+    //         setFormData((prevState) => ({
+    //             ...prevState,
+    //             ...response.data,
+    //             permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
+    //             emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
+    //             subjects: response.data.subjects || prevState.subjects
+    //         }));
+    //     } catch (error) {
+    //         setFetchError(error.response ? error.response.data.message : error.message);
+    //     } finally {
+    //         setFetchLoading(false);
+    //     }
+    // };
 
 
     useEffect(() => {
@@ -107,6 +120,19 @@ function RegistrationForm() {
             setFormData(JSON.parse(storedFormData));
         }
     }, []);
+
+
+
+    // Effect to handle exam name updates
+    useEffect(() => {
+        if (exam) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                examNames: [...new Set([...(prevFormData.examNames || []), exam])], // Append exam name, prevent duplicates
+            }));
+        }
+    }, [exam]);
+
 
 
 
@@ -288,30 +314,67 @@ function RegistrationForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // if (!paymentSuccessful) {
-        //     alert('Please complete the payment before submitting the form.');
-        //     return;
-        // }
+        console.log('Form data before submission:', formData);
 
-        if (!formData.name || !formData.adhar || !formData.email || !formData.phone || !formData.permanentAddress.country || !formData.permanentAddress.state || !formData.permanentAddress.city || !formData.permanentAddress.pincode) {
+        // Check for required fields
+        if (!formData.name || !formData.adhar || !formData.email || !formData.phone ||
+            !formData.permanentAddress.country || !formData.permanentAddress.state ||
+            !formData.permanentAddress.city || !formData.permanentAddress.pincode) {
             alert('Please fill all the required fields.');
             return;
         }
 
-        const submissionData = {
-            ...formData,
-            paymentId
-        };
+        // Add the exam name from Redux or location if not already in formData
+        let examToSubmit = exam || examFromRedux || '';
+
+        if (!formData.examNames.includes(examToSubmit) && examToSubmit) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                examNames: [...prevFormData.examNames, examToSubmit], // Push exam to array if not already present
+            }));
+        }
 
         try {
-            const response = await axios.post('/api/regform', submissionData);
-            setModalOpen(true); // Open the modal
-            localStorage.removeItem('formData'); // Clear localStorage on successful submission
+            const response = await axios.post('/api/regform', {
+                ...formData,
+                examNames: formData.examNames.length > 0 ? formData.examNames : [examToSubmit],
+                paymentId: paymentId || ''
+            });
+
+            console.log('Form submitted successfully:', response.data);
+            setModalOpen(true);
+            localStorage.removeItem('formData');
         } catch (error) {
             console.error('Error submitting form:', error);
-            alert('Error submitting form. Please try again.');
+            alert('There was an error submitting the form. Please try again later.');
         }
     };
+
+    // Fetch registration data based on Aadhaar
+    const fetchRegistrationData = async (adharNumber) => {
+        try {
+            const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
+            setFormData((prevState) => ({
+                ...prevState,
+                ...response.data,
+                permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
+                emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
+                subjects: response.data.subjects || prevState.subjects
+            }));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // Effect to handle exam name updates
+    useEffect(() => {
+        if (exam) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                examNames: [...new Set([...(prevFormData.examNames || []), exam])], // Append exam name, prevent duplicates
+            }));
+        }
+    }, [exam]);
 
 
     const handleFetchDetails = async () => {
@@ -342,8 +405,14 @@ function RegistrationForm() {
 
 
     return (
-        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md max-w-max">
+        <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-6">Registration Form</h2>
+            {exam && (
+                <div className="mb-4">
+                    <h2 className="text-xl">You are registering for: <span className="font-bold">{exam}</span></h2>
+                </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor="adhar" className="block text-sm font-medium text-gray-700">Aadhar Number</label>
@@ -716,4 +785,3 @@ function RegistrationForm() {
 }
 
 export default RegistrationForm;
-

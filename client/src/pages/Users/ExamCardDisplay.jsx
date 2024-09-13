@@ -21,12 +21,9 @@ const ExamCardDisplay = ({ exams }) => {
 
     const handleClosePopup = () => {
         if (selectedExam) {
-            navigate('/registration-form', { state: { exam: selectedExam } });
+            // Navigate to the registration form and pass the selected exam name as state
+            navigate('/registration-form', { state: { exam: selectedExam.examName } });
         }
-    };
-
-    const handleCancelPopup = () => {
-        setSelectedExam(null);
     };
 
     return (
@@ -34,7 +31,7 @@ const ExamCardDisplay = ({ exams }) => {
             {/* Title bar with centered title */}
             <div className="flex justify-center mb-8">
                 <div className="bg-[#6C48C5] text-center py-3 px-6 rounded-full shadow-md w-2/3">
-                    <h1 className="text-2xl font-bold text-white">Exams Overview</h1>
+                    <h1 className="text-2xl font-bold text-brown-600">Exams Overview</h1>
                 </div>
             </div>
 
@@ -108,7 +105,7 @@ const ExamCardDisplay = ({ exams }) => {
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg p-8 w-full max-w-lg shadow-2xl relative">
                             <h3 className="text-2xl font-bold mb-6 text-center">Exam Details</h3>
-                            <div className="space-y-4 mb-6">
+                            <div className="space-y-4">
                                 <p><strong>Exam Name:</strong> {selectedExam.examName}</p>
                                 <p><strong>Duration:</strong> {selectedExam.duration} minutes</p>
                                 <p><strong>Eligibility:</strong> {selectedExam.eligibility}</p>
@@ -117,20 +114,12 @@ const ExamCardDisplay = ({ exams }) => {
                                 <p><strong>Passing Marks:</strong> {selectedExam.passingMarks}</p>
                                 <p><strong>Registration End Date:</strong> {new Date(selectedExam.registrationEndDate).toLocaleDateString()}</p>
                             </div>
-                            <div className="flex justify-between">
-                                <button
-                                    onClick={handleClosePopup}
-                                    className="bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition-all w-full mr-2"
-                                >
-                                    Register
-                                </button>
-                                <button
-                                    onClick={handleCancelPopup}
-                                    className="bg-gray-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-gray-700 transition-all w-full ml-2"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
+                            <button
+                                onClick={handleClosePopup}
+                                className="bg-green-600 text-white font-semibold px-6 py-3 mt-6 rounded-lg hover:bg-green-700 transition-all w-full"
+                            >
+                                Register
+                            </button>
                         </div>
                     </div>
                 )}

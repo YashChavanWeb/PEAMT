@@ -7,7 +7,7 @@ router.post('/', createRegForm);
 router.get('/:id', getRegFormById);
 router.put('/:id', updateRegForm);
 
-// New route to get form by Aadhar number
+// New route to get form by Aadhaar number
 router.get('/adhar/:adhar', getRegFormByAdhar);
 
 export default router;

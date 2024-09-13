@@ -1,4 +1,3 @@
-// Modal.js
 import React from 'react';
 
 function PopupModel({ isOpen, onClose, formData }) {
@@ -18,20 +17,35 @@ function PopupModel({ isOpen, onClose, formData }) {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="fixed inset-0 bg-gray-600 opacity-50" onClick={onClose}></div>
-            <div className="relative bg-white p-6 rounded-lg shadow-lg w-80">
-                <h2 className="text-lg font-bold mb-4">Registration Successful</h2>
+        <div
+            className="fixed inset-0 flex items-center justify-center z-50"
+            role="dialog"
+            aria-labelledby="modal-title"
+            aria-modal="true"
+        >
+            <div
+                className="fixed inset-0 bg-gray-600 opacity-50"
+                onClick={onClose}
+                aria-label="Close modal"
+            ></div>
+            <div
+                className="relative bg-white p-6 rounded-lg shadow-lg w-80"
+                role="document"
+                aria-labelledby="modal-title"
+            >
+                <h2 id="modal-title" className="text-lg font-bold mb-4">
+                    Registration Successful
+                </h2>
                 <p className="mb-4">Your form has been submitted successfully!</p>
                 <button
                     onClick={handleDownload}
-                    className="bg-green-500 text-white px-4 py-2 rounded-md mr-2"
+                    className="bg-green-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-green-600 transition"
                 >
                     Download Form Data
                 </button>
                 <button
                     onClick={onClose}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
                 >
                     Close
                 </button>
