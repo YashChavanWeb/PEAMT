@@ -2,40 +2,40 @@
 import RegForm from '../models/RegForm.js';
 
     // Create a new registration form
-    export const createRegForm = async (req, res) => {
-        try {
-            const {
-                name, adhar, email, phone, fatherName, motherName, currentCourse,
-                subjects, dateOfBirth, gender, nationality, emergencyContact,
-                previousEducation, permanentAddress, paymentId, examNames
-            } = req.body;
+  // Create a new registration form
+// Create a new registration form
+export const createRegForm = async (req, res) => {
+    try {
+        const {
+            name, adhar, email, phone, fatherName, motherName, currentCourse,
+            subjects, dateOfBirth, gender, nationality, emergencyContact,
+            previousEducation, permanentAddress, paymentId, examNames
+        } = req.body;
 
-            console.log('Received data:', req.body); // Log incoming request data
-
-            if (!name || !adhar || !email || !phone || !fatherName || !motherName ||
-                !currentCourse || !subjects || !dateOfBirth || !gender || !nationality ||
-                !emergencyContact || !previousEducation || !permanentAddress || !paymentId) {
-                console.error('Missing required fields'); // Log if fields are missing
-                return res.status(400).json({ message: 'All fields are required' });
-            }
-
-            const subjectsArray = Array.isArray(subjects) ? subjects : [];
-            const examNamesString = Array.isArray(examNames) ? examNames.join(',') : '';
-
-            const newRegForm = new RegForm({
-                name, adhar, email, phone, fatherName, motherName, currentCourse,
-                subjects: subjectsArray, dateOfBirth, gender, nationality,
-                emergencyContact, previousEducation, permanentAddress, paymentId,
-                examNames: examNamesString
-            });
-
-            await newRegForm.save();
-            res.status(201).json(newRegForm);
-        } catch (error) {
-            console.error('Error creating registration form:', error); // Log the error
-            res.status(500).json({ message: 'Error creating form. Please try again.' });
+        if (!name || !adhar || !email || !phone || !fatherName || !motherName ||
+            !currentCourse || !subjects || !dateOfBirth || !gender || !nationality ||
+            !emergencyContact || !previousEducation || !permanentAddress || !paymentId) {
+            return res.status(400).json({ message: 'All fields are required' });
         }
-    };
+
+        // Ensure subjects is an array and examNames is an array
+        const subjectsArray = Array.isArray(subjects) ? subjects : [];
+        const examNamesArray = Array.isArray(examNames) ? examNames : [];
+
+        const newRegForm = new RegForm({
+            name, adhar, email, phone, fatherName, motherName, currentCourse,
+            subjects: subjectsArray, dateOfBirth, gender, nationality,
+            emergencyContact, previousEducation, permanentAddress, paymentId,
+            examNames: examNamesArray
+        });
+
+        await newRegForm.save();
+        res.status(201).json(newRegForm);
+    } catch (error) {
+        console.error('Error creating registration form:', error);
+        res.status(500).json({ message: 'Error creating form. Please try again.' });
+    }
+};
 
     // Get a registration form by its ID
     export const getRegFormById = async (req, res) => {
@@ -52,35 +52,33 @@ import RegForm from '../models/RegForm.js';
     };
 
     // Update an existing registration form
-    export const updateRegForm = async (req, res) => {
-        try {
-            const { id } = req.params;
-            const { examName } = req.body;
-    
-            // Find the form by ID
-            const form = await RegForm.findById(id);
-    
-            if (!form) {
-                return res.status(404).json({ message: 'Form not found' });
-            }
-    
-            // Check if the examName is already present
-            let examNames = form.examNames ? form.examNames.split(',') : [];
-            if (!examNames.includes(examName)) {
-                examNames.push(examName); // Add new exam name to the array
-            }
-    
-            // Update examNames as a comma-separated string
-            form.examNames = examNames.join(',');
-    
-            // Save updated form
-            await form.save();
-    
-            res.status(200).json({ message: 'Form updated successfully', form });
-        } catch (error) {
-            res.status(500).json({ message: 'Error updating form', error });
+   // Update an existing registration form to add an exam name dynamically
+export const updateRegForm = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { examName } = req.body;
+
+        // Find the form by ID
+        const form = await RegForm.findById(id);
+
+        if (!form) {
+            return res.status(404).json({ message: 'Form not found' });
         }
-    };
+
+        // Ensure examNames is an array, then add the new exam if it's not already present
+        if (!form.examNames.includes(examName)) {
+            form.examNames.push(examName); // Add new exam name to the array
+        }
+
+        // Save the updated form
+        await form.save();
+
+        res.status(200).json({ message: 'Form updated successfully', form });
+    } catch (error) {
+        console.error('Error updating form:', error);
+        res.status(500).json({ message: 'Error updating form', error });
+    }
+};
 
 // Get a registration form by Aadhar number
 export const getRegFormByAdhar = async (req, res) => {
