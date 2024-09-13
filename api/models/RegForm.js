@@ -24,7 +24,7 @@ const regFormSchema = new mongoose.Schema({
         pincode: { type: String, required: true }
     },
     paymentId: { type: String, required: true },
-    examNames: { type: String } // Changed from array to comma-separated string
+    examNames: [String] // Changed from array to comma-separated string
 });
 
 const RegForm = mongoose.model('RegForm', regFormSchema);

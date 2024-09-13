@@ -5,11 +5,9 @@ import PopupModel from './PopupModel';
 import { useLocation } from 'react-router-dom';
 
 function RegistrationForm() {
-    // Retrieve data from location state if coming from another route
     const location = useLocation();
-    const { exam } = location.state || {};  // Assuming exam details are passed through location state
+    const { exam } = location.state || {}; // Assuming exam details are passed through location state
 
-    // OR if using Redux to fetch examName from global state
     const examFromRedux = useSelector((state) => state.exam);
 
     const [formData, setFormData] = useState({
@@ -38,16 +36,6 @@ function RegistrationForm() {
         examNames: '', // Safe fallback for examName
     });
 
-
-
-    // const location = useLocation();
-    // const { exam } = location.state || {}; // Access the exam name from the state
-
-
-    // // the exam details are passed
-    // const location = useLocation();
-    // const exam = location.state?.exam; // Access the passed state
-
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
@@ -56,49 +44,22 @@ function RegistrationForm() {
     const [error, setError] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [paymentSuccessful, setPaymentSuccessful] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false); // State for modal
-    const [paymentCompleted, setPaymentCompleted] = useState(false); // New state for tracking payment status
-    const [regData, setRegData] = useState(null);  // State for holding the fetched registration data
-    const [fetchLoading, setFetchLoading] = useState(false);  // State for handling fetch loading
-    const [fetchError, setFetchError] = useState(null);  // State for handling fetch errors
-
-
-    // const fetchRegistrationData = async (adharNumber) => {
-    //     setFetchLoading(true);
-    //     setFetchError(null);
-
-    //     try {
-    //         const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
-    //         setRegData(response.data);
-
-    //         // Update form fields with the fetched data
-    //         setFormData((prevState) => ({
-    //             ...prevState,
-    //             ...response.data,
-    //             permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
-    //             emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
-    //             subjects: response.data.subjects || prevState.subjects
-    //         }));
-    //     } catch (error) {
-    //         setFetchError(error.response ? error.response.data.message : error.message);
-    //     } finally {
-    //         setFetchLoading(false);
-    //     }
-    // };
-
+    const [modalOpen, setModalOpen] = useState(false);
+    const [paymentCompleted, setPaymentCompleted] = useState(false);
+    const [regData, setRegData] = useState(null);
+    const [fetchLoading, setFetchLoading] = useState(false);
+    const [fetchError, setFetchError] = useState(null);
 
     useEffect(() => {
         const checkPaymentStatus = async () => {
             try {
-                // Check if a payment ID is present in localStorage
                 const storedPaymentId = localStorage.getItem('paymentId');
                 if (storedPaymentId) {
                     setPaymentId(storedPaymentId);
-                    setPaymentCompleted(true); // Mark payment as completed
+                    setPaymentCompleted(true);
                     return;
                 }
 
-                // Replace with your API endpoint to check payment status
                 const response = await axios.get(`/api/check-payment-status/${currentUser.id}`);
                 if (response.data.paymentCompleted) {
                     localStorage.setItem('paymentId', response.data.paymentId);
@@ -113,7 +74,6 @@ function RegistrationForm() {
         checkPaymentStatus();
     }, [currentUser.id]);
 
-
     useEffect(() => {
         const storedFormData = localStorage.getItem('formData');
         if (storedFormData) {
@@ -121,21 +81,14 @@ function RegistrationForm() {
         }
     }, []);
 
-
-
-    // Effect to handle exam name updates
     useEffect(() => {
         if (exam) {
             setFormData((prevFormData) => ({
                 ...prevFormData,
-                examNames: [...new Set([...(prevFormData.examNames || []), exam])], // Append exam name, prevent duplicates
+                examNames: [...new Set([...(prevFormData.examNames || []), exam])]
             }));
         }
     }, [exam]);
-
-
-
-
 
     const handlePayment = () => {
         if (paymentCompleted) {
@@ -156,8 +109,8 @@ function RegistrationForm() {
                 setLoading(false);
                 setPaymentId(response.razorpay_payment_id);
                 setPaymentSuccessful(true);
-                setPaymentCompleted(true); // Mark payment as completed
-                localStorage.setItem('paymentId', response.razorpay_payment_id); // Store payment ID
+                setPaymentCompleted(true);
+                localStorage.setItem('paymentId', response.razorpay_payment_id);
                 alert('Payment Successful');
             },
             prefill: {
@@ -185,9 +138,6 @@ function RegistrationForm() {
         }
     };
 
-
-
-
     const handleSubjectChange = (e, index) => {
         const newSubjects = [...formData.subjects];
         newSubjects[index] = e.target.value;
@@ -211,7 +161,6 @@ function RegistrationForm() {
             subjects: newSubjects,
         }));
     };
-
 
     const fetchCountries = async () => {
         try {
@@ -276,8 +225,41 @@ function RegistrationForm() {
             [name]: value
         };
 
-        if (name === 'adhar' && value.length === 12) { // Assuming Aadhar number length is 12
-            fetchRegistrationData(value);
+        // Clear formData and examNames when a new Aadhar is entered
+        if (name === 'adhar') {
+            if (value.length === 0) {
+                // Clear form data and reset examNames
+                setFormData({
+                    name: '',
+                    adhar: '',
+                    email: '',
+                    phone: '',
+                    fatherName: '',
+                    motherName: '',
+                    currentCourse: '',
+                    subjects: [],
+                    dateOfBirth: '',
+                    gender: '',
+                    nationality: '',
+                    emergencyContact: {
+                        name: '',
+                        phone: ''
+                    },
+                    previousEducation: '',
+                    permanentAddress: {
+                        country: '',
+                        state: '',
+                        city: '',
+                        pincode: ''
+                    },
+                    examNames: [] // Reset examNames
+                });
+                setRegData(null);
+                localStorage.removeItem('formData');
+                return;
+            } else if (value.length === 12) {
+                fetchRegistrationData(value);
+            }
         }
 
         setFormData(updatedFormData);
@@ -309,12 +291,8 @@ function RegistrationForm() {
         localStorage.setItem('formData', JSON.stringify(updatedFormData));
     };
 
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        console.log('Form data before submission:', formData);
 
         // Check for required fields
         if (!formData.name || !formData.adhar || !formData.email || !formData.phone ||
@@ -324,33 +302,33 @@ function RegistrationForm() {
             return;
         }
 
-        // Add the exam name from Redux or location if not already in formData
+        // Ensure the formData has all the required fields
         let examToSubmit = exam || examFromRedux || '';
+        let updatedExamNames = formData.examNames || []; // Ensure it starts as an array
 
-        if (!formData.examNames.includes(examToSubmit) && examToSubmit) {
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                examNames: [...prevFormData.examNames, examToSubmit], // Push exam to array if not already present
-            }));
+        // Only add the current exam to examNames if it's not already there
+        if (examToSubmit && !updatedExamNames.includes(examToSubmit)) {
+            updatedExamNames = [...updatedExamNames, examToSubmit];
         }
 
         try {
             const response = await axios.post('/api/regform', {
                 ...formData,
-                examNames: formData.examNames.length > 0 ? formData.examNames : [examToSubmit],
+                examNames: updatedExamNames, // Use updated examNames
                 paymentId: paymentId || ''
             });
 
             console.log('Form submitted successfully:', response.data);
             setModalOpen(true);
-            localStorage.removeItem('formData');
+            localStorage.removeItem('formData'); // Clear local storage after submission
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('There was an error submitting the form. Please try again later.');
         }
     };
 
-    // Fetch registration data based on Aadhaar
+
+
     const fetchRegistrationData = async (adharNumber) => {
         try {
             const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
@@ -359,26 +337,17 @@ function RegistrationForm() {
                 ...response.data,
                 permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
                 emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
-                subjects: response.data.subjects || prevState.subjects
+                subjects: response.data.subjects || prevState.subjects,
+                examNames: response.data.examNames || [] // Reset if no examNames exist
             }));
         } catch (error) {
             console.error(error);
         }
     };
 
-    // Effect to handle exam name updates
-    useEffect(() => {
-        if (exam) {
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                examNames: [...new Set([...(prevFormData.examNames || []), exam])], // Append exam name, prevent duplicates
-            }));
-        }
-    }, [exam]);
-
 
     const handleFetchDetails = async () => {
-        if (formData.adhar.length !== 12) { // Assuming Aadhar number length is 12
+        if (formData.adhar.length !== 12) {
             alert('Please enter a valid Aadhar number.');
             return;
         }
@@ -401,7 +370,6 @@ function RegistrationForm() {
             setFetchLoading(false);
         }
     };
-
 
 
     return (
@@ -436,7 +404,6 @@ function RegistrationForm() {
                     {fetchError && <p className="text-red-500">{fetchError}</p>}
                 </div>
 
-
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                     <input
@@ -444,18 +411,6 @@ function RegistrationForm() {
                         id="name"
                         name="name"
                         value={formData.name}
-                        onChange={handleChange}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="adhar" className="block text-sm font-medium text-gray-700">Aadhar Number</label>
-                    <input
-                        type="text"
-                        id="adhar"
-                        name="adhar"
-                        value={formData.adhar}
                         onChange={handleChange}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         required
@@ -490,8 +445,8 @@ function RegistrationForm() {
                     <input
                         type="text"
                         id="fatherName"
-                        name="fatherName" // Updated
-                        value={formData.fatherName} // Updated
+                        name="fatherName"
+                        value={formData.fatherName}
                         onChange={handleChange}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         required
@@ -502,8 +457,8 @@ function RegistrationForm() {
                     <input
                         type="text"
                         id="motherName"
-                        name="motherName" // Updated
-                        value={formData.motherName} // Updated
+                        name="motherName"
+                        value={formData.motherName}
                         onChange={handleChange}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         required
@@ -599,8 +554,6 @@ function RegistrationForm() {
                     </div>
                 </div>
 
-
-
                 <div>
                     <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
                     <input
@@ -613,7 +566,6 @@ function RegistrationForm() {
                         required
                     />
                 </div>
-
 
                 <div>
                     <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender</label>
@@ -632,7 +584,6 @@ function RegistrationForm() {
                     </select>
                 </div>
 
-
                 <div>
                     <label htmlFor="nationality" className="block text-sm font-medium text-gray-700">Nationality</label>
                     <input
@@ -645,7 +596,6 @@ function RegistrationForm() {
                         required
                     />
                 </div>
-
 
                 <div>
                     <label htmlFor="emergencyContact.name" className="block text-sm font-medium text-gray-700">Emergency Contact Name</label>
@@ -660,7 +610,6 @@ function RegistrationForm() {
                     />
                 </div>
 
-
                 <div>
                     <label htmlFor="emergencyContact.phone" className="block text-sm font-medium text-gray-700">Emergency Contact Phone</label>
                     <input
@@ -673,7 +622,6 @@ function RegistrationForm() {
                         required
                     />
                 </div>
-
 
                 <div>
                     <label htmlFor="previousEducation" className="block text-sm font-medium text-gray-700">Previous Education</label>
@@ -705,7 +653,6 @@ function RegistrationForm() {
                         required
                     />
                 </div>
-
 
                 <div>
                     <label
@@ -741,7 +688,6 @@ function RegistrationForm() {
                         Add Subject
                     </button>
                 </div>
-
 
                 <div className='p-6 max-w-md mx-auto bg-white shadow-lg rounded-lg'>
                     <h2 className='text-2xl font-bold mb-4 text-gray-700'>Student Registration</h2>
@@ -782,6 +728,7 @@ function RegistrationForm() {
             />
         </div>
     );
+
 }
 
 export default RegistrationForm;
