@@ -1,3 +1,4 @@
+
 import RegForm from '../models/RegForm.js';
 
     // Create a new registration form
