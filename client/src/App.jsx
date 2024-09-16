@@ -19,6 +19,7 @@ import UserDashboard from "./pages/Users/UserDashboard";
 import AdminRoute from "./components/private/AdminRoute";
 import UserRoute from "./components/private/UserRoute";
 import FileUploader from "./pages/Admin/FileUploader";
+import MyExams from "./pages/Users/MyExams";
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
@@ -54,6 +55,7 @@ function App() {
             <Route path='/exam-window' element={<ExamWindow />} />
             {/* <Route path="/exam-window/:examId" element={<ExamWindow />} /> */}
             <Route path='/submit-confirmation' element={<SubmitConfirmation />} />
+            <Route path='/my-exams' element={<MyExams />} />
           </Route>
 
           {/* For Owners */}

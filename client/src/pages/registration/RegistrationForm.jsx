@@ -8,6 +8,7 @@ function RegistrationForm() {
     const location = useLocation();
     const { exam } = location.state || {}; // Assuming exam details are passed through location state
 
+
     const examFromRedux = useSelector((state) => state.exam);
 
     const [formData, setFormData] = useState({
@@ -311,12 +312,16 @@ function RegistrationForm() {
             updatedExamNames = [...updatedExamNames, examToSubmit];
         }
 
+        // Add username to the formData
+        const userData = {
+            ...formData,
+            examNames: updatedExamNames, // Use updated examNames
+            paymentId: paymentId || '',
+            username: currentUser.username || '' // Add username from the currentUser
+        };
+
         try {
-            const response = await axios.post('/api/regform', {
-                ...formData,
-                examNames: updatedExamNames, // Use updated examNames
-                paymentId: paymentId || ''
-            });
+            const response = await axios.post('/api/regform', userData);
 
             console.log('Form submitted successfully:', response.data);
             setModalOpen(true);
@@ -326,6 +331,7 @@ function RegistrationForm() {
             alert('There was an error submitting the form. Please try again later.');
         }
     };
+
 
 
 

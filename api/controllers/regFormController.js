@@ -1,4 +1,5 @@
 import RegForm from '../models/RegForm.js';
+import Exam from '../models/Exam.js';
 
 // Create or update a registration form
 export const createRegForm = async (req, res) => {
@@ -6,13 +7,13 @@ export const createRegForm = async (req, res) => {
         const {
             name, adhar, email, phone, fatherName, motherName, currentCourse,
             subjects, dateOfBirth, gender, nationality, emergencyContact,
-            previousEducation, permanentAddress, paymentId, examNames
+            previousEducation, permanentAddress, paymentId, examNames, username
         } = req.body;
 
         // Validate required fields
         if (!name || !adhar || !email || !phone || !fatherName || !motherName ||
             !currentCourse || !subjects || !dateOfBirth || !gender || !nationality ||
-            !emergencyContact || !previousEducation || !permanentAddress || !paymentId) {
+            !emergencyContact || !previousEducation || !permanentAddress || !paymentId || !username) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -41,7 +42,8 @@ export const createRegForm = async (req, res) => {
                 JSON.stringify(existingForm.emergencyContact) === JSON.stringify(emergencyContact) &&
                 existingForm.previousEducation === previousEducation &&
                 JSON.stringify(existingForm.permanentAddress) === JSON.stringify(permanentAddress) &&
-                existingForm.paymentId === paymentId;
+                existingForm.paymentId === paymentId &&
+                existingForm.username === username;
 
             if (isExactMatch) {
                 // Update examNames and save
@@ -58,7 +60,7 @@ export const createRegForm = async (req, res) => {
             name, adhar, email, phone, fatherName, motherName, currentCourse,
             subjects: subjectsArray, dateOfBirth, gender, nationality,
             emergencyContact, previousEducation, permanentAddress, paymentId,
-            examNames: examNamesArray
+            examNames: examNamesArray, username // Add username to the new form
         });
 
         await newRegForm.save();
@@ -68,8 +70,6 @@ export const createRegForm = async (req, res) => {
         res.status(500).json({ message: 'Error creating form. Please try again.' });
     }
 };
-
-
 
 // Get a registration form by its ID
 export const getRegFormById = async (req, res) => {
@@ -124,5 +124,52 @@ export const getRegFormByAdhar = async (req, res) => {
         res.status(200).json(regForm);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// Get exam names by username
+export const getExamNamesByUsername = async (req, res) => {
+    try {
+        const { username } = req.params;
+        const regForm = await RegForm.findOne({ username });
+        if (!regForm) {
+            return res.status(404).json({ message: 'Form not found' });
+        }
+        res.status(200).json({ examNames: regForm.examNames });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+// Get exam details by exam names associated with a username
+export const getExamDetailsByNames = async (req, res) => {
+    try {
+        const { username } = req.params;
+        // Find user registration form by username
+        const userRegForm = await RegForm.findOne({ username });
+
+        if (!userRegForm) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const examNames = userRegForm.examNames;
+
+        if (!examNames || examNames.length === 0) {
+            return res.status(404).json({ message: 'No exams found for this user' });
+        }
+
+        // Fetch exam details from Exam collection
+        const exams = await Exam.find({ examName: { $in: examNames } });
+
+        if (!exams || exams.length === 0) {
+            return res.status(404).json({ message: 'No details found for the exams' });
+        }
+
+        res.status(200).json(exams);
+    } catch (error) {
+        console.error('Error fetching exam details:', error);
+        res.status(500).json({ message: 'Error fetching exam details', error });
     }
 };
