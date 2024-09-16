@@ -24,6 +24,11 @@ const ExamCardDisplay = ({ exams }) => {
             // Navigate to the registration form and pass the selected exam name as state
             navigate('/registration-form', { state: { exam: selectedExam.examName } });
         }
+        setSelectedExam(null); // Close the popup
+    };
+
+    const handleCancelPopup = () => {
+        setSelectedExam(null); // Close the popup
     };
 
     return (
@@ -104,6 +109,14 @@ const ExamCardDisplay = ({ exams }) => {
                 {selectedExam && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg p-8 w-full max-w-lg shadow-2xl relative">
+                            <button
+                                onClick={handleCancelPopup}
+                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-colors"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
                             <h3 className="text-2xl font-bold mb-6 text-center">Exam Details</h3>
                             <div className="space-y-4">
                                 <p><strong>Exam Name:</strong> {selectedExam.examName}</p>

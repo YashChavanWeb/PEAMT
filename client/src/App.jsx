@@ -51,7 +51,8 @@ function App() {
             <Route path='/profile' element={<Profile />} />
             <Route path='/registration-form' element={<RegistrationForm />} />
             <Route path='/start' element={<StartPage />} />
-            <Route path='/exam-section' element={<ExamWindow />} />
+            <Route path='/exam-window' element={<ExamWindow />} />
+            {/* <Route path="/exam-window/:examId" element={<ExamWindow />} /> */}
             <Route path='/submit-confirmation' element={<SubmitConfirmation />} />
           </Route>
 
