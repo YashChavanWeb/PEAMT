@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 function AdminDashboard() {
     const [showPopup, setShowPopup] = useState(false);
@@ -14,12 +15,15 @@ function AdminDashboard() {
     });
 
     const [exams, setExams] = useState([]);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [remainingExams, setRemainingExams] = useState(3); // Default limit
 
     const { currentUser } = useSelector((state) => state.user);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         fetchExams();
+        fetchRemainingExams(); // Fetch remaining exams on component mount
     }, []);
 
     const fetchExams = async () => {
@@ -28,6 +32,36 @@ function AdminDashboard() {
             if (response.ok) {
                 const data = await response.json();
                 setExams(data);
+            } else {
+                console.error('Failed to fetch exams.');
+            }
+        } catch (error) {
+            console.error('Error fetching exams:', error);
+        }
+    };
+
+    const fetchRemainingExams = async () => {
+        try {
+            const response = await fetch('/api/exams');
+            if (response.ok) {
+                const data = await response.json();
+                const startOfMonth = new Date();
+                startOfMonth.setDate(1);
+                startOfMonth.setHours(0, 0, 0, 0);
+
+                const endOfMonth = new Date();
+                endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+                endOfMonth.setDate(0);
+                endOfMonth.setHours(23, 59, 59, 999);
+
+                const count = data.filter(exam => {
+                    const createdAt = new Date(exam.createdAt);
+                    return exam.adminEmail === currentUser?.email &&
+                        createdAt >= startOfMonth &&
+                        createdAt <= endOfMonth;
+                }).length;
+
+                setRemainingExams(3 - count); // Update remaining exams count
             } else {
                 console.error('Failed to fetch exams.');
             }
@@ -55,15 +89,15 @@ function AdminDashboard() {
                 },
                 body: JSON.stringify({
                     ...examDetails,
-                    adminEmail: currentUser?.email
+                    adminEmail: currentUser?.email,
                 }),
             });
 
-            if (response.ok) {
-                alert('Exam created successfully!');
+            const result = await response.json();
 
+            if (response.ok) {
                 const message = `Exam "${examDetails.examName}" created successfully!`;
-                setSuccessMessage(message);
+                alert(message);
                 localStorage.setItem('successMessage', message);
 
                 setShowPopup(false);
@@ -78,31 +112,35 @@ function AdminDashboard() {
                 });
 
                 fetchExams();
+                fetchRemainingExams(); // Update remaining exams count
             } else {
-                alert('Failed to create exam.');
+                setErrorMessage(result.message || 'Failed to create exam.');
+                console.error(result.message || 'Failed to create exam.');
             }
         } catch (error) {
+            setErrorMessage('Error creating exam.');
             console.error('Error creating exam:', error);
         }
+    };
+
+    const handleQuestionListClick = (examId) => {
+        navigate(`/exam-builder`); // Redirect to the exam-builder route with examId
     };
 
     const adminExams = exams.filter(exam => exam.adminEmail === currentUser?.email);
 
     return (
-        <div className="admin-dashboard bg-white flex flex-col items-center justify-center h-screen p-4 overflow-x-hidden"
-        style={{
-            backgroundImage: 'url("https://i.pinimg.com/236x/b5/69/85/b5698579540881089e74f9e994ba8885.jpg")', // Replace with your image URL
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-        }}
-    >
-
-            
-            {/* <div className="w-full max-w-4xl mb-8">
-                <p className="text-lg font-semibold text-gray-800">
-                    Signed in as: <span className="font-bold">{currentUser?.email}</span>
-                </p>
-            </div> */}
+        <div className="admin-dashboard bg-white flex flex-col items-center justify-start h-screen p-4 overflow-x-hidden"
+            style={{
+                backgroundImage: 'url("https://i.pinimg.com/236x/b5/69/85/b5698579540881089e74f9e994ba8885.jpg")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                paddingTop: '1rem' // Adjusted to reduce top space
+            }}
+        >
+            <div className="mb-4">
+                <p className="text-lg font-semibold">Remaining exams this month: {remainingExams}</p>
+            </div>
 
             <button
                 onClick={handleButtonClick}
@@ -126,7 +164,7 @@ function AdminDashboard() {
                         style={{
                             padding: '24px',
                             borderRadius: '16px',
-                            boxShadow: 'none', // Removed shadow from outer border
+                            boxShadow: 'none',
                             backgroundColor: '#e0e0e0',
                             maxWidth: '600px',
                             width: '100%',
@@ -141,6 +179,7 @@ function AdminDashboard() {
                             {Object.keys(examDetails).map((key) => (
                                 <div key={key} style={{ marginBottom: '16px' }}>
                                     <label
+                                        htmlFor={key}
                                         style={{
                                             display: 'block',
                                             marginBottom: '8px',
@@ -151,6 +190,7 @@ function AdminDashboard() {
                                         {key.replace(/([A-Z])/g, ' $1').trim()}:
                                     </label>
                                     <input
+                                        id={key}
                                         type={key.includes('Date') ? 'date' : key.includes('Marks') ? 'number' : 'text'}
                                         name={key}
                                         value={examDetails[key]}
@@ -219,11 +259,10 @@ function AdminDashboard() {
                                 </button>
                             </div>
                         </form>
+                        {errorMessage && <p style={{ color: 'red', textAlign: 'center', marginTop: '16px' }}>{errorMessage}</p>}
                     </div>
                 </div>
             )}
-
-
 
             <div className="w-full max-w-4xl mt-8 overflow-x-auto">
                 {adminExams.length > 0 ? (
@@ -237,6 +276,7 @@ function AdminDashboard() {
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Registration End Date</th>
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Total Marks</th>
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Passing Marks</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Actions</th> {/* New column */}
                             </tr>
                         </thead>
                         <tbody>
@@ -249,6 +289,14 @@ function AdminDashboard() {
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{new Date(exam.registrationEndDate).toLocaleDateString()}</td>
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.totalMarks}</td>
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.passingMarks}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">
+                                        <button
+                                            onClick={() => handleQuestionListClick(exam._id)} // Pass exam ID
+                                            className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-600"
+                                        >
+                                            Question List
+                                        </button>
+                                    </td> {/* New cell */}
                                 </tr>
                             ))}
                         </tbody>
@@ -262,4 +310,3 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
-

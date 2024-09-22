@@ -73,9 +73,9 @@ function FileUploader() {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <input 
-            type="file" 
-            onChange={onFileChange} 
+          <input
+            type="file"
+            onChange={onFileChange}
             className='hidden'
             id="fileInput"
           />

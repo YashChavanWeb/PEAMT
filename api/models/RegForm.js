@@ -24,7 +24,8 @@ const regFormSchema = new mongoose.Schema({
         pincode: { type: String, required: true }
     },
     paymentId: { type: String, required: true },
-    examNames: [String] // Changed from array to comma-separated string
+    examNames: [String], // Array of exam names
+    username: { type: String, required: true } // Add username field
 });
 
 const RegForm = mongoose.model('RegForm', regFormSchema);
