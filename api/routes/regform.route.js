@@ -11,3 +11,6 @@ router.put('/:id', updateRegForm);
 router.get('/adhar/:adhar', getRegFormByAdhar);
 
 export default router;
+
+
+
