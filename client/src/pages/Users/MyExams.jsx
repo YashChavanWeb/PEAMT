@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function MyExams() {
     const { currentUser } = useSelector((state) => state.user);
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
-    // Function to fetch exam details based on the username
     const fetchExamDetails = async () => {
         if (!currentUser.username) {
             setError('Username not available.');
@@ -21,7 +22,7 @@ function MyExams() {
                 throw new Error('Failed to fetch exam details');
             }
             const data = await response.json();
-            setExams(data || []); // Set exam details if available
+            setExams(data || []);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -31,13 +32,15 @@ function MyExams() {
 
     useEffect(() => {
         fetchExamDetails();
-    }, [currentUser.username]); // Fetch exam details when username changes
+    }, [currentUser.username]);
+
+    const handleGiveExam = (exam) => {
+        navigate('/start', { state: { examName: exam.examName } });
+    };
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">My Exams</h1>
-
-            {/* Render exam details in a timetable format */}
             {loading ? (
                 <p className="text-lg text-gray-600">Loading exam details...</p>
             ) : error ? (
@@ -56,20 +59,36 @@ function MyExams() {
                                     <th className="px-6 py-3 border-b">Registration End Date</th>
                                     <th className="px-6 py-3 border-b">Total Marks</th>
                                     <th className="px-6 py-3 border-b">Passing Marks</th>
+                                    <th className="px-6 py-3 border-b">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {exams.map((exam, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 border-b">{exam.examName}</td>
-                                        <td className="px-6 py-4 border-b">{exam.duration}</td>
-                                        <td className="px-6 py-4 border-b">{exam.eligibility}</td>
-                                        <td className="px-6 py-4 border-b">{new Date(exam.examDate).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 border-b">{new Date(exam.registrationEndDate).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 border-b">{exam.totalMarks}</td>
-                                        <td className="px-6 py-4 border-b">{exam.passingMarks}</td>
-                                    </tr>
-                                ))}
+                                {exams.map((exam, index) => {
+                                    const examDate = new Date(exam.examDate);
+                                    const today = new Date();
+                                    const isToday = today.toDateString() === examDate.toDateString();
+
+                                    return (
+                                        <tr key={index} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 border-b">{exam.examName}</td>
+                                            <td className="px-6 py-4 border-b">{exam.duration}</td>
+                                            <td className="px-6 py-4 border-b">{exam.eligibility}</td>
+                                            <td className="px-6 py-4 border-b">{examDate.toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 border-b">{new Date(exam.registrationEndDate).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 border-b">{exam.totalMarks}</td>
+                                            <td className="px-6 py-4 border-b">{exam.passingMarks}</td>
+                                            <td className="px-6 py-4 border-b">
+                                                <button
+                                                    onClick={() => handleGiveExam(exam)}
+                                                    disabled={!isToday}
+                                                    className={`${isToday ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-600 cursor-not-allowed'} font-semibold py-2 px-4 rounded transition`}
+                                                >
+                                                    Give Exam
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     ) : (

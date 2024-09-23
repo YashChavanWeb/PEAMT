@@ -1,232 +1,181 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Import Axios for API calls
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for programmatic navigation
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ExamWindow() {
-    const [exams, setExams] = useState([]); // State for list of exams
-    const [selectedExam, setSelectedExam] = useState(''); // State for selected exam
     const [questions, setQuestions] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
+    const [responses, setResponses] = useState({});
     const [error, setError] = useState('');
-    const [code, setCode] = useState(''); // State for 6-digit code
-    const [codeValid, setCodeValid] = useState(false); // State to manage code validity
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState({}); // State for storing selected answers
-    const [warningCount, setWarningCount] = useState(0); // Count for tab switch warnings
+    const [time, setTime] = useState({ hours: 1, minutes: 0, seconds: 0 });
+    const timerRef = useRef();
+    const navigate = useNavigate();
 
-    const navigate = useNavigate(); // Initialize useNavigate
-
-    // Fetch list of exams on component mount
     useEffect(() => {
-        const fetchExams = async () => {
-            setLoading(true);
-            setError('');
+        const fetchData = async () => {
             try {
-                const response = await axios.get('/api/exams');
-                setExams(response.data);
+                const response = await fetch('/api/examQuestions?examName=Final Exam'); // Adjust the exam name as needed
+                if (!response.ok) {
+                    throw new Error('Failed to fetch questions');
+                }
+                const data = await response.json();
+
+                // Check if questions exist
+                if (data.questions && data.questions.length > 0) {
+                    setQuestions(data.questions);
+                } else {
+                    setError('No questions available for the Final Exam.');
+                }
             } catch (error) {
-                console.error('Error fetching exams:', error);
-                setError('Failed to load exams. Please try again later.');
-            } finally {
-                setLoading(false);
+                console.error('Error fetching questions:', error);
+                setError('Could not load questions. Please try again later.');
             }
         };
 
-        fetchExams();
+        fetchData();
+
+        timerRef.current = setInterval(() => {
+            setTime((prevTime) => {
+                const { hours, minutes, seconds } = prevTime;
+
+                if (seconds > 0) {
+                    return { ...prevTime, seconds: seconds - 1 };
+                } else if (minutes > 0) {
+                    return { hours, minutes: minutes - 1, seconds: 59 };
+                } else if (hours > 0) {
+                    return { hours: hours - 1, minutes: 59, seconds: 59 };
+                } else {
+                    clearInterval(timerRef.current);
+                    return prevTime;
+                }
+            });
+        }, 1000);
+
+        return () => clearInterval(timerRef.current);
     }, []);
 
-    // Fetch exam questions when a selected exam changes
-    useEffect(() => {
-        if (!selectedExam || !codeValid) return;
-
-        const fetchExamQuestions = async () => {
-            setLoading(true);
-            setError('');
-            setQuestions([]); // Reset questions state when a new exam is selected
-            setCurrentQuestionIndex(0); // Reset to first question
-            try {
-                const response = await axios.get('/api/examQuestions', { params: { examName: selectedExam } });
-                const existingQuestions = response.data.questions || [];
-                setQuestions(existingQuestions);
-            } catch (error) {
-                console.error('Error fetching exam questions:', error);
-                setError('Failed to load exam questions. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchExamQuestions();
-    }, [selectedExam, codeValid]);
-
-    // Handle visibility change
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                // Increase warning count and handle actions
-                setWarningCount(prevCount => {
-                    const newCount = prevCount + 1;
-                    if (newCount === 2) {
-                        alert('Warning: Switching tabs multiple times may affect your exam.');
-                    } else if (newCount >= 3) {
-                        // Redirect to /submit-confirmation after 3 tab switches
-                        navigate('/submit-confirmation');
-                    }
-                    return newCount;
-                });
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [navigate]);
-
-    const handleCodeChange = (e) => {
-        setCode(e.target.value);
-        if (e.target.value.length === 6) {
-            // Validate code (you might want to replace this with actual validation logic)
-            setCodeValid(true);
-        } else {
-            setCodeValid(false);
-        }
+    const handleQuestionSelect = (index) => {
+        setSelectedQuestionIndex(index);
+        setError('');
     };
 
-    const handleNextQuestion = () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
+    const handleSaveResponse = () => {
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        if (!currentResponse.option) {
+            setError('Please select an option before proceeding.');
+            return;
         }
-    };
-
-    const handlePreviousQuestion = () => {
-        if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(currentQuestionIndex - 1);
-        }
-    };
-
-    const handleOptionChange = (e) => {
-        const questionId = questions[currentQuestionIndex].id;
-        setSelectedAnswers({
-            ...selectedAnswers,
-            [questionId]: e.target.value
+        setResponses({
+            ...responses,
+            [selectedQuestionIndex]: { ...currentResponse, status: 'saved' }
         });
+        setSelectedQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
+        setError('');
     };
 
-    const handleSubmitExam = async () => {
-        // Implement your exam submission logic here
-        console.log('Exam submitted with answers:', selectedAnswers);
+    const handleOptionChange = (option) => {
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        setResponses({
+            ...responses,
+            [selectedQuestionIndex]: { option, status: option ? 'selected' : 'skipped' }
+        });
+        setError('');
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
-    }
+    const handlePrevious = () => {
+        setSelectedQuestionIndex(Math.max(selectedQuestionIndex - 1, 0));
+        setError('');
+    };
+
+    const handleNext = () => {
+        handleSaveResponse();
+    };
+
+    const handleSubmit = () => {
+        // Submit logic can go here
+        navigate('/submit-confirmation');
+    };
+
+    const formatTime = (time) => {
+        const { hours, minutes, seconds } = time;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    const currentQuestion = questions[selectedQuestionIndex];
+    const selectedOption = responses[selectedQuestionIndex]?.option;
 
     return (
-        <div className="p-6 bg-gray-100 h-screen">
-            <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-4">
-                <h1 className="text-2xl font-bold text-blue-700 mb-4">Select an Exam</h1>
-
-                {/* Error handling */}
-                {error && <p className="text-red-600 mb-4">{error}</p>}
-
-                {/* Exam selection */}
-                <div className="mb-4">
-                    <label htmlFor="exam-select" className="block text-lg font-semibold text-gray-800 mb-2">
-                        Choose Exam:
-                    </label>
-                    <select
-                        id="exam-select"
-                        value={selectedExam}
-                        onChange={(e) => setSelectedExam(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg w-full bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="" disabled>Select an exam</option>
-                        {exams.map(exam => (
-                            <option key={exam._id} value={exam.examName}>
-                                {exam.examName}
-                            </option>
-                        ))}
-                    </select>
+        <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
+            <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
+                <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
+                    <h3 className="text-xl font-semibold mb-4">Questions</h3>
+                    {error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-2">
+                            {questions.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleQuestionSelect(index)}
+                                    className={`px-4 py-2 rounded-lg text-white ${responses[index]?.status === 'saved' ? 'bg-green-500' : 'bg-blue-500'} hover:bg-opacity-75`}
+                                >
+                                    {index + 1}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
-
-                {/* Code input */}
-                {selectedExam && (
-                    <div className="mb-4">
-                        <label htmlFor="code-input" className="block text-lg font-semibold text-gray-800 mb-2">
-                            Enter 6-digit code:
-                        </label>
-                        <input
-                            id="code-input"
-                            type="text"
-                            value={code}
-                            onChange={handleCodeChange}
-                            placeholder="Enter 6-digit code"
-                            className="px-4 py-2 border border-gray-300 rounded-lg w-full bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {!codeValid && <p className="text-red-600 mt-2">Code must be 6 digits.</p>}
-                    </div>
-                )}
-
-                {/* Display question */}
-                {questions.length > 0 && codeValid && (
-                    <div>
-                        <div className="mb-4">
-                            <h2 className="text-lg font-semibold text-gray-800">Question {currentQuestionIndex + 1}:</h2>
-                            <p className="text-gray-700 mb-4">{questions[currentQuestionIndex].text}</p>
-                            {questions[currentQuestionIndex].type === 'MCQ' ? (
-                                <div className="space-y-2">
-                                    {questions[currentQuestionIndex].options.map((option, index) => (
-                                        <div key={index} className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                id={`question-${questions[currentQuestionIndex].id}-option-${index}`}
-                                                name={`question-${questions[currentQuestionIndex].id}`}
-                                                value={option}
-                                                checked={selectedAnswers[questions[currentQuestionIndex].id] === option}
-                                                onChange={handleOptionChange}
-                                                className="mr-2"
-                                            />
-                                            <label
-                                                htmlFor={`question-${questions[currentQuestionIndex].id}-option-${index}`}
-                                                className="text-gray-600"
-                                            >
-                                                {String.fromCharCode(65 + index)}. {option}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-700">{questions[currentQuestionIndex].answerText}</p>
-                            )}
-                            <div className="mt-2">
-                                <p className="text-gray-600">Difficulty: {questions[currentQuestionIndex].difficulty}</p>
-                                <p className="text-gray-600">Marks: {questions[currentQuestionIndex].marks}</p>
+            </div>
+            <div className="w-3/4 p-2 relative" style={{ height: '100%', overflowY: 'auto' }}>
+                <div className="absolute top-4 right-4 text-lg font-semibold">{formatTime(time)}</div>
+                <div className="flex flex-col h-full p-0 bg-white rounded-lg shadow-md">
+                    {error ? (
+                        <p className="text-red-500 ml-10 mb-3">{error}</p>
+                    ) : (
+                        <>
+                            <h3 className="ml-10 text-2xl font-semibold mb-4">Question {currentQuestion?.number + 1}</h3>
+                            <p className="ml-10 text-lg mb-4">{currentQuestion?.text}</p>
+                            <div className="space-y-2 ml-10 mb-4">
+                                {currentQuestion?.options.map((option, index) => (
+                                    <div key={index} className="flex items-center space-x-2">
+                                        <input
+                                            type="radio"
+                                            id={`option${index}`}
+                                            name="options"
+                                            value={option}
+                                            checked={selectedOption === option}
+                                            onChange={() => handleOptionChange(option)}
+                                            className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                        />
+                                        <label htmlFor={`option${index}`} className="text-lg">{option}</label>
+                                    </div>
+                                ))}
                             </div>
-                        </div>
-
-                        {/* Navigation buttons */}
-                        <div className="flex justify-between">
-                            <button
-                                onClick={handlePreviousQuestion}
-                                disabled={currentQuestionIndex === 0}
-                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={handleNextQuestion}
-                                disabled={currentQuestionIndex === questions.length - 1}
-                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                            >
-                                Next
-                            </button>
-                        </div>
-
-                        {/* Question count */}
-                        <p className="mt-4 text-gray-600">Question {currentQuestionIndex + 1} of {questions.length}</p>
-                    </div>
-                )}
+                            <div className="flex justify-between mt-auto space-2 mb-4 ml-10 mr-10">
+                                <button
+                                    onClick={handlePrevious}
+                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                                >
+                                    Previous
+                                </button>
+                                {selectedQuestionIndex === questions.length - 1 ? (
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                                    >
+                                        Submit
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleNext}
+                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                    >
+                                        Save & Next
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
