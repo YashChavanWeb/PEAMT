@@ -1,284 +1,181 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function ExamWindow() {
-    const [exams, setExams] = useState([]);
-    const [selectedExam, setSelectedExam] = useState('');
     const [questions, setQuestions] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
+    const [responses, setResponses] = useState({});
     const [error, setError] = useState('');
-    const [secureCode, setSecureCode] = useState('');
-    const [codeValid, setCodeValid] = useState(false);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState({});
-    const [warningCount, setWarningCount] = useState(0);
-    const [isValidatingCode, setIsValidatingCode] = useState(false);
+    const [time, setTime] = useState({ hours: 1, minutes: 0, seconds: 0 });
+    const timerRef = useRef();
     const navigate = useNavigate();
 
-    // Fetch exams when component mounts
     useEffect(() => {
-        const fetchExams = async () => {
-            setLoading(true);
-            setError('');
+        const fetchData = async () => {
             try {
-                const response = await axios.get('/api/exams');
-                setExams(response.data);
+                const response = await fetch('/api/examQuestions?examName=Final Exam'); // Adjust the exam name as needed
+                if (!response.ok) {
+                    throw new Error('Failed to fetch questions');
+                }
+                const data = await response.json();
+
+                // Check if questions exist
+                if (data.questions && data.questions.length > 0) {
+                    setQuestions(data.questions);
+                } else {
+                    setError('No questions available for the Final Exam.');
+                }
             } catch (error) {
-                console.error('Error fetching exams:', error);
-                setError('Failed to load exams. Please try again later.');
-            } finally {
-                setLoading(false);
+                console.error('Error fetching questions:', error);
+                setError('Could not load questions. Please try again later.');
             }
         };
-        fetchExams();
+
+        fetchData();
+
+        timerRef.current = setInterval(() => {
+            setTime((prevTime) => {
+                const { hours, minutes, seconds } = prevTime;
+
+                if (seconds > 0) {
+                    return { ...prevTime, seconds: seconds - 1 };
+                } else if (minutes > 0) {
+                    return { hours, minutes: minutes - 1, seconds: 59 };
+                } else if (hours > 0) {
+                    return { hours: hours - 1, minutes: 59, seconds: 59 };
+                } else {
+                    clearInterval(timerRef.current);
+                    return prevTime;
+                }
+            });
+        }, 1000);
+
+        return () => clearInterval(timerRef.current);
     }, []);
 
-    // Fetch questions after exam is selected and code is validated
-    useEffect(() => {
-        if (!selectedExam || !codeValid) return;
-
-        const fetchExamQuestions = async () => {
-            setLoading(true);
-            setError('');
-            setQuestions([]);
-            setCurrentQuestionIndex(0);
-            try {
-                const response = await axios.get('/api/examQuestions', { params: { examName: selectedExam } });
-                setQuestions(response.data.questions || []);
-            } catch (error) {
-                console.error('Error fetching exam questions:', error);
-                setError('Failed to load exam questions. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchExamQuestions();
-    }, [selectedExam, codeValid]);
-
-    // Handle tab switch warnings
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                setWarningCount((prevCount) => {
-                    const newCount = prevCount + 1;
-                    if (newCount === 2) {
-                        alert('Warning: Switching tabs multiple times may affect your exam.');
-                    } else if (newCount >= 3) {
-                        navigate('/submit-confirmation');
-                    }
-                    return newCount;
-                });
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [navigate]);
-
-    // Handle code input change
-    const handleCodeChange = (e) => {
-        const value = e.target.value;
-        if (/^\d{0,6}$/.test(value)) {
-            setSecureCode(value);
-            setCodeValid(false); // Reset code validity when input changes
-        }
+    const handleQuestionSelect = (index) => {
+        setSelectedQuestionIndex(index);
+        setError('');
     };
 
-    // Validate the secure code
-    // Validate the secure code
-const validateCode = async () => {
-    setIsValidatingCode(true);
-    try {
-        const response = await axios.post('http://localhost:3000/api/exams/verify-code', {
-            examName: selectedExam,
-            enteredCode: secureCode,
+    const handleSaveResponse = () => {
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        if (!currentResponse.option) {
+            setError('Please select an option before proceeding.');
+            return;
+        }
+        setResponses({
+            ...responses,
+            [selectedQuestionIndex]: { ...currentResponse, status: 'saved' }
         });
-        if (response.data.valid) {
-            setCodeValid(true);
-            setError('');
-            navigate('/exam-builder'); // Navigate to the exam builder page
-        } else {
-            setCodeValid(false);
-            setError('Invalid secure code. Please try again.');
-        }
-    } catch (error) {
-        console.error('Error validating secure code:', error);
-        setError('Failed to validate secure code. Please try again later.');
-    } finally {
-        setIsValidatingCode(false);
-    }
-};
-
-    
-
-    // Handle navigation between questions
-    const handleNextQuestion = () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
-        }
+        setSelectedQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
+        setError('');
     };
 
-    const handlePreviousQuestion = () => {
-        if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(currentQuestionIndex - 1);
-        }
-    };
-
-    // Handle option change for answers
-    const handleOptionChange = (e) => {
-        const questionId = questions[currentQuestionIndex].id;
-        setSelectedAnswers({
-            ...selectedAnswers,
-            [questionId]: e.target.value,
+    const handleOptionChange = (option) => {
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        setResponses({
+            ...responses,
+            [selectedQuestionIndex]: { option, status: option ? 'selected' : 'skipped' }
         });
+        setError('');
     };
 
-    // Handle exam submission
-    const handleSubmitExam = async () => {
-        try {
-            const response = await axios.post('/api/submitExam', {
-                examName: selectedExam,
-                answers: selectedAnswers,
-            });
-
-            if (response.data.success) {
-                navigate('/exam-submitted')
-            } else {
-                setError(response.data.message || 'Failed to submit exam.');
-            }
-        } catch (error) {
-            console.error('Error submitting exam:', error);
-            setError('Failed to submit exam. Please try again later.');
-        }
+    const handlePrevious = () => {
+        setSelectedQuestionIndex(Math.max(selectedQuestionIndex - 1, 0));
+        setError('');
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
-    }
+    const handleNext = () => {
+        handleSaveResponse();
+    };
+
+    const handleSubmit = () => {
+        // Submit logic can go here
+        navigate('/submit-confirmation');
+    };
+
+    const formatTime = (time) => {
+        const { hours, minutes, seconds } = time;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    const currentQuestion = questions[selectedQuestionIndex];
+    const selectedOption = responses[selectedQuestionIndex]?.option;
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen flex items-center justify-center">
-            <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6">
-                <h1 className="text-2xl font-bold text-blue-700 mb-4 text-center">Start Your Exam</h1>
-                {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
-
-                <div className="mb-4">
-                    <label htmlFor="exam-select" className="block text-lg font-semibold text-gray-800 mb-2">
-                        Choose Exam:
-                    </label>
-                    <select
-                        id="exam-select"
-                        value={selectedExam}
-                        onChange={(e) => {
-                            setSelectedExam(e.target.value);
-                            setSecureCode('');
-                            setCodeValid(false);
-                            setQuestions([]);
-                            setSelectedAnswers({});
-                            setError('');
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg w-full bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    >
-                        <option value="" disabled>Select an exam</option>
-                        {exams.map(exam => (
-                            <option key={exam._id} value={exam.examName}>
-                                {exam.examName}
-                            </option>
-                        ))}
-                    </select>
+        <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
+            <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
+                <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
+                    <h3 className="text-xl font-semibold mb-4">Questions</h3>
+                    {error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-2">
+                            {questions.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleQuestionSelect(index)}
+                                    className={`px-4 py-2 rounded-lg text-white ${responses[index]?.status === 'saved' ? 'bg-green-500' : 'bg-blue-500'} hover:bg-opacity-75`}
+                                >
+                                    {index + 1}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
-
-                {selectedExam && (
-                    <div className="mb-4">
-                        <label htmlFor="code-input" className="block text-lg font-semibold text-gray-800 mb-2">
-                            Enter 6-digit code:
-                        </label>
-                        <input
-                            id="code-input"
-                            type="text"
-                            value={secureCode}
-                            onChange={handleCodeChange}
-                            placeholder="Enter 6-digit code"
-                            maxLength="6"
-                            className="px-4 py-2 border border-gray-300 rounded-lg w-full bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
-                        {!codeValid && secureCode.length === 6 && <p className="text-red-600 mt-2">Invalid code. Please try again.</p>}
-                        {isValidatingCode && <p className="text-blue-600 mt-2">Validating code...</p>}
-                        <button
-                            onClick={validateCode}
-                            disabled={secureCode.length !== 6}
-                            className={`mt-4 px-4 py-2 ${secureCode.length === 6 ? 'bg-blue-600 text-white' : 'bg-gray-400 text-gray-700'} rounded-lg`}
-                        >
-                            Validate Code
-                        </button>
-                    </div>
-                )}
-
-                {questions.length > 0 && codeValid && (
-                    <div>
-                        <div className="mb-4">
-                            <h2 className="text-lg font-semibold text-gray-800">Question {currentQuestionIndex + 1}:</h2>
-                            <p className="text-gray-700 mb-4">{questions[currentQuestionIndex].text}</p>
-                            {questions[currentQuestionIndex].type === 'MCQ' ? (
-                                <div className="space-y-2">
-                                    {questions[currentQuestionIndex].options.map((option, index) => (
-                                        <div key={index} className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                id={`option-${index}`}
-                                                name={`question-${questions[currentQuestionIndex].id}`}
-                                                value={option}
-                                                checked={selectedAnswers[questions[currentQuestionIndex].id] === option}
-                                                onChange={handleOptionChange}
-                                                className="mr-2"
-                                            />
-                                            <label htmlFor={`option-${index}`} className="text-gray-700">{option}</label>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <textarea
-                                    value={selectedAnswers[questions[currentQuestionIndex].id] || ''}
-                                    onChange={handleOptionChange}
-                                    className="w-full h-24 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter your answer here..."
-                                />
-                            )}
-                        </div>
-
-                        <div className="flex justify-between mt-6">
-                            <button
-                                onClick={handlePreviousQuestion}
-                                disabled={currentQuestionIndex === 0}
-                                className="px-4 py-2 bg-gray-500 text-white rounded-lg disabled:bg-gray-300"
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={handleNextQuestion}
-                                disabled={!selectedAnswers[questions[currentQuestionIndex]?.id]}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                            >
-                                Next
-                            </button>
-                        </div>
-
-                        {currentQuestionIndex === questions.length - 1 && (
-                            <button
-                                onClick={handleSubmitExam}
-                                className="mt-6 px-4 py-2 bg-green-600 text-white rounded-lg w-full"
-                            >
-                                Submit Exam
-                            </button>
-                        )}
-                    </div>
-                )}
+            </div>
+            <div className="w-3/4 p-2 relative" style={{ height: '100%', overflowY: 'auto' }}>
+                <div className="absolute top-4 right-4 text-lg font-semibold">{formatTime(time)}</div>
+                <div className="flex flex-col h-full p-0 bg-white rounded-lg shadow-md">
+                    {error ? (
+                        <p className="text-red-500 ml-10 mb-3">{error}</p>
+                    ) : (
+                        <>
+                            <h3 className="ml-10 text-2xl font-semibold mb-4">Question {currentQuestion?.number + 1}</h3>
+                            <p className="ml-10 text-lg mb-4">{currentQuestion?.text}</p>
+                            <div className="space-y-2 ml-10 mb-4">
+                                {currentQuestion?.options.map((option, index) => (
+                                    <div key={index} className="flex items-center space-x-2">
+                                        <input
+                                            type="radio"
+                                            id={`option${index}`}
+                                            name="options"
+                                            value={option}
+                                            checked={selectedOption === option}
+                                            onChange={() => handleOptionChange(option)}
+                                            className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                        />
+                                        <label htmlFor={`option${index}`} className="text-lg">{option}</label>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex justify-between mt-auto space-2 mb-4 ml-10 mr-10">
+                                <button
+                                    onClick={handlePrevious}
+                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                                >
+                                    Previous
+                                </button>
+                                {selectedQuestionIndex === questions.length - 1 ? (
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                                    >
+                                        Submit
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleNext}
+                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                    >
+                                        Save & Next
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );

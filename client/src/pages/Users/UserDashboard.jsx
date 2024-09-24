@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import ExamCardDisplay from './ExamCardDisplay';
 
 function UserDashboard() {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         const fetchExams = async () => {
@@ -30,7 +32,15 @@ function UserDashboard() {
     if (error) return <div>{error}</div>;
 
     return (
-        <ExamCardDisplay exams={exams} />
+        <div className="p-4">
+            <button
+                onClick={() => navigate('/my-exams')}
+                className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition"
+            >
+                Go to My Exams
+            </button>
+            <ExamCardDisplay exams={exams} />
+        </div>
     );
 }
 
