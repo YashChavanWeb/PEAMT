@@ -64,6 +64,16 @@ function ExamWindow() {
         window.addEventListener('mousemove', handleActivity);
         window.addEventListener('keypress', handleActivity);
 
+        // Prevent copy-paste
+        const preventCopyPaste = (event) => {
+            event.preventDefault();
+            alert("Copying and pasting are not allowed during the exam.");
+        };
+
+        window.addEventListener('copy', preventCopyPaste);
+        window.addEventListener('paste', preventCopyPaste);
+        window.addEventListener('cut', preventCopyPaste);
+
         const handleKeyLock = (event) => {
             if (
                 event.key === "Escape" ||
@@ -79,7 +89,6 @@ function ExamWindow() {
             if (document.visibilityState === 'hidden') {
                 event.preventDefault();
                 if (warningShown) {
-                    // Show auto-submit popup
                     setShowAutoSubmitPopup(true);
                     setTimeout(() => {
                         handleSubmit(); // Auto-submit after showing the popup
@@ -97,7 +106,6 @@ function ExamWindow() {
         window.addEventListener("keydown", handleKeyLock);
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
-        // Fullscreen mode request
         const requestFullscreen = () => {
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
@@ -117,6 +125,9 @@ function ExamWindow() {
             clearTimeout(sessionTimeout);
             window.removeEventListener('mousemove', handleActivity);
             window.removeEventListener('keypress', handleActivity);
+            window.removeEventListener('copy', preventCopyPaste);
+            window.removeEventListener('paste', preventCopyPaste);
+            window.removeEventListener('cut', preventCopyPaste);
             window.removeEventListener("keydown", handleKeyLock);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };

@@ -31,3 +31,4 @@ const regFormSchema = new mongoose.Schema({
 const RegForm = mongoose.model('RegForm', regFormSchema);
 
 export default RegForm;
+
