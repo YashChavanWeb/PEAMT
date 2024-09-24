@@ -9,6 +9,9 @@ function ExamWindow() {
     const [responses, setResponses] = useState({});
     const [error, setError] = useState('');
     const [time, setTime] = useState({ hours: 1, minutes: 0, seconds: 0 });
+    const [warningShown, setWarningShown] = useState(false);
+    const [showAutoSubmitPopup, setShowAutoSubmitPopup] = useState(false);
+    const [sessionTimeout, setSessionTimeout] = useState(null);
     const timerRef = useRef();
     const navigate = useNavigate();
 
@@ -50,6 +53,17 @@ function ExamWindow() {
             });
         }, 1000);
 
+        const handleActivity = () => {
+            clearTimeout(sessionTimeout);
+            setSessionTimeout(setTimeout(() => {
+                alert("Your session has timed out due to inactivity.");
+                navigate('/logout'); // Redirect to logout or login page
+            }, 15 * 60 * 1000)); // 15 minutes timeout
+        };
+
+        window.addEventListener('mousemove', handleActivity);
+        window.addEventListener('keypress', handleActivity);
+
         const handleKeyLock = (event) => {
             if (
                 event.key === "Escape" ||
@@ -61,13 +75,52 @@ function ExamWindow() {
             }
         };
 
+        const handleVisibilityChange = (event) => {
+            if (document.visibilityState === 'hidden') {
+                event.preventDefault();
+                if (warningShown) {
+                    // Show auto-submit popup
+                    setShowAutoSubmitPopup(true);
+                    setTimeout(() => {
+                        handleSubmit(); // Auto-submit after showing the popup
+                    }, 6000); // 6 seconds
+                } else {
+                    const confirmation = window.confirm("Switching tabs is not allowed during the exam. Are you sure you want to leave this tab?");
+                    if (!confirmation) {
+                        setWarningShown(true);
+                        alert("Please stay on this page during the exam.");
+                    }
+                }
+            }
+        };
+
         window.addEventListener("keydown", handleKeyLock);
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        // Fullscreen mode request
+        const requestFullscreen = () => {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        };
+
+        requestFullscreen();
 
         return () => {
             clearInterval(timerRef.current);
+            clearTimeout(sessionTimeout);
+            window.removeEventListener('mousemove', handleActivity);
+            window.removeEventListener('keypress', handleActivity);
             window.removeEventListener("keydown", handleKeyLock);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
-    }, [examName]);
+    }, [examName, warningShown, sessionTimeout]);
 
     const handleQuestionSelect = (index) => {
         setSelectedQuestionIndex(index);
@@ -121,6 +174,11 @@ function ExamWindow() {
 
     return (
         <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
+            {showAutoSubmitPopup && (
+                <div className="fixed top-0 left-0 right-0 bg-yellow-300 text-black text-lg text-center p-4 z-50">
+                    Your exam is auto-submitting due to inactivity. Please wait...
+                </div>
+            )}
             <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
                 <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
                     <h3 className="text-xl font-semibold mb-4">Questions</h3>
