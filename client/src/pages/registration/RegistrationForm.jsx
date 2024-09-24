@@ -350,8 +350,34 @@ function RegistrationForm() {
             console.error(error);
         }
     };
+    
+    // // Fetch registration data based on Aadhaar
+    // const fetchRegistrationData = async (adharNumber) => {
+    //     try {
+    //         const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
+    //         setFormData((prevState) => ({
+    //             ...prevState,
+    //             ...response.data,
+    //             permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
+    //             emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
+    //             subjects: response.data.subjects || prevState.subjects
+    //         }));
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
+    // Effect to handle exam name updates
+    useEffect(() => {
+        if (exam) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                examNames: [...new Set([...(prevFormData.examNames || []), exam])], // Append exam name, prevent duplicates
+            }));
+        }
+    }, [exam]);
 
+    
     const handleFetchDetails = async () => {
         if (formData.adhar.length !== 12) {
             alert('Please enter a valid Aadhar number.');

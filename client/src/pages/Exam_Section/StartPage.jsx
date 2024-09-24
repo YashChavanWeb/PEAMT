@@ -1,18 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 function StartPage() {
     const location = useLocation();
     const { examName } = location.state || { examName: 'defaultExam' }; // Get the exam name from state
     const [code, setCode] = useState('');
+    const [error, setError] = useState('');
 
     const navigate = useNavigate();
 
-    const handleStart = () => {
-        if (code.length === 6) {
-            navigate('/exam-window', { state: { examName, code } }); // Pass examName and code to ExamWindow
-        } else {
+    const handleStart = async () => {
+        if (code.length !== 6) {
             alert('Please enter a valid 6-digit code.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://localhost:3000/api/exams/verify-code', {
+                examName,
+                enteredCode: code,
+            });
+            if (response.data.valid) {
+                navigate('/exam-window', { state: { examName, code } }); // Pass examName and code to ExamWindow
+            } else {
+                setError('Invalid secure code. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error validating secure code:', error);
+            setError('Failed to validate secure code. Please try again later.');
         }
     };
 
@@ -21,6 +37,8 @@ function StartPage() {
             <div className="p-6 bg-white shadow-lg rounded-lg w-full max-w-md border border-gray-200">
                 <h1 className="text-4xl font-bold text-blue-700 mb-4">Welcome to the Exam: {examName}</h1>
                 <p className="text-lg text-gray-700 mb-6">Please review the rules below before starting.</p>
+
+                {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
 
                 <div className="mb-4">
                     <label htmlFor="code-input" className="block text-lg font-semibold text-gray-800 mb-2">
