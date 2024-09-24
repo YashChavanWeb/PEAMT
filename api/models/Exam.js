@@ -33,6 +33,13 @@ const examSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    secureCode: {
+        type: String,
+        required: true,
+        minlength: 6,
+        maxlength: 6,
+    },
 }, {
     timestamps: true, // Automatically add createdAt and updatedAt timestamps
 });

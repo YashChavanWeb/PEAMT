@@ -1,6 +1,7 @@
+// AdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard() {
     const [showPopup, setShowPopup] = useState(false);
@@ -12,6 +13,7 @@ function AdminDashboard() {
         registrationEndDate: '',
         totalMarks: '',
         passingMarks: '',
+        secureCode: '', // New field for the 6-digit code
     });
 
     const [exams, setExams] = useState([]);
@@ -28,7 +30,12 @@ function AdminDashboard() {
 
     const fetchExams = async () => {
         try {
-            const response = await fetch('/api/exams');
+            const response = await fetch('/api/exams', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include authorization headers if required
+                },
+            });
             if (response.ok) {
                 const data = await response.json();
                 setExams(data);
@@ -42,7 +49,11 @@ function AdminDashboard() {
 
     const fetchRemainingExams = async () => {
         try {
-            const response = await fetch('/api/exams');
+            const response = await fetch('/api/exams', {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
             if (response.ok) {
                 const data = await response.json();
                 const startOfMonth = new Date();
@@ -81,6 +92,14 @@ function AdminDashboard() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate that secureCode is exactly 6 digits
+        const secureCodeRegex = /^\d{6}$/;
+        if (!secureCodeRegex.test(examDetails.secureCode)) {
+            setErrorMessage('Secure Code must be exactly 6 digits.');
+            return;
+        }
+
         try {
             const response = await fetch('/api/exams', {
                 method: 'POST',
@@ -88,7 +107,14 @@ function AdminDashboard() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ...examDetails,
+                    examName: examDetails.examName,
+                    duration: examDetails.duration,
+                    eligibility: examDetails.eligibility,
+                    examDate: examDetails.examDate,
+                    registrationEndDate: examDetails.registrationEndDate,
+                    totalMarks: examDetails.totalMarks,
+                    passingMarks: examDetails.passingMarks,
+                    secureCode: examDetails.secureCode, // Include secureCode
                     adminEmail: currentUser?.email,
                 }),
             });
@@ -109,6 +135,7 @@ function AdminDashboard() {
                     registrationEndDate: '',
                     totalMarks: '',
                     passingMarks: '',
+                    secureCode: '', // Reset secureCode
                 });
 
                 fetchExams();
@@ -124,7 +151,7 @@ function AdminDashboard() {
     };
 
     const handleQuestionListClick = (examId) => {
-        navigate(`/exam-builder`); // Redirect to the exam-builder route with examId
+        navigate(`/exam-builder?examId=${examId}`); // Redirect to the exam-builder route with examId
     };
 
     const adminExams = exams.filter(exam => exam.adminEmail === currentUser?.email);
@@ -145,6 +172,7 @@ function AdminDashboard() {
             <button
                 onClick={handleButtonClick}
                 className="bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:bg-gradient-to-l"
+                disabled={remainingExams <= 0} // Disable button if no remaining exams
             >
                 Create New Exam
             </button>
@@ -176,41 +204,91 @@ function AdminDashboard() {
                             Create New Exam
                         </h2>
                         <form onSubmit={handleSubmit}>
-                            {Object.keys(examDetails).map((key) => (
-                                <div key={key} style={{ marginBottom: '16px' }}>
-                                    <label
-                                        htmlFor={key}
-                                        style={{
-                                            display: 'block',
-                                            marginBottom: '8px',
-                                            color: '#666',
-                                            textTransform: 'capitalize',
-                                        }}
-                                    >
-                                        {key.replace(/([A-Z])/g, ' $1').trim()}:
-                                    </label>
-                                    <input
-                                        id={key}
-                                        type={key.includes('Date') ? 'date' : key.includes('Marks') ? 'number' : 'text'}
-                                        name={key}
-                                        value={examDetails[key]}
-                                        onChange={handleChange}
-                                        style={{
-                                            padding: '12px',
-                                            borderRadius: '8px',
-                                            backgroundColor: '#e0e0e0',
-                                            boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
-                                            border: 'none',
-                                            outline: 'none',
-                                            width: '100%',
-                                            transition: 'box-shadow 0.3s ease',
-                                        }}
-                                        onFocus={(e) => (e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff')}
-                                        onBlur={(e) => (e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff')}
-                                        required
-                                    />
-                                </div>
-                            ))}
+                            {Object.keys(examDetails).map((key) => {
+                                if (key === 'secureCode') {
+                                    return (
+                                        <div key={key} style={{ marginBottom: '16px' }}>
+                                            <label
+                                                htmlFor={key}
+                                                style={{
+                                                    display: 'block',
+                                                    marginBottom: '8px',
+                                                    color: '#666',
+                                                    textTransform: 'capitalize',
+                                                }}
+                                            >
+                                                {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                            </label>
+                                            <input
+                                                id={key}
+                                                type="text"
+                                                name={key}
+                                                value={examDetails[key]}
+                                                onChange={handleChange}
+                                                placeholder="Enter 6-digit code"
+                                                maxLength="6"
+                                                pattern="\d{6}"
+                                                title="6-digit numeric code"
+                                                style={{
+                                                    padding: '12px',
+                                                    borderRadius: '8px',
+                                                    backgroundColor: '#fff',
+                                                    boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                                                    border: '1px solid #ccc',
+                                                    outline: 'none',
+                                                    width: '100%',
+                                                    transition: 'box-shadow 0.3s ease, border 0.3s ease',
+                                                }}
+                                                onFocus={(e) => {
+                                                    e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff';
+                                                    e.target.style.border = '1px solid #888';
+                                                }}
+                                                onBlur={(e) => {
+                                                    e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff';
+                                                    e.target.style.border = '1px solid #ccc';
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div key={key} style={{ marginBottom: '16px' }}>
+                                        <label
+                                            htmlFor={key}
+                                            style={{
+                                                display: 'block',
+                                                marginBottom: '8px',
+                                                color: '#666',
+                                                textTransform: 'capitalize',
+                                            }}
+                                        >
+                                            {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                        </label>
+                                        <input
+                                            id={key}
+                                            type={key.includes('Date') ? 'date' : key.includes('Marks') ? 'number' : 'text'}
+                                            name={key}
+                                            value={examDetails[key]}
+                                            onChange={handleChange}
+                                            style={{
+                                                padding: '12px',
+                                                borderRadius: '8px',
+                                                backgroundColor: '#e0e0e0',
+                                                boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                                                border: 'none',
+                                                outline: 'none',
+                                                width: '100%',
+                                                transition: 'box-shadow 0.3s ease',
+                                            }}
+                                            onFocus={(e) => (e.target.style.boxShadow = '4px 4px 8px #bebebe, -4px -4px 8px #ffffff')}
+                                            onBlur={(e) => (e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff')}
+                                            required
+                                        />
+                                    </div>
+                                );
+                            })}
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
                                 <button
                                     type="submit"
@@ -307,6 +385,7 @@ function AdminDashboard() {
             </div>
         </div>
     );
+
 }
 
 export default AdminDashboard;

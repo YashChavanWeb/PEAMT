@@ -351,21 +351,21 @@ function RegistrationForm() {
         }
     };
     
-    // Fetch registration data based on Aadhaar
-    const fetchRegistrationData = async (adharNumber) => {
-        try {
-            const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
-            setFormData((prevState) => ({
-                ...prevState,
-                ...response.data,
-                permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
-                emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
-                subjects: response.data.subjects || prevState.subjects
-            }));
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    // // Fetch registration data based on Aadhaar
+    // const fetchRegistrationData = async (adharNumber) => {
+    //     try {
+    //         const response = await axios.get(`/api/regform/adhar/${adharNumber}`);
+    //         setFormData((prevState) => ({
+    //             ...prevState,
+    //             ...response.data,
+    //             permanentAddress: response.data.permanentAddress || prevState.permanentAddress,
+    //             emergencyContact: response.data.emergencyContact || prevState.emergencyContact,
+    //             subjects: response.data.subjects || prevState.subjects
+    //         }));
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     // Effect to handle exam name updates
     useEffect(() => {
