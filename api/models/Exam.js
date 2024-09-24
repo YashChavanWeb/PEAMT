@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const examSchema = new mongoose.Schema({
     examName: {
@@ -29,11 +30,10 @@ const examSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    adminEmail: { // New field to store the admin's email
+    adminEmail: {
         type: String,
         required: true,
     },
-
     secureCode: {
         type: String,
         required: true,
@@ -41,13 +41,20 @@ const examSchema = new mongoose.Schema({
         maxlength: 6,
     },
 }, {
-    timestamps: true, // Automatically add createdAt and updatedAt timestamps
+    timestamps: true,
+});
+
+// Middleware to hash secureCode before saving
+examSchema.pre('save', async function(next) {
+    if (this.isModified('secureCode')) {
+        const salt = await bcrypt.genSalt(10);
+        this.secureCode = await bcrypt.hash(this.secureCode, salt);
+    }
+    next();
 });
 
 const adminUri = process.env.ADMIN;
-// Create connection to the ADMIN database
 const adminConnection = mongoose.createConnection(adminUri);
-// Create model using adminConnection
 const Exam = adminConnection.model('Exam', examSchema);
 
 export default Exam;
