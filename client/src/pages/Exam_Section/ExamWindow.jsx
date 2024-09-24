@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 function ExamWindow() {
     const location = useLocation();
-    const { examName } = location.state || { examName: 'defaultExam' }; // Get the exam name from state
+    const { examName } = location.state || { examName: 'defaultExam' };
     const [questions, setQuestions] = useState([]);
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [responses, setResponses] = useState({});
@@ -20,8 +20,6 @@ function ExamWindow() {
                     throw new Error('Failed to fetch questions');
                 }
                 const data = await response.json();
-
-                // Check if questions exist
                 if (data.questions && data.questions.length > 0) {
                     setQuestions(data.questions);
                 } else {
@@ -38,7 +36,6 @@ function ExamWindow() {
         timerRef.current = setInterval(() => {
             setTime((prevTime) => {
                 const { hours, minutes, seconds } = prevTime;
-
                 if (seconds > 0) {
                     return { ...prevTime, seconds: seconds - 1 };
                 } else if (minutes > 0) {
@@ -47,13 +44,30 @@ function ExamWindow() {
                     return { hours: hours - 1, minutes: 59, seconds: 59 };
                 } else {
                     clearInterval(timerRef.current);
+                    handleSubmit(); // Auto-submit when time runs out
                     return prevTime;
                 }
             });
         }, 1000);
 
-        return () => clearInterval(timerRef.current);
-    }, [examName]); // Dependency added
+        const handleKeyLock = (event) => {
+            if (
+                event.key === "Escape" ||
+                event.key === "F5" ||
+                (event.ctrlKey && event.key === "r")
+            ) {
+                event.preventDefault();
+                alert("Navigation is disabled during the exam. Please stay on this page.");
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyLock);
+
+        return () => {
+            clearInterval(timerRef.current);
+            window.removeEventListener("keydown", handleKeyLock);
+        };
+    }, [examName]);
 
     const handleQuestionSelect = (index) => {
         setSelectedQuestionIndex(index);
@@ -93,7 +107,7 @@ function ExamWindow() {
     };
 
     const handleSubmit = () => {
-        // Submit logic can go here
+        // Implement submit logic
         navigate('/submit-confirmation');
     };
 
