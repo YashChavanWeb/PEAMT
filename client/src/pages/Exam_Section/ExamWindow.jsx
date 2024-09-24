@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function ExamWindow() {
+    const location = useLocation();
+    const { examName } = location.state || { examName: 'defaultExam' }; // Get the exam name from state
     const [questions, setQuestions] = useState([]);
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [responses, setResponses] = useState({});
@@ -13,7 +15,7 @@ function ExamWindow() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/examQuestions?examName=Final Exam'); // Adjust the exam name as needed
+                const response = await fetch(`/api/examQuestions?examName=${encodeURIComponent(examName)}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch questions');
                 }
@@ -23,7 +25,7 @@ function ExamWindow() {
                 if (data.questions && data.questions.length > 0) {
                     setQuestions(data.questions);
                 } else {
-                    setError('No questions available for the Final Exam.');
+                    setError(`No questions available for the exam: ${examName}.`);
                 }
             } catch (error) {
                 console.error('Error fetching questions:', error);
@@ -51,7 +53,7 @@ function ExamWindow() {
         }, 1000);
 
         return () => clearInterval(timerRef.current);
-    }, []);
+    }, [examName]); // Dependency added
 
     const handleQuestionSelect = (index) => {
         setSelectedQuestionIndex(index);
