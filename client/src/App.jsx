@@ -20,9 +20,16 @@ import AdminRoute from "./components/private/AdminRoute";
 import UserRoute from "./components/private/UserRoute";
 import FileUploader from "./pages/Admin/FileUploader";
 import MyExams from "./pages/Users/MyExams";
+import { useState } from "react";
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
+  const [jsonContent, setJsonContent] = useState(null); // State to hold JSON content
+
+  // Define the function to handle JSON content change
+  const handleJsonContentChange = (newJsonContent) => {
+    setJsonContent(newJsonContent); // Update the state with new JSON content
+  };
 
   return (
     <BrowserRouter>
@@ -38,8 +45,8 @@ function App() {
           {/* Admin-only Routes */}
           <Route element={<AdminRoute />}>
             <Route path='/admin-dashboard' element={<AdminDashboard />} />
-            <Route path='/exam-builder' element={<ExamBuilder />} />
-            <Route path='/converter' element={<FileUploader />} />
+            <Route path='/converter' element={<FileUploader onJsonContentChange={handleJsonContentChange} />} />
+            <Route path='/exam-builder' element={<ExamBuilder jsonContent={jsonContent} />} />
           </Route>
 
           {/* User-only Routes */}

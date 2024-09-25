@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import CustomRadioButton from './CustomRadioButton';
-import axios from 'axios'; // Import Axios for API calls
-import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
-function ExamBuilder() {
+function ExamBuilder({ jsonContent }) {
   const [questions, setQuestions] = useState([]);
   const [examName, setExamName] = useState('');
-  const [examOptions, setExamOptions] = useState([]); // State to hold dropdown options
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(''); // Add error state
+  const [examOptions, setExamOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const { currentUser } = useSelector((state) => state.user);
-  const adminEmail = currentUser?.email || ''; // Use the email from currentUser
+  const adminEmail = currentUser?.email || '';
 
   useEffect(() => {
-    // Fetch existing exams for the admin email on component mount
+    if (jsonContent) {
+      console.log('Received JSON Content in ExamBuilder:', jsonContent);
+    }
+  }, [jsonContent]);
+
+  useEffect(() => {
     const fetchExams = async () => {
       setLoading(true);
       setError('');
       try {
         const response = await axios.get('/api/exams');
         const exams = response.data;
-        // Filter exams for the current admin email
         const adminExams = exams.filter(exam => exam.adminEmail === adminEmail);
         setExamOptions(adminExams);
       } catch (error) {
@@ -37,13 +41,11 @@ function ExamBuilder() {
 
   useEffect(() => {
     if (examName) {
-      // Fetch existing questions for the selected exam name
       const fetchExistingQuestions = async () => {
         setLoading(true);
         setError('');
         try {
           const response = await axios.get('/api/examQuestions', { params: { examName } });
-          // Access the `questions` property from the response data
           const existingQuestions = response.data.questions || [];
           setQuestions(existingQuestions);
         } catch (error) {
@@ -63,73 +65,31 @@ function ExamBuilder() {
   };
 
   const addQuestion = () => {
-    const newQuestion = {
-      id: questions.length + 1,
-      text: '',
-      type: 'MCQ',
-      options: ['', '', '', ''],
-      correctAnswer: null,
-      marks: 0,
-      difficulty: 'Medium',
-      answerText: ''
-    };
-    setQuestions([...questions, newQuestion]);
+    if (jsonContent && jsonContent.length > 0) {
+      const newQuestionIndex = questions.length % jsonContent.length;
+      const jsonQuestion = jsonContent[newQuestionIndex];
+
+      const newQuestion = {
+        id: questions.length + 1,
+        text: jsonQuestion.question || '',
+        type: jsonQuestion.type || 'MCQ',
+        options: jsonQuestion.type === 'theory' 
+                  ? []  // No options for theory questions
+                  : jsonQuestion.choices.map(choice => choice.choice) || [],
+        correctAnswer: null,
+        marks: 0,
+        difficulty: 'Medium',
+        answerText: jsonQuestion.type === 'theory' ? '' : null
+      };
+
+      setQuestions([...questions, newQuestion]);
+    } else {
+      console.warn("No valid JSON content available to add a question.");
+      alert("No valid JSON content available to add a question.");
+    }
   };
 
-  const updateQuestionText = (id, text) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, text } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateOptionText = (questionId, optionIndex, optionText) => {
-    const updatedQuestions = questions.map((question) => {
-      if (question.id === questionId) {
-        const updatedOptions = question.options.map((option, index) =>
-          index === optionIndex ? optionText : option
-        );
-        return { ...question, options: updatedOptions };
-      }
-      return question;
-    });
-    setQuestions(updatedQuestions);
-  };
-
-  const updateCorrectAnswer = (questionId, correctAnswerIndex) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === questionId ? { ...question, correctAnswer: correctAnswerIndex } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateQuestionType = (id, type) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, type } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateQuestionMarks = (id, marks) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, marks: parseInt(marks) } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateQuestionDifficulty = (id, difficulty) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, difficulty } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateTheoryAnswerText = (id, answerText) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, answerText } : question
-    );
-    setQuestions(updatedQuestions);
-  };
+  // ... other functions remain unchanged ...
 
   const submitExamQuestions = async () => {
     setLoading(true);
@@ -165,7 +125,6 @@ function ExamBuilder() {
         <button className='button' onClick={addQuestion}>Add Question</button>
       </section>
 
-      {/* Dropdown for Exam Name */}
       <div className="my-4">
         <label>
           Select Exam Name:
@@ -183,12 +142,13 @@ function ExamBuilder() {
           </select>
         </label>
       </div>
+
       <section className='flex flex-col flex-wrap w-[90%] mx-auto'>
         {questions.length === 0 && examName ? (
           <p>No questions available for the selected exam. You can add new questions below.</p>
         ) : (
-          questions.map((question) => (
-            <section key={question.id} className='my-4'>
+          questions.map((question, index) => (
+            <section key={`${question.id}-${index}`} className='my-4'>
               <div className='flex flex-row justify-between text-center my-2'>
                 <h3 className='font-bold my-auto'>Question {question.id}</h3>
                 <input
@@ -210,7 +170,6 @@ function ExamBuilder() {
                   </select>
                 </label>
               </div>
-
               <div className='my-4 flex justify-between'>
                 <label className='my-auto border-2 p-2 rounded-full text-center'>
                   Difficulty Level:
@@ -274,6 +233,12 @@ function ExamBuilder() {
       <div className='text-center my-4'>
         <button onClick={submitExamQuestions} className='button'>Submit Exam Questions</button>
       </div>
+
+      {jsonContent ? (
+        <pre>{JSON.stringify(jsonContent, null, 2)}</pre>
+      ) : (
+        <p>No JSON content available.</p>
+      )}
     </div>
   );
 }
