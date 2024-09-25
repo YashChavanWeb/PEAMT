@@ -1,7 +1,7 @@
 import express from 'express';
 import Exam from '../models/Exam.js';
+import bcrypt from 'bcrypt'; // Import bcrypt for comparing secure code
 import moment from 'moment'; // Import moment.js for date manipulation
-import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
@@ -44,10 +44,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-
-
 // Verify secure code for the exam
-// Verify secure code for the exam by exam name
 router.post('/verify-code', async (req, res) => {
     const { examName, enteredCode } = req.body;
     try {
@@ -57,8 +54,9 @@ router.post('/verify-code', async (req, res) => {
             return res.status(404).json({ message: 'Exam not found' });
         }
 
-        // Compare the secure code entered with the stored secure code, ensuring both are trimmed
-        if (exam.secureCode.trim() === enteredCode.trim()) {
+        // Compare the entered code with the hashed secureCode using bcrypt
+        const isMatch = await bcrypt.compare(enteredCode, exam.secureCode);
+        if (isMatch) {
             return res.status(200).json({ valid: true, message: 'Code is valid' });
         } else {
             return res.status(400).json({ valid: false, message: 'Invalid secure code' });
@@ -68,6 +66,5 @@ router.post('/verify-code', async (req, res) => {
         return res.status(500).json({ message: 'Error verifying code', error });
     }
 });
-
 
 export default router;
