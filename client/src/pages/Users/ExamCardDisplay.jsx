@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Gradient patterns for different cards
@@ -13,7 +13,32 @@ const gradientPatterns = [
 
 const ExamCardDisplay = ({ exams }) => {
     const [selectedExam, setSelectedExam] = useState(null);
+    const [appliedExams, setAppliedExams] = useState([]); // State to track applied exams
     const navigate = useNavigate();
+
+    // Fetch applied exams from the backend
+    useEffect(() => {
+        const fetchAppliedExams = async () => {
+            try {
+                const user = JSON.parse(localStorage.getItem('user')); // Fetch user from local storage
+                if (user && user.username) {
+                    const response = await fetch(`/api/username/${user.username}/exams`); // Fetch applied exams
+                    if (response.ok) {
+                        const data = await response.json();
+                        setAppliedExams(data.appliedExams); // Store applied exams in state
+                    } else {
+                        console.error('Failed to fetch applied exams');
+                    }
+                } else {
+                    console.error('User not found in local storage');
+                }
+            } catch (error) {
+                console.error('Error fetching applied exams:', error);
+            }
+        };
+
+        fetchAppliedExams();
+    }, []); // Empty dependency array ensures this runs only once on component mount
 
     const handleApplyClick = (exam) => {
         setSelectedExam(exam);
@@ -61,6 +86,9 @@ const ExamCardDisplay = ({ exams }) => {
                     // Apply a different gradient pattern to each card based on index
                     const cardGradient = gradientPatterns[index % gradientPatterns.length];
 
+                    // Check if the exam is in the list of applied exams
+                    const hasApplied = appliedExams.includes(examName);
+
                     return (
                         <div
                             key={index}
@@ -95,12 +123,17 @@ const ExamCardDisplay = ({ exams }) => {
                             </div>
 
                             <div className="text-center">
-                                <button
-                                    onClick={() => handleApplyClick(exam)}
-                                    className="bg-white text-blue-600 font-semibold px-6 py-2 rounded-lg hover:bg-gray-200 transition-all"
-                                >
-                                    Apply Now
-                                </button>
+                                {/* Conditionally render the button or message based on applied status */}
+                                {hasApplied ? (
+                                    <span className="text-green-500 font-bold">You've applied for the exam</span>
+                                ) : (
+                                    <button
+                                        onClick={() => handleApplyClick(exam)}
+                                        className="bg-white text-blue-600 font-semibold px-6 py-2 rounded-lg hover:bg-gray-200 transition-all"
+                                    >
+                                        Apply Now
+                                    </button>
+                                )}
                             </div>
                         </div>
                     );
@@ -125,14 +158,15 @@ const ExamCardDisplay = ({ exams }) => {
                                 <p><strong>Exam Date:</strong> {new Date(selectedExam.examDate).toLocaleDateString()}</p>
                                 <p><strong>Total Marks:</strong> {selectedExam.totalMarks}</p>
                                 <p><strong>Passing Marks:</strong> {selectedExam.passingMarks}</p>
-                                <p><strong>Registration End Date:</strong> {new Date(selectedExam.registrationEndDate).toLocaleDateString()}</p>
                             </div>
-                            <button
-                                onClick={handleClosePopup}
-                                className="bg-green-600 text-white font-semibold px-6 py-3 mt-6 rounded-lg hover:bg-green-700 transition-all w-full"
-                            >
-                                Register
-                            </button>
+                            <div className="flex justify-center mt-6">
+                                <button
+                                    onClick={handleClosePopup}
+                                    className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-all"
+                                >
+                                    Proceed to Registration
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

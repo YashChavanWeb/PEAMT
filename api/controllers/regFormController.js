@@ -3,6 +3,7 @@ import RegForm from '../models/RegForm.js';
 import Exam from '../models/Exam.js';
 
 // Create or update a registration form
+// Create or update a registration form
 export const createRegForm = async (req, res) => {
     try {
         const {
@@ -47,8 +48,9 @@ export const createRegForm = async (req, res) => {
                 existingForm.username === username;
 
             if (isExactMatch) {
-                // Update examNames and save
+                // If the form is an exact match, and the student hasn't applied yet, set hasApplied to true
                 existingForm.examNames = updatedExamNames;
+                existingForm.hasApplied = true; // Update the hasApplied flag
                 await existingForm.save();
                 return res.status(200).json(existingForm);
             }
@@ -61,7 +63,8 @@ export const createRegForm = async (req, res) => {
             name, adhar, email, phone, fatherName, motherName, currentCourse,
             subjects: subjectsArray, dateOfBirth, gender, nationality,
             emergencyContact, previousEducation, permanentAddress, paymentId,
-            examNames: examNamesArray, username // Add username to the new form
+            examNames: examNamesArray, username,
+            hasApplied: true // Set hasApplied to true for the new form
         });
 
         await newRegForm.save();

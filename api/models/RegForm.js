@@ -25,7 +25,8 @@ const regFormSchema = new mongoose.Schema({
     },
     paymentId: { type: String, required: true },
     examNames: [String], // Array of exam names
-    username: { type: String, required: true } // Add username field
+    username: { type: String, required: true }, // Add username field
+    hasApplied: { type: Boolean, default: false }
 });
 
 const RegForm = mongoose.model('RegForm', regFormSchema);
