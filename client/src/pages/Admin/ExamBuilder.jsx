@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import CustomRadioButton from './CustomRadioButton';
-import axios from 'axios'; // Import Axios for API calls
-import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import CustomRadioButton from './CustomRadioButton'; // Import the custom radio button component
 
 function ExamBuilder() {
   const [questions, setQuestions] = useState([]);
   const [examName, setExamName] = useState('');
-  const [examOptions, setExamOptions] = useState([]); // State to hold dropdown options
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(''); // Add error state
-
+  const [examOptions, setExamOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [file, setFile] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
-  const adminEmail = currentUser?.email || ''; // Use the email from currentUser
+  const adminEmail = currentUser?.email || '';
 
   useEffect(() => {
-    // Fetch existing exams for the admin email on component mount
     const fetchExams = async () => {
       setLoading(true);
       setError('');
       try {
         const response = await axios.get('/api/exams');
-        const exams = response.data;
-        // Filter exams for the current admin email
-        const adminExams = exams.filter(exam => exam.adminEmail === adminEmail);
-        setExamOptions(adminExams);
+        const exams = response.data.filter(exam => exam.adminEmail === adminEmail);
+        setExamOptions(exams);
       } catch (error) {
         console.error('Error fetching exams:', error);
         setError('Error fetching exams.');
@@ -37,17 +36,14 @@ function ExamBuilder() {
 
   useEffect(() => {
     if (examName) {
-      // Fetch existing questions for the selected exam name
       const fetchExistingQuestions = async () => {
         setLoading(true);
         setError('');
         try {
           const response = await axios.get('/api/examQuestions', { params: { examName } });
-          // Access the `questions` property from the response data
-          const existingQuestions = response.data.questions || [];
-          setQuestions(existingQuestions);
+          setQuestions(response.data.questions || []);
         } catch (error) {
-          console.error('Error fetching existing exam questions:', error);
+          console.error('Error fetching exam questions:', error);
           setError('Error fetching exam questions.');
         } finally {
           setLoading(false);
@@ -76,79 +72,48 @@ function ExamBuilder() {
     setQuestions([...questions, newQuestion]);
   };
 
-  const updateQuestionText = (id, text) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, text } : question
-    );
-    setQuestions(updatedQuestions);
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
-  const updateOptionText = (questionId, optionIndex, optionText) => {
-    const updatedQuestions = questions.map((question) => {
-      if (question.id === questionId) {
-        const updatedOptions = question.options.map((option, index) =>
-          index === optionIndex ? optionText : option
-        );
-        return { ...question, options: updatedOptions };
-      }
-      return question;
-    });
-    setQuestions(updatedQuestions);
-  };
+  const uploadFile = async () => {
+    if (!file) {
+      toast.error('No file selected');
+      return;
+    }
 
-  const updateCorrectAnswer = (questionId, correctAnswerIndex) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === questionId ? { ...question, correctAnswer: correctAnswerIndex } : question
-    );
-    setQuestions(updatedQuestions);
-  };
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const updateQuestionType = (id, type) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, type } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateQuestionMarks = (id, marks) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, marks: parseInt(marks) } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateQuestionDifficulty = (id, difficulty) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, difficulty } : question
-    );
-    setQuestions(updatedQuestions);
-  };
-
-  const updateTheoryAnswerText = (id, answerText) => {
-    const updatedQuestions = questions.map((question) =>
-      question.id === id ? { ...question, answerText } : question
-    );
-    setQuestions(updatedQuestions);
+    try {
+      const response = await axios.post('http://localhost:3000/api/convert/convert', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const newQuestions = response.data.questions; // Assuming your API returns questions
+      setQuestions(newQuestions);
+      toast.success('File converted to questions successfully');
+    } catch (error) {
+      toast.error('Error converting file to questions');
+      console.error('Error:', error);
+    }
   };
 
   const submitExamQuestions = async () => {
     setLoading(true);
     setError('');
     try {
-      const data = {
-        examName,
-        questions,
-        adminEmail,
-      };
+      const data = { examName, questions, adminEmail };
       const response = await axios.post('/api/examQuestions', data);
       if (response.status === 200 || response.status === 201) {
-        alert('Exam questions submitted successfully');
+        toast.success('Exam questions submitted successfully');
       } else {
-        alert('Failed to submit exam questions');
+        toast.error('Failed to submit exam questions');
       }
     } catch (error) {
       console.error('Error submitting exam questions:', error);
-      alert('Failed to submit exam questions');
+      toast.error('Failed to submit exam questions');
     } finally {
       setLoading(false);
     }
@@ -165,7 +130,6 @@ function ExamBuilder() {
         <button className='button' onClick={addQuestion}>Add Question</button>
       </section>
 
-      {/* Dropdown for Exam Name */}
       <div className="my-4">
         <label>
           Select Exam Name:
@@ -183,6 +147,7 @@ function ExamBuilder() {
           </select>
         </label>
       </div>
+
       <section className='flex flex-col flex-wrap w-[90%] mx-auto'>
         {questions.length === 0 && examName ? (
           <p>No questions available for the selected exam. You can add new questions below.</p>
@@ -210,7 +175,7 @@ function ExamBuilder() {
                   </select>
                 </label>
               </div>
-
+              {/* Difficulty and Marks */}
               <div className='my-4 flex justify-between'>
                 <label className='my-auto border-2 p-2 rounded-full text-center'>
                   Difficulty Level:
@@ -235,7 +200,7 @@ function ExamBuilder() {
                   />
                 </label>
               </div>
-
+              {/* Options for MCQ */}
               {question.type === 'MCQ' ? (
                 <div>
                   {question.options.map((option, optionIndex) => (
@@ -274,6 +239,14 @@ function ExamBuilder() {
       <div className='text-center my-4'>
         <button onClick={submitExamQuestions} className='button'>Submit Exam Questions</button>
       </div>
+
+      {/* File Upload Section */}
+      <div className='my-4'>
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={uploadFile} className='button'>Upload Questions</button>
+      </div>
+
+      <ToastContainer />
     </div>
   );
 }
