@@ -7,6 +7,7 @@ function ExamWindow() {
     const [questions, setQuestions] = useState([]);
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [responses, setResponses] = useState({});
+    const [markedForReview, setMarkedForReview] = useState({});
     const [error, setError] = useState('');
     const [time, setTime] = useState({ hours: 1, minutes: 0, seconds: 0 });
     const timerRef = useRef();
@@ -97,20 +98,91 @@ function ExamWindow() {
         setError('');
     };
 
+    const handleMarkForReview = () => {
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        setMarkedForReview({
+            ...markedForReview,
+            [selectedQuestionIndex]: true
+        });
+        if (!currentResponse.option) {
+            setResponses({
+                ...responses,
+                [selectedQuestionIndex]: { ...currentResponse, status: 'skipped' }
+            });
+        }
+        setSelectedQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
+        setError('');
+    };
+
     const handlePrevious = () => {
         setSelectedQuestionIndex(Math.max(selectedQuestionIndex - 1, 0));
         setError('');
     };
 
     const handleNext = () => {
-        handleSaveResponse();
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        if (currentResponse.option) {
+            setResponses({
+                ...responses,
+                [selectedQuestionIndex]: { ...currentResponse, status: 'saved' }
+            });
+        } else {
+            setResponses({
+                ...responses,
+                [selectedQuestionIndex]: { ...currentResponse, status: 'skipped' }
+            });
+        }
+        setSelectedQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
+        setError('');
     };
+
+    const handleSaveAndNext = () => {
+        const currentResponse = responses[selectedQuestionIndex] || {};
+        if (!currentResponse.option) {
+            setError('Please select an option before proceeding.');
+            return;
+        }
+        setResponses({
+            ...responses,
+            [selectedQuestionIndex]: { ...currentResponse, status: 'saved' }
+        });
+        setSelectedQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
+        setError('');
+    };
+
+    const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
 
     const handleSubmit = () => {
-        // Implement submit logic
-        navigate('/submit-confirmation');
+        setShowConfirmSubmit(true);
     };
-
+    const confirmSubmit = async () => {
+        const resultData = {
+            userId: user.id, // Ensure you have this value properly set
+            examName: "Sample Exam", // Replace with the actual exam name
+            responses: userResponses, // Replace with actual responses from the user
+        };
+    
+        try {
+            const response = await fetch('http://localhost:3000/api/submitResult', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(resultData),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to submit results');
+            }
+    
+            const data = await response.json();
+            console.log('Result submitted successfully:', data);
+        } catch (error) {
+            console.error('Error submitting results:', error);
+        }
+    };
+    
+    
     const formatTime = (time) => {
         const { hours, minutes, seconds } = time;
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -124,77 +196,120 @@ function ExamWindow() {
             <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
                 <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
                     <h3 className="text-xl font-semibold mb-4">Questions</h3>
-                    {error ? (
+                    {error && (
                         <p className="text-red-500">{error}</p>
-                    ) : (
-                        <div className="grid grid-cols-3 gap-2">
-                            {questions.map((_, index) => (
+                    )}
+                    <div className="grid grid-cols-3 gap-2">
+                        {questions.map((_, index) => {
+                            const isMarked = markedForReview[index];
+                            const isSaved = responses[index]?.status === 'saved';
+                            const hasNoOption = !responses[index]?.option;
+                            let buttonColor = isSaved
+                                ? 'bg-green-500'
+                                : isMarked
+                                    ? hasNoOption ? 'bg-red-500' : 'bg-orange-500'
+                                    : 'bg-blue-500';
+
+                            return (
                                 <button
                                     key={index}
                                     onClick={() => handleQuestionSelect(index)}
-                                    className={`px-4 py-2 rounded-lg text-white ${responses[index]?.status === 'saved' ? 'bg-green-500' : 'bg-blue-500'} hover:bg-opacity-75`}
+                                    className={`px-4 py-2 rounded-lg text-white ${buttonColor} hover:bg-opacity-75`}
                                 >
                                     {index + 1}
                                 </button>
-                            ))}
-                        </div>
-                    )}
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
             <div className="w-3/4 p-2 relative" style={{ height: '100%', overflowY: 'auto' }}>
                 <div className="absolute top-4 right-4 text-lg font-semibold">{formatTime(time)}</div>
                 <div className="flex flex-col h-full p-0 bg-white rounded-lg shadow-md">
-                    {error ? (
-                        <p className="text-red-500 ml-10 mb-3">{error}</p>
-                    ) : (
-                        <>
-                            <h3 className="ml-10 text-2xl font-semibold mb-4">Question {currentQuestion?.number + 1}</h3>
-                            <p className="ml-10 text-lg mb-4">{currentQuestion?.text}</p>
-                            <div className="space-y-2 ml-10 mb-4">
-                                {currentQuestion?.options.map((option, index) => (
-                                    <div key={index} className="flex items-center space-x-2">
-                                        <input
-                                            type="radio"
-                                            id={`option${index}`}
-                                            name="options"
-                                            value={option}
-                                            checked={selectedOption === option}
-                                            onChange={() => handleOptionChange(option)}
-                                            className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                        />
-                                        <label htmlFor={`option${index}`} className="text-lg">{option}</label>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="flex justify-between mt-auto space-2 mb-4 ml-10 mr-10">
-                                <button
-                                    onClick={handlePrevious}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                                >
-                                    Previous
-                                </button>
-                                {selectedQuestionIndex === questions.length - 1 ? (
-                                    <button
-                                        onClick={handleSubmit}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                                    >
-                                        Submit
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={handleNext}
-                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                                    >
-                                        Save & Next
-                                    </button>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
+                    <h3 className="ml-10 text-2xl font-semibold mb-4">Question {currentQuestion?.number + 1}</h3>
+                    <p className="ml-10 text-lg mb-4">{currentQuestion?.text}</p>
 
-export default ExamWindow;
+                    {/* Display error message directly below the question */}
+                    {error && (
+                        <p className="text-red-500 ml-10 mb-4">Error: {error}</p>
+                    )}
+
+                    <div className="space-y-2 ml-10 mb-4">
+                        {currentQuestion?.options.map((option, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                                <input
+                                    type="radio"
+                                    id={`option${index}`}
+                                    name="options"
+                                    value={option}
+                                    checked={selectedOption === option}
+                                    onChange={() => handleOptionChange(option)}
+                                    className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                />
+                                <label htmlFor={`option${index}`} className="text-lg">{option}</label>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-between mt-auto space-2 mb-4 ml-10 mr-10">
+                        <button
+                            onClick={handlePrevious}
+                            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                        >
+                            Previous
+                        </button>
+                        <button
+                                                       onClick={handleMarkForReview}
+                                                       className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                                                   >
+                                                       Mark for Review
+                                                   </button>
+                                                   <button
+                                                       onClick={handleSaveAndNext}
+                                                       className={`px-4 py-2 ${selectedOption ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-lg`}
+                                                   >
+                                                       Save & Next
+                                                   </button>
+                                                   <button
+                                                       onClick={handleNext}
+                                                       className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                                                   >
+                                                       Next
+                                                   </button>
+                                                   <button
+                                                       onClick={handleSubmit}
+                                                       className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                                   >
+                                                       Submit
+                                                   </button>
+                                               </div>
+                                           </div>
+                                       </div>
+                           
+                                       {/* Confirmation dialog for submission */}
+                                       {showConfirmSubmit && (
+                                           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                                               <div className="bg-white p-6 rounded-lg shadow-lg">
+                                                   <h2 className="text-lg font-semibold mb-4">Are you sure you want to submit your exam?</h2>
+                                                   <div className="flex justify-end space-x-4">
+                                                       <button
+                                                           onClick={confirmSubmit}
+                                                           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                                       >
+                                                           Yes
+                                                       </button>
+                                                       <button
+                                                           onClick={() => setShowConfirmSubmit(false)}
+                                                           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                                       >
+                                                           No
+                                                       </button>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       )}
+                                   </div>
+                               );
+                           }
+                           
+                           export default ExamWindow;
+                           

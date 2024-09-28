@@ -12,6 +12,8 @@ import regformRoutes from './routes/regform.route.js';  // Updated import
 import examRoutes from './routes/examRoutes.js';
 import examQuestions from './routes/examQuestions.route.js'
 import uploadRoutes from './routes/uploadRoutes.js';
+import resultRoutes from './routes/resultRoutes.js'; // Add this line
+
 
 
 dotenv.config();
@@ -41,6 +43,8 @@ app.use('/api/regform', regformRoutes); // Updated route
 app.use('/api/exams', examRoutes);
 app.use('/api/examQuestions', examQuestions);
 app.use('/api/convert', uploadRoutes);
+app.use('/api', resultRoutes); // Add this line
+
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));

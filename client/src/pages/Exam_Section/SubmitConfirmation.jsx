@@ -1,9 +1,12 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function SubmitConfirmation() {
     const navigate = useNavigate();
+
+    const handleSeeResult = () => {
+        navigate('/result'); // Navigate to the Result component
+    };
 
     const handleHome = () => {
         navigate('/'); 
@@ -15,8 +18,14 @@ function SubmitConfirmation() {
                 <h1 className="text-3xl font-bold mb-4">Exam Submitted Successfully</h1>
                 <p className="text-lg mb-6">Thank you for completing the exam. Your responses have been submitted successfully.</p>
                 <button
+                    onClick={handleSeeResult}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 mb-4"
+                >
+                    See Result
+                </button>
+                <button
                     onClick={handleHome}
-                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 mt-4"
                 >
                     Go to Home
                 </button>

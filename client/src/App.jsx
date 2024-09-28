@@ -20,6 +20,7 @@ import AdminRoute from "./components/private/AdminRoute";
 import UserRoute from "./components/private/UserRoute";
 import FileUploader from "./pages/Admin/FileUploader";
 import MyExams from "./pages/Users/MyExams";
+import Result from './pages/Exam_Section/Result';
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
@@ -64,6 +65,7 @@ function App() {
 
           {/* Catch-all Route for 404 */}
           <Route path='*' element={<Home />} /> {/* Optionally, you might want to use a 404 page */}
+          <Route path="/result" element={<Result />} />
         </Routes>
       </div>
     </BrowserRouter>
