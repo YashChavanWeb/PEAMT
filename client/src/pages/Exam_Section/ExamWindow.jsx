@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function ExamWindow() {
     const location = useLocation();
     const { examName } = location.state || { examName: 'defaultExam' };
+    const { currentUser } = useSelector((state) => state.user); // Accessing current user from Redux
     const [questions, setQuestions] = useState([]);
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [responses, setResponses] = useState({});
@@ -219,13 +221,14 @@ function ExamWindow() {
     const handleSubmit = () => {
         setShowConfirmSubmit(true);
     };
+
     const confirmSubmit = async () => {
         const resultData = {
-            userId: user.id, // Ensure you have this value properly set
-            examName: "Sample Exam", // Replace with the actual exam name
-            responses: userResponses, // Replace with actual responses from the user
+            userId: currentUser._id, // Use currentUser from useSelector
+            examName: examName, // Use the actual exam name
+            responses: responses, // Actual responses from the user
         };
-    
+
         try {
             const response = await fetch('http://localhost:3000/api/submitResult', {
                 method: 'POST',
@@ -234,19 +237,19 @@ function ExamWindow() {
                 },
                 body: JSON.stringify(resultData),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to submit results');
             }
-    
+
             const data = await response.json();
             console.log('Result submitted successfully:', data);
+            navigate('/success'); // Redirect on success, modify as needed
         } catch (error) {
             console.error('Error submitting results:', error);
         }
     };
-    
-    
+
     const formatTime = (time) => {
         const { hours, minutes, seconds } = time;
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -254,7 +257,6 @@ function ExamWindow() {
 
     const currentQuestion = questions[selectedQuestionIndex];
     const selectedOption = responses[selectedQuestionIndex]?.option;
-
     return (
         <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
             {showAutoSubmitPopup && (
@@ -265,9 +267,7 @@ function ExamWindow() {
             <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
                 <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
                     <h3 className="text-xl font-semibold mb-4">Questions</h3>
-                    {error && (
-                        <p className="text-red-500">{error}</p>
-                    )}
+                    {error && <p className="text-red-500">{error}</p>}
                     <div className="grid grid-cols-3 gap-2">
                         {questions.map((_, index) => {
                             const isMarked = markedForReview[index];
@@ -295,13 +295,10 @@ function ExamWindow() {
             <div className="w-3/4 p-2 relative" style={{ height: '100%', overflowY: 'auto' }}>
                 <div className="absolute top-4 right-4 text-lg font-semibold">{formatTime(time)}</div>
                 <div className="flex flex-col h-full p-0 bg-white rounded-lg shadow-md">
-                    <h3 className="ml-10 text-2xl font-semibold mb-4">Question {currentQuestion?.number + 1}</h3>
+                    <h3 className="ml-10 text-2xl font-semibold mb-4">Question {selectedQuestionIndex + 1}</h3>
                     <p className="ml-10 text-lg mb-4">{currentQuestion?.text}</p>
 
-                    {/* Display error message directly below the question */}
-                    {error && (
-                        <p className="text-red-500 ml-10 mb-4">Error: {error}</p>
-                    )}
+                    {error && <p className="text-red-500 ml-10 mb-4">Error: {error}</p>}
 
                     <div className="space-y-2 ml-10 mb-4">
                         {currentQuestion?.options.map((option, index) => (
@@ -327,58 +324,56 @@ function ExamWindow() {
                             Previous
                         </button>
                         <button
-                                                       onClick={handleMarkForReview}
-                                                       className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                                                   >
-                                                       Mark for Review
-                                                   </button>
-                                                   <button
-                                                       onClick={handleSaveAndNext}
-                                                       className={`px-4 py-2 ${selectedOption ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-lg`}
-                                                   >
-                                                       Save & Next
-                                                   </button>
-                                                   <button
-                                                       onClick={handleNext}
-                                                       className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                                                   >
-                                                       Next
-                                                   </button>
-                                                   <button
-                                                       onClick={handleSubmit}
-                                                       className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                                                   >
-                                                       Submit
-                                                   </button>
-                                               </div>
-                                           </div>
-                                       </div>
-                           
-                                       {/* Confirmation dialog for submission */}
-                                       {showConfirmSubmit && (
-                                           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                               <div className="bg-white p-6 rounded-lg shadow-lg">
-                                                   <h2 className="text-lg font-semibold mb-4">Are you sure you want to submit your exam?</h2>
-                                                   <div className="flex justify-end space-x-4">
-                                                       <button
-                                                           onClick={confirmSubmit}
-                                                           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                                                       >
-                                                           Yes
-                                                       </button>
-                                                       <button
-                                                           onClick={() => setShowConfirmSubmit(false)}
-                                                           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                                                       >
-                                                           No
-                                                       </button>
-                                                   </div>
-                                               </div>
-                                           </div>
-                                       )}
-                                   </div>
-                               );
-                           }
-                           
-                           export default ExamWindow;
-                           
+                            onClick={handleMarkForReview}
+                            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                        >
+                            Mark for Review
+                        </button>
+                        <button
+                            onClick={handleSaveAndNext}
+                            className={`px-4 py-2 ${selectedOption ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-lg`}
+                        >
+                            Save & Next
+                        </button>
+                        <button
+                            onClick={handleNext}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        >
+                            Next
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {showConfirmSubmit && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 className="text-lg font-semibold mb-4">Are you sure you want to submit your exam?</h2>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={confirmSubmit}
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                            >
+                                Yes
+                            </button>
+                            <button
+                                onClick={() => setShowConfirmSubmit(false)}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default ExamWindow;
