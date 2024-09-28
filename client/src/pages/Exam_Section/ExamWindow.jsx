@@ -257,6 +257,8 @@ function ExamWindow() {
 
     const currentQuestion = questions[selectedQuestionIndex];
     const selectedOption = responses[selectedQuestionIndex]?.option;
+
+
     return (
         <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
             {showAutoSubmitPopup && (
