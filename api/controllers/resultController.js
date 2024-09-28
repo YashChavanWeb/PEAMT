@@ -11,7 +11,7 @@ export const submitResult = async (req, res) => {
     }
 
     try {
-        // Fetch the correct answers from the database
+        // Fetch the exam questions from the database
         const exam = await ExamQuestions.findOne({ examName });
         if (!exam) {
             return res.status(404).json({ message: 'Exam not found' });
@@ -19,11 +19,14 @@ export const submitResult = async (req, res) => {
 
         // Calculate the score
         let score = 0;
-        const correctAnswers = exam.questions.map(q => q.correctAnswer);
 
-        correctAnswers.forEach((correctAnswer, index) => {
-            if (responses[index] === correctAnswer) {
-                score += 1; // Increment score for correct answers
+        // Iterate through each question in the exam
+        exam.questions.forEach((question, index) => {
+            const userResponse = responses[index];
+
+            // Check if the user's response matches the correct answer
+            if (userResponse && userResponse.option === question.options[question.correctAnswer]) {
+                score += question.marks; // Add the question's marks to the score if correct
             }
         });
 
@@ -44,15 +47,14 @@ export const submitResult = async (req, res) => {
     }
 };
 
-
 export const getResults = async (req, res) => {
-    const { userId } = req.params;
+    const { userId } = req.query; // Changed from req.params to req.query
 
     try {
         const results = await Result.find({ userId });
-        res.json(results);
+        res.status(200).json(results); // Return the results with a status of 200
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Error in getResults:", error.message);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
