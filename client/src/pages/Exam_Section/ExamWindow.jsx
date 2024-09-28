@@ -244,7 +244,8 @@ function ExamWindow() {
 
             const data = await response.json();
             console.log('Result submitted successfully:', data);
-            navigate('/submit-confirmation'); // Redirect on success, modify as needed
+//             navigate('/submit-confirmation'); // Redirect on success, modify as needed
+            navigate('/success'); // Redirect on success, modify as needed
         } catch (error) {
             console.error('Error submitting results:', error);
         }
