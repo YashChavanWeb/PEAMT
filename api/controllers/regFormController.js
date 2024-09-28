@@ -177,3 +177,30 @@ export const getExamDetailsByNames = async (req, res) => {
         res.status(500).json({ message: 'Error fetching exam details', error });
     }
 };
+
+
+
+// Get all usernames and emails associated with a specific exam name
+export const getUsernamesByExamName = async (req, res) => {
+    try {
+        const { examName } = req.params;
+
+        // Find all registration forms that include the given exam name
+        const regForms = await RegForm.find({ examNames: examName });
+
+        if (!regForms || regForms.length === 0) {
+            return res.status(404).json({ message: 'No users found for this exam name' });
+        }
+
+        // Extract usernames and emails
+        const users = regForms.map(form => ({
+            username: form.username,
+            email: form.email
+        }));
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching usernames:', error);
+        res.status(500).json({ message: 'Error fetching usernames', error });
+    }
+};
+

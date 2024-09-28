@@ -5,7 +5,8 @@ import {
     updateRegForm,
     getRegFormByAdhar,
     getExamNamesByUsername,
-    getExamDetailsByNames
+    getExamDetailsByNames,
+    getUsernamesByExamName
 } from '../controllers/regFormController.js';
 
 const router = express.Router();
@@ -23,6 +24,8 @@ router.get('/username/:username/exams', getExamNamesByUsername);
 
 // New route to get exam details by exam names
 router.get('/username/:username/exams/details', getExamDetailsByNames);
+
+router.get('/usernames/exam/:examName', getUsernamesByExamName);
 
 export default router;
 
