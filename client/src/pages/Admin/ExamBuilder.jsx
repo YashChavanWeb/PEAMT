@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import CustomRadioButton from './CustomRadioButton'; // Import the custom radio button component
+import CustomRadioButton from './CustomRadioButton';
+import axios from 'axios'; // Import Axios for API calls
+import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
 
 function ExamBuilder() {
   const [questions, setQuestions] = useState([]);
   const [examName, setExamName] = useState('');
-  const [examOptions, setExamOptions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [file, setFile] = useState(null);
+  const [examOptions, setExamOptions] = useState([]); // State to hold dropdown options
+  const [subjects, setSubjects] = useState([]); // State to hold subjects
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [error, setError] = useState(''); // Add error state
+
   const { currentUser } = useSelector((state) => state.user);
-  const adminEmail = currentUser?.email || '';
+  const adminEmail = currentUser?.email || ''; // Use the email from currentUser
 
   useEffect(() => {
+    // Fetch existing exams for the admin email on component mount
     const fetchExams = async () => {
       setLoading(true);
       setError('');
       try {
         const response = await axios.get('/api/exams');
-        const exams = response.data.filter(exam => exam.adminEmail === adminEmail);
-        setExamOptions(exams);
+        const exams = response.data;
+        // Filter exams for the current admin email
+        const adminExams = exams.filter(exam => exam.adminEmail === adminEmail);
+        setExamOptions(adminExams);
       } catch (error) {
         console.error('Error fetching exams:', error);
         setError('Error fetching exams.');
@@ -36,14 +38,16 @@ function ExamBuilder() {
 
   useEffect(() => {
     if (examName) {
+      // Fetch existing questions for the selected exam name
       const fetchExistingQuestions = async () => {
         setLoading(true);
         setError('');
         try {
           const response = await axios.get('/api/examQuestions', { params: { examName } });
-          setQuestions(response.data.questions || []);
+          const existingQuestions = response.data.questions || [];
+          setQuestions(existingQuestions);
         } catch (error) {
-          console.error('Error fetching exam questions:', error);
+          console.error('Error fetching existing exam questions:', error);
           setError('Error fetching exam questions.');
         } finally {
           setLoading(false);
@@ -51,6 +55,24 @@ function ExamBuilder() {
       };
 
       fetchExistingQuestions();
+
+      // Fetch subjects for the selected exam name
+      const fetchSubjectsForExam = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get('/api/exams/subjects', { params: { examName } });
+          setSubjects(response.data);
+        } catch (error) {
+          console.error('Error fetching subjects:', error);
+          setError('Error fetching subjects.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchSubjectsForExam();
+    } else {
+      setSubjects([]); // Reset subjects if no exam is selected
     }
   }, [examName]);
 
@@ -67,53 +89,92 @@ function ExamBuilder() {
       correctAnswer: null,
       marks: 0,
       difficulty: 'Medium',
-      answerText: ''
+      answerText: '',
+      subject: '' // New field for subject
     };
     setQuestions([...questions, newQuestion]);
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const updateQuestionText = (id, text) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, text } : question
+    );
+    setQuestions(updatedQuestions);
   };
 
-  const uploadFile = async () => {
-    if (!file) {
-      toast.error('No file selected');
-      return;
-    }
+  const updateOptionText = (questionId, optionIndex, optionText) => {
+    const updatedQuestions = questions.map((question) => {
+      if (question.id === questionId) {
+        const updatedOptions = question.options.map((option, index) =>
+          index === optionIndex ? optionText : option
+        );
+        return { ...question, options: updatedOptions };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
+  };
 
-    const formData = new FormData();
-    formData.append('file', file);
+  const updateCorrectAnswer = (questionId, correctAnswerIndex) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === questionId ? { ...question, correctAnswer: correctAnswerIndex } : question
+    );
+    setQuestions(updatedQuestions);
+  };
 
-    try {
-      const response = await axios.post('http://localhost:3000/api/convert/convert', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      const newQuestions = response.data.questions; // Assuming your API returns questions
-      setQuestions(newQuestions);
-      toast.success('File converted to questions successfully');
-    } catch (error) {
-      toast.error('Error converting file to questions');
-      console.error('Error:', error);
-    }
+  const updateQuestionType = (id, type) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, type } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionMarks = (id, marks) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, marks: parseInt(marks) } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionDifficulty = (id, difficulty) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, difficulty } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateTheoryAnswerText = (id, answerText) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, answerText } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionSubject = (id, subject) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, subject } : question
+    );
+    setQuestions(updatedQuestions);
   };
 
   const submitExamQuestions = async () => {
     setLoading(true);
     setError('');
     try {
-      const data = { examName, questions, adminEmail };
+      const data = {
+        examName,
+        questions,
+        adminEmail,
+      };
       const response = await axios.post('/api/examQuestions', data);
       if (response.status === 200 || response.status === 201) {
-        toast.success('Exam questions submitted successfully');
+        alert('Exam questions submitted successfully');
       } else {
-        toast.error('Failed to submit exam questions');
+        alert('Failed to submit exam questions');
       }
     } catch (error) {
       console.error('Error submitting exam questions:', error);
-      toast.error('Failed to submit exam questions');
+      alert('Failed to submit exam questions');
     } finally {
       setLoading(false);
     }
@@ -130,6 +191,7 @@ function ExamBuilder() {
         <button className='button' onClick={addQuestion}>Add Question</button>
       </section>
 
+      {/* Dropdown for Exam Name */}
       <div className="my-4">
         <label>
           Select Exam Name:
@@ -175,7 +237,7 @@ function ExamBuilder() {
                   </select>
                 </label>
               </div>
-              {/* Difficulty and Marks */}
+
               <div className='my-4 flex justify-between'>
                 <label className='my-auto border-2 p-2 rounded-full text-center'>
                   Difficulty Level:
@@ -196,41 +258,57 @@ function ExamBuilder() {
                     value={question.marks}
                     onChange={(e) => updateQuestionMarks(question.id, e.target.value)}
                     min="0"
-                    className='font-bold w-20 p-1'
+                    className='border rounded-md p-1 mx-2'
                   />
                 </label>
               </div>
-              {/* Options for MCQ */}
-              {question.type === 'MCQ' ? (
-                <div>
-                  {question.options.map((option, optionIndex) => (
-                    <div key={`${question.id}-${optionIndex}`} className='flex flex-row'>
-                      <CustomRadioButton
-                        id={`option-${question.id}-${optionIndex}`}
-                        value={option}
-                        checked={question.correctAnswer === optionIndex}
-                        onChange={() => updateCorrectAnswer(question.id, optionIndex)}
-                      />
-                      <input
-                        type="text"
-                        placeholder={`Option ${optionIndex + 1}`}
-                        value={option}
-                        onChange={(e) => updateOptionText(question.id, optionIndex, e.target.value)}
-                        className='border-2 p-2 rounded-xl my-2'
-                      />
-                    </div>
+
+              <label className='my-auto border-2 p-2 rounded-full text-center'>
+                Subject:
+                <select
+                  value={question.subject}
+                  onChange={(e) => updateQuestionSubject(question.id, e.target.value)}
+                  className='my-auto mx-auto font-bold w-1/2'
+                >
+                  <option value="">Select a subject</option>
+                  {subjects.map(subject => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
                   ))}
-                </div>
-              ) : (
-                <div>
+                </select>
+              </label>
+
+              <div className='flex flex-col'>
+                {question.type === 'MCQ' ? (
+                  <div>
+                    {question.options.map((option, index) => (
+                      <div key={index} className='flex items-center my-2'>
+                        <input
+                          type="radio"
+                          name={`question-${question.id}-options`}
+                          checked={question.correctAnswer === index}
+                          onChange={() => updateCorrectAnswer(question.id, index)}
+                        />
+                        <input
+                          type="text"
+                          className='w-full m-1 p-2 border rounded-md'
+                          placeholder={`Option ${index + 1}`}
+                          value={option}
+                          onChange={(e) => updateOptionText(question.id, index, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
                   <textarea
-                    placeholder="Enter answer text"
+                    className='w-full border rounded-md p-2'
+                    placeholder="Enter your answer"
                     value={question.answerText}
                     onChange={(e) => updateTheoryAnswerText(question.id, e.target.value)}
-                    className='border-2 p-2 rounded-xl w-full'
                   />
-                </div>
-              )}
+                )}
+              </div>
             </section>
           ))
         )}
@@ -239,14 +317,6 @@ function ExamBuilder() {
       <div className='text-center my-4'>
         <button onClick={submitExamQuestions} className='button'>Submit Exam Questions</button>
       </div>
-
-      {/* File Upload Section */}
-      <div className='my-4'>
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={uploadFile} className='button'>Upload Questions</button>
-      </div>
-
-      <ToastContainer />
     </div>
   );
 }

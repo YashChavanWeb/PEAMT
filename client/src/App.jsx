@@ -20,6 +20,7 @@ import AdminRoute from "./components/private/AdminRoute";
 import UserRoute from "./components/private/UserRoute";
 import FileUploader from "./pages/Admin/FileUploader";
 import MyExams from "./pages/Users/MyExams";
+import RegisteredUsers from "./pages/Admin/RegisteredUsers";
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
@@ -40,6 +41,7 @@ function App() {
             <Route path='/admin-dashboard' element={<AdminDashboard />} />
             <Route path='/exam-builder' element={<ExamBuilder />} />
             <Route path='/converter' element={<FileUploader />} />
+            <Route path='/registered-users' element={<RegisteredUsers />} />
           </Route>
 
           {/* User-only Routes */}

@@ -1,17 +1,14 @@
-// FileUploader.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import JsonPreview from './JsonPreview'; // Adjust the path as needed
 import FilePreview from './FilePreview'; // Import the new FilePreview component
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-function FileUploader({ onJsonContentChange }) {
+function FileUploader() {
   const [file, setFile] = useState(null);
   const [jsonContent, setJsonContent] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleFile = (file) => {
     setFile(file);
@@ -38,12 +35,7 @@ function FileUploader({ onJsonContentChange }) {
       });
       console.log('Response Data:', response.data); // Debugging line
       toast.success('File converted to JSON successfully');
-      const convertedJson = response.data.json; // Get the JSON content
-      setJsonContent(convertedJson); // Store JSON content
-      onJsonContentChange(convertedJson); // Notify the parent component of the change
-
-      // Redirect to ExamBuilder after conversion
-      navigate('/exam-builder'); // Redirecting to the ExamBuilder route
+      setJsonContent(response.data.json); // Store JSON content
     } catch (error) {
       toast.error('Error converting file to JSON');
       console.error('Error converting file:', error);
@@ -70,7 +62,6 @@ function FileUploader({ onJsonContentChange }) {
     setFile(null);
     setJsonContent(null);
     document.getElementById('fileInput').value = ''; // Clear the file input
-    onJsonContentChange(null); // Clear the JSON content in parent
   };
 
   return (

@@ -49,7 +49,6 @@
 
 
 
-
 import ExamQuestions from "../models/examQuestions.model.js";
 
 // Create or update exam questions
@@ -60,6 +59,13 @@ export const createExamQuestions = async (req, res) => {
         // Validate request body
         if (!examName || !Array.isArray(questions) || questions.length === 0 || !adminEmail) {
             return res.status(400).json({ message: 'Exam name, questions, and admin email are required' });
+        }
+
+        // Check that each question has a subject
+        for (const question of questions) {
+            if (!question.subject) {
+                return res.status(400).json({ message: 'Each question must have a subject' });
+            }
         }
 
         // Find existing exam questions for the adminEmail

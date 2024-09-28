@@ -13,6 +13,7 @@ function AdminDashboard() {
         totalMarks: '',
         passingMarks: '',
         secureCode: '', // New field for the 6-digit code
+        subjects: [], // New field for subjects
     });
 
     const [exams, setExams] = useState([]);
@@ -88,6 +89,12 @@ function AdminDashboard() {
         setExamDetails({ ...examDetails, [name]: value });
     };
 
+    const handleSubjectsChange = (e) => {
+        const { value } = e.target;
+        const subjectsArray = value.split(',').map(subject => subject.trim());
+        setExamDetails({ ...examDetails, subjects: subjectsArray });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -113,6 +120,7 @@ function AdminDashboard() {
                     totalMarks: examDetails.totalMarks,
                     passingMarks: examDetails.passingMarks,
                     secureCode: examDetails.secureCode, // Include secureCode
+                    subjects: examDetails.subjects, // Include subjects
                     adminEmail: currentUser?.email,
                 }),
             });
@@ -134,6 +142,7 @@ function AdminDashboard() {
                     totalMarks: '',
                     passingMarks: '',
                     secureCode: '', // Reset secureCode
+                    subjects: [], // Reset subjects
                 });
 
                 fetchExams();
@@ -152,8 +161,8 @@ function AdminDashboard() {
         navigate(`/exam-builder?examId=${examId}`); // Redirect to the exam-builder route with examId
     };
 
-    const handleViewRegisteredUsers = (examId) => {
-        navigate(`/registered-users?examId=${examId}`); // Navigate to the registered users page with examId
+    const handleViewRegisteredUsers = (examId, examName) => {
+        navigate(`/registered-users?examName=${encodeURIComponent(examName)}`);
     };
 
     const adminExams = exams.filter(exam => exam.adminEmail === currentUser?.email);
@@ -249,6 +258,43 @@ function AdminDashboard() {
                                                 onBlur={(e) => {
                                                     e.target.style.boxShadow = '6px 6px 12px #bebebe, -6px -6px 12px #ffffff';
                                                     e.target.style.border = '1px solid #ccc';
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                if (key === 'subjects') {
+                                    return (
+                                        <div key={key} style={{ marginBottom: '16px' }}>
+                                            <label
+                                                htmlFor={key}
+                                                style={{
+                                                    display: 'block',
+                                                    marginBottom: '8px',
+                                                    color: '#666',
+                                                    textTransform: 'capitalize',
+                                                }}
+                                            >
+                                                Subjects (comma-separated):
+                                            </label>
+                                            <input
+                                                id={key}
+                                                type="text"
+                                                name={key}
+                                                value={examDetails[key].join(', ')}
+                                                onChange={handleSubjectsChange}
+                                                placeholder="Enter subjects"
+                                                style={{
+                                                    padding: '12px',
+                                                    borderRadius: '8px',
+                                                    backgroundColor: '#fff',
+                                                    boxShadow: '6px 6px 12px #bebebe, -6px -6px 12px #ffffff',
+                                                    border: '1px solid #ccc',
+                                                    outline: 'none',
+                                                    width: '100%',
+                                                    transition: 'box-shadow 0.3s ease, border 0.3s ease',
                                                 }}
                                                 required
                                             />
@@ -357,6 +403,7 @@ function AdminDashboard() {
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Registration End Date</th>
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Total Marks</th>
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Passing Marks</th>
+                                <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Subjects</th> {/* Added column for subjects */}
                                 <th className="px-6 py-3 border-b border-gray-300 text-left text-sm font-medium">Actions</th>
                             </tr>
                         </thead>
@@ -370,6 +417,7 @@ function AdminDashboard() {
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{new Date(exam.registrationEndDate).toLocaleDateString()}</td>
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.totalMarks}</td>
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.passingMarks}</td>
+                                    <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.subjects.join(', ')}</td> {/* Display subjects */}
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">
                                         <button
                                             onClick={() => handleQuestionListClick(exam._id)} // Pass exam ID
@@ -378,7 +426,7 @@ function AdminDashboard() {
                                             Question List
                                         </button>
                                         <button
-                                            onClick={() => handleViewRegisteredUsers(exam._id)} // View registered users for the exam
+                                            onClick={() => handleViewRegisteredUsers(exam._id, exam.examName)} // Pass exam ID and name
                                             className="ml-2 bg-green-500 text-white font-bold py-1 px-3 rounded hover:bg-green-600"
                                         >
                                             Registered Users
