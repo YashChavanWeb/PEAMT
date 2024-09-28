@@ -43,10 +43,6 @@ const examQuestionsSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    subjects: {
-        type: [String],
-        required: true, // Assuming subjects are required
-    },
     questions: [questionSchema], // Array of questions
     adminEmail: {
         type: String,

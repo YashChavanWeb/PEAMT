@@ -99,7 +99,22 @@ export const getExamQuestions = async (req, res) => {
 
         const exam = await ExamQuestions.findOne({ examName });
         if (exam) {
-            res.status(200).json(exam); // Return the full exam object
+            // Map through questions to include subjects explicitly if needed
+            const questionsWithSubjects = exam.questions.map(question => ({
+                text: question.text,
+                type: question.type,
+                options: question.options,
+                correctAnswer: question.correctAnswer,
+                marks: question.marks,
+                difficulty: question.difficulty,
+                subject: question.subject, // Including the subject explicitly
+            }));
+
+            res.status(200).json({
+                examName: exam.examName,
+                adminEmail: exam.adminEmail,
+                questions: questionsWithSubjects
+            }); // Return the exam details along with questions and their subjects
         } else {
             res.status(404).json({ message: 'Exam not found' });
         }
@@ -108,3 +123,4 @@ export const getExamQuestions = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch exam questions', error });
     }
 };
+

@@ -11,27 +11,36 @@ export const submitResult = async (req, res) => {
     }
 
     try {
-        // Fetch the correct answers from the database
+        // Fetch the exam questions from the database
         const exam = await ExamQuestions.findOne({ examName });
         if (!exam) {
             return res.status(404).json({ message: 'Exam not found' });
         }
 
-        // Calculate the score
-        let score = 0;
-        const correctAnswers = exam.questions.map(q => q.correctAnswer);
+        // Initialize scores by subject
+        const subjectScores = {};
 
-        correctAnswers.forEach((correctAnswer, index) => {
-            if (responses[index] === correctAnswer) {
-                score += 1; // Increment score for correct answers
+        // Iterate through each question in the exam
+        exam.questions.forEach((question, index) => {
+            const userResponse = responses[question.subject]?.[index]; // Assuming responses are organized by subject
+            const correctAnswer = question.options[question.correctAnswer];
+
+            // Initialize score for the subject if not already done
+            if (!subjectScores[question.subject]) {
+                subjectScores[question.subject] = 0;
+            }
+
+            // Check if the user's response matches the correct answer
+            if (userResponse && userResponse.option === correctAnswer) {
+                subjectScores[question.subject] += question.marks; // Add the question's marks to the subject score if correct
             }
         });
 
-        // Create a new result record
+        // Create a new result record with scores by subject
         const result = new Result({
             examName,
             userId,
-            score,
+            scores: subjectScores, // Store subject-wise scores
             responses,
         });
 
@@ -44,15 +53,14 @@ export const submitResult = async (req, res) => {
     }
 };
 
-
 export const getResults = async (req, res) => {
-    const { userId } = req.params;
+    const { userId } = req.query; // Changed from req.params to req.query
 
     try {
         const results = await Result.find({ userId });
-        res.json(results);
+        res.status(200).json(results); // Return the results with a status of 200
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Error in getResults:", error.message);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };

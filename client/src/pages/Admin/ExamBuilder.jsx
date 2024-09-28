@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import CustomRadioButton from './CustomRadioButton';
-import axios from 'axios'; // Import Axios for API calls
-import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
-import { useLocation } from 'react-router-dom'; // Import useLocation
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
 function ExamBuilder() {
   const [questions, setQuestions] = useState([]);
-  const [examName, setExamName] = useState(''); // State for selected exam name
+  const [examName, setExamName] = useState('');
   const [examOptions, setExamOptions] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,25 +15,23 @@ function ExamBuilder() {
   const { currentUser } = useSelector((state) => state.user);
   const adminEmail = currentUser?.email || '';
 
-  const location = useLocation(); // Get current location
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const initialExamName = queryParams.get('examName'); // Extract examName from URL
+  const initialExamName = queryParams.get('examName');
 
   useEffect(() => {
     if (initialExamName) {
-      setExamName(initialExamName); // Set the exam name from URL if available
+      setExamName(initialExamName);
     }
   }, [initialExamName]);
 
   useEffect(() => {
-    // Fetch existing exams for the admin email on component mount
     const fetchExams = async () => {
       setLoading(true);
       setError('');
       try {
         const response = await axios.get('/api/exams');
         const exams = response.data;
-        // Filter exams for the current admin email
         const adminExams = exams.filter(exam => exam.adminEmail === adminEmail);
         setExamOptions(adminExams);
       } catch (error) {
@@ -49,7 +47,6 @@ function ExamBuilder() {
 
   useEffect(() => {
     if (examName) {
-      // Fetch existing questions for the selected exam name
       const fetchExistingQuestions = async () => {
         setLoading(true);
         setError('');
@@ -67,7 +64,6 @@ function ExamBuilder() {
 
       fetchExistingQuestions();
 
-      // Fetch subjects for the selected exam name
       const fetchSubjectsForExam = async () => {
         setLoading(true);
         try {
@@ -83,7 +79,7 @@ function ExamBuilder() {
 
       fetchSubjectsForExam();
     } else {
-      setSubjects([]); // Reset subjects if no exam is selected
+      setSubjects([]);
     }
   }, [examName]);
 
@@ -202,7 +198,6 @@ function ExamBuilder() {
         <button className='button' onClick={addQuestion}>Add Question</button>
       </section>
 
-      {/* Dropdown for Exam Name */}
       <div className="my-4">
         <label>
           Select Exam Name:
@@ -295,19 +290,20 @@ function ExamBuilder() {
                   <div>
                     {question.options.map((option, index) => (
                       <div key={index} className='flex items-center my-2'>
-                        <input
-                          type="radio"
-                          name={`question-${question.id}-options`}
+                        <CustomRadioButton
+                          id={`question-${question.id}-option-${index}`}
                           checked={question.correctAnswer === index}
                           onChange={() => updateCorrectAnswer(question.id, index)}
-                        />
-                        <input
-                          type="text"
-                          className='w-full m-1 p-2 border rounded-md'
-                          placeholder={`Option ${index + 1}`}
                           value={option}
-                          onChange={(e) => updateOptionText(question.id, index, e.target.value)}
-                        />
+                        >
+                          <input
+                            type="text"
+                            className='w-full m-1 p-2 border rounded-md'
+                            placeholder={`Option ${index + 1}`}
+                            value={option}
+                            onChange={(e) => updateOptionText(question.id, index, e.target.value)}
+                          />
+                        </CustomRadioButton>
                       </div>
                     ))}
                   </div>
