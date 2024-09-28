@@ -157,8 +157,8 @@ function AdminDashboard() {
         }
     };
 
-    const handleQuestionListClick = (examId) => {
-        navigate(`/exam-builder?examId=${examId}`); // Redirect to the exam-builder route with examId
+    const handleQuestionListClick = (examName) => {
+        navigate(`/exam-builder?examName=${examName}`); // Redirect to the exam-builder route with examId
     };
 
     const handleViewRegisteredUsers = (examId, examName) => {
@@ -420,7 +420,7 @@ function AdminDashboard() {
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">{exam.subjects.join(', ')}</td> {/* Display subjects */}
                                     <td className="px-6 py-4 border-b border-gray-300 text-sm">
                                         <button
-                                            onClick={() => handleQuestionListClick(exam._id)} // Pass exam ID
+                                            onClick={() => handleQuestionListClick(exam.examName)} // Pass exam ID
                                             className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-600"
                                         >
                                             Question List

@@ -2,17 +2,28 @@ import React, { useState, useEffect } from 'react';
 import CustomRadioButton from './CustomRadioButton';
 import axios from 'axios'; // Import Axios for API calls
 import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import { useLocation } from 'react-router-dom'; // Import useLocation
 
 function ExamBuilder() {
   const [questions, setQuestions] = useState([]);
-  const [examName, setExamName] = useState('');
-  const [examOptions, setExamOptions] = useState([]); // State to hold dropdown options
-  const [subjects, setSubjects] = useState([]); // State to hold subjects
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(''); // Add error state
+  const [examName, setExamName] = useState(''); // State for selected exam name
+  const [examOptions, setExamOptions] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const { currentUser } = useSelector((state) => state.user);
-  const adminEmail = currentUser?.email || ''; // Use the email from currentUser
+  const adminEmail = currentUser?.email || '';
+
+  const location = useLocation(); // Get current location
+  const queryParams = new URLSearchParams(location.search);
+  const initialExamName = queryParams.get('examName'); // Extract examName from URL
+
+  useEffect(() => {
+    if (initialExamName) {
+      setExamName(initialExamName); // Set the exam name from URL if available
+    }
+  }, [initialExamName]);
 
   useEffect(() => {
     // Fetch existing exams for the admin email on component mount
@@ -90,7 +101,7 @@ function ExamBuilder() {
       marks: 0,
       difficulty: 'Medium',
       answerText: '',
-      subject: '' // New field for subject
+      subject: ''
     };
     setQuestions([...questions, newQuestion]);
   };
