@@ -15,6 +15,9 @@ function ExamWindow() {
     const [warningShown, setWarningShown] = useState(false);
     const [showAutoSubmitPopup, setShowAutoSubmitPopup] = useState(false);
     const [sessionTimeout, setSessionTimeout] = useState(null);
+    const [warningShown, setWarningShown] = useState(false);
+    const [showAutoSubmitPopup, setShowAutoSubmitPopup] = useState(false);
+    const [sessionTimeout, setSessionTimeout] = useState(null);
     const timerRef = useRef();
     const navigate = useNavigate();
 
@@ -55,6 +58,27 @@ function ExamWindow() {
                 }
             });
         }, 1000);
+
+        const handleActivity = () => {
+            clearTimeout(sessionTimeout);
+            setSessionTimeout(setTimeout(() => {
+                alert("Your session has timed out due to inactivity.");
+                navigate('/logout'); // Redirect to logout or login page
+            }, 15 * 60 * 1000)); // 15 minutes timeout
+        };
+
+        window.addEventListener('mousemove', handleActivity);
+        window.addEventListener('keypress', handleActivity);
+
+        // Prevent copy-paste
+        const preventCopyPaste = (event) => {
+            event.preventDefault();
+            alert("Copying and pasting are not allowed during the exam.");
+        };
+
+        window.addEventListener('copy', preventCopyPaste);
+        window.addEventListener('paste', preventCopyPaste);
+        window.addEventListener('cut', preventCopyPaste);
 
         const handleActivity = () => {
             clearTimeout(sessionTimeout);
@@ -134,6 +158,7 @@ function ExamWindow() {
             window.removeEventListener("keydown", handleKeyLock);
             // document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
+    }, [examName, warningShown, sessionTimeout]);
     }, [examName, warningShown, sessionTimeout]);
 
     const handleQuestionSelect = (index) => {

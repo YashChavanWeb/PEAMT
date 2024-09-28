@@ -2,16 +2,28 @@ import React, { useState, useEffect } from 'react';
 import CustomRadioButton from './CustomRadioButton';
 import axios from 'axios'; // Import Axios for API calls
 import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import { useLocation } from 'react-router-dom'; // Import useLocation
 
 function ExamBuilder() {
   const [questions, setQuestions] = useState([]);
-  const [examName, setExamName] = useState('');
-  const [examOptions, setExamOptions] = useState([]); // State to hold dropdown options
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(''); // Add error state
+  const [examName, setExamName] = useState(''); // State for selected exam name
+  const [examOptions, setExamOptions] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const { currentUser } = useSelector((state) => state.user);
-  const adminEmail = currentUser?.email || ''; // Use the email from currentUser
+  const adminEmail = currentUser?.email || '';
+
+  const location = useLocation(); // Get current location
+  const queryParams = new URLSearchParams(location.search);
+  const initialExamName = queryParams.get('examName'); // Extract examName from URL
+
+  useEffect(() => {
+    if (initialExamName) {
+      setExamName(initialExamName); // Set the exam name from URL if available
+    }
+  }, [initialExamName]);
 
   useEffect(() => {
     // Fetch existing exams for the admin email on component mount
@@ -43,7 +55,6 @@ function ExamBuilder() {
         setError('');
         try {
           const response = await axios.get('/api/examQuestions', { params: { examName } });
-          // Access the `questions` property from the response data
           const existingQuestions = response.data.questions || [];
           setQuestions(existingQuestions);
         } catch (error) {
@@ -55,6 +66,24 @@ function ExamBuilder() {
       };
 
       fetchExistingQuestions();
+
+      // Fetch subjects for the selected exam name
+      const fetchSubjectsForExam = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get('/api/exams/subjects', { params: { examName } });
+          setSubjects(response.data);
+        } catch (error) {
+          console.error('Error fetching subjects:', error);
+          setError('Error fetching subjects.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchSubjectsForExam();
+    } else {
+      setSubjects([]); // Reset subjects if no exam is selected
     }
   }, [examName]);
 
@@ -71,7 +100,8 @@ function ExamBuilder() {
       correctAnswer: null,
       marks: 0,
       difficulty: 'Medium',
-      answerText: ''
+      answerText: '',
+      subject: ''
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -131,6 +161,13 @@ function ExamBuilder() {
     setQuestions(updatedQuestions);
   };
 
+  const updateQuestionSubject = (id, subject) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, subject } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
   const submitExamQuestions = async () => {
     setLoading(true);
     setError('');
@@ -183,6 +220,7 @@ function ExamBuilder() {
           </select>
         </label>
       </div>
+
       <section className='flex flex-col flex-wrap w-[90%] mx-auto'>
         {questions.length === 0 && examName ? (
           <p>No questions available for the selected exam. You can add new questions below.</p>
@@ -231,41 +269,57 @@ function ExamBuilder() {
                     value={question.marks}
                     onChange={(e) => updateQuestionMarks(question.id, e.target.value)}
                     min="0"
-                    className='font-bold w-20 p-1'
+                    className='border rounded-md p-1 mx-2'
                   />
                 </label>
               </div>
 
-              {question.type === 'MCQ' ? (
-                <div>
-                  {question.options.map((option, optionIndex) => (
-                    <div key={`${question.id}-${optionIndex}`} className='flex flex-row'>
-                      <CustomRadioButton
-                        id={`option-${question.id}-${optionIndex}`}
-                        value={option}
-                        checked={question.correctAnswer === optionIndex}
-                        onChange={() => updateCorrectAnswer(question.id, optionIndex)}
-                      />
-                      <input
-                        type="text"
-                        placeholder={`Option ${optionIndex + 1}`}
-                        value={option}
-                        onChange={(e) => updateOptionText(question.id, optionIndex, e.target.value)}
-                        className='border-2 p-2 rounded-xl my-2'
-                      />
-                    </div>
+              <label className='my-auto border-2 p-2 rounded-full text-center'>
+                Subject:
+                <select
+                  value={question.subject}
+                  onChange={(e) => updateQuestionSubject(question.id, e.target.value)}
+                  className='my-auto mx-auto font-bold w-1/2'
+                >
+                  <option value="">Select a subject</option>
+                  {subjects.map(subject => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
                   ))}
-                </div>
-              ) : (
-                <div>
+                </select>
+              </label>
+
+              <div className='flex flex-col'>
+                {question.type === 'MCQ' ? (
+                  <div>
+                    {question.options.map((option, index) => (
+                      <div key={index} className='flex items-center my-2'>
+                        <input
+                          type="radio"
+                          name={`question-${question.id}-options`}
+                          checked={question.correctAnswer === index}
+                          onChange={() => updateCorrectAnswer(question.id, index)}
+                        />
+                        <input
+                          type="text"
+                          className='w-full m-1 p-2 border rounded-md'
+                          placeholder={`Option ${index + 1}`}
+                          value={option}
+                          onChange={(e) => updateOptionText(question.id, index, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
                   <textarea
-                    placeholder="Enter answer text"
+                    className='w-full border rounded-md p-2'
+                    placeholder="Enter your answer"
                     value={question.answerText}
                     onChange={(e) => updateTheoryAnswerText(question.id, e.target.value)}
-                    className='border-2 p-2 rounded-xl w-full'
                   />
-                </div>
-              )}
+                )}
+              </div>
             </section>
           ))
         )}

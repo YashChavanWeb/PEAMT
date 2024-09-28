@@ -28,6 +28,10 @@ const questionSchema = new mongoose.Schema({
         enum: ['Easy', 'Medium', 'Hard'],
         default: 'Medium',
     },
+    subject: {
+        type: String,
+        required: true, // Assuming subject is required
+    },
 });
 
 function arrayLimit(val) {
@@ -39,13 +43,16 @@ const examQuestionsSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    subjects: {
+        type: [String],
+        required: true, // Assuming subjects are required
+    },
     questions: [questionSchema], // Array of questions
     adminEmail: {
         type: String,
         required: true,
     },
 });
-
 
 const adminUri = process.env.ADMIN;
 // Create connection to the ADMIN database
