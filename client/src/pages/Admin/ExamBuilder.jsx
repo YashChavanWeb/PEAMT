@@ -2,22 +2,28 @@ import React, { useState, useEffect } from 'react';
 import CustomRadioButton from './CustomRadioButton';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
-function ExamBuilder({ jsonContent }) {
+function ExamBuilder() {
   const [questions, setQuestions] = useState([]);
   const [examName, setExamName] = useState('');
   const [examOptions, setExamOptions] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const { currentUser } = useSelector((state) => state.user);
   const adminEmail = currentUser?.email || '';
 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialExamName = queryParams.get('examName');
+
   useEffect(() => {
-    if (jsonContent) {
-      console.log('Received JSON Content in ExamBuilder:', jsonContent);
+    if (initialExamName) {
+      setExamName(initialExamName);
     }
-  }, [jsonContent]);
+  }, [initialExamName]);
 
   useEffect(() => {
     const fetchExams = async () => {
@@ -57,6 +63,23 @@ function ExamBuilder({ jsonContent }) {
       };
 
       fetchExistingQuestions();
+
+      const fetchSubjectsForExam = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get('/api/exams/subjects', { params: { examName } });
+          setSubjects(response.data);
+        } catch (error) {
+          console.error('Error fetching subjects:', error);
+          setError('Error fetching subjects.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchSubjectsForExam();
+    } else {
+      setSubjects([]);
     }
   }, [examName]);
 
@@ -65,31 +88,81 @@ function ExamBuilder({ jsonContent }) {
   };
 
   const addQuestion = () => {
-    if (jsonContent && jsonContent.length > 0) {
-      const newQuestionIndex = questions.length % jsonContent.length;
-      const jsonQuestion = jsonContent[newQuestionIndex];
-
-      const newQuestion = {
-        id: questions.length + 1,
-        text: jsonQuestion.question || '',
-        type: jsonQuestion.type || 'MCQ',
-        options: jsonQuestion.type === 'theory' 
-                  ? []  // No options for theory questions
-                  : jsonQuestion.choices.map(choice => choice.choice) || [],
-        correctAnswer: null,
-        marks: 0,
-        difficulty: 'Medium',
-        answerText: jsonQuestion.type === 'theory' ? '' : null
-      };
-
-      setQuestions([...questions, newQuestion]);
-    } else {
-      console.warn("No valid JSON content available to add a question.");
-      alert("No valid JSON content available to add a question.");
-    }
+    const newQuestion = {
+      id: questions.length + 1,
+      text: '',
+      type: 'MCQ',
+      options: ['', '', '', ''],
+      correctAnswer: null,
+      marks: 0,
+      difficulty: 'Medium',
+      answerText: '',
+      subject: ''
+    };
+    setQuestions([...questions, newQuestion]);
   };
 
-  // ... other functions remain unchanged ...
+  const updateQuestionText = (id, text) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, text } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateOptionText = (questionId, optionIndex, optionText) => {
+    const updatedQuestions = questions.map((question) => {
+      if (question.id === questionId) {
+        const updatedOptions = question.options.map((option, index) =>
+          index === optionIndex ? optionText : option
+        );
+        return { ...question, options: updatedOptions };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
+  };
+
+  const updateCorrectAnswer = (questionId, correctAnswerIndex) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === questionId ? { ...question, correctAnswer: correctAnswerIndex } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionType = (id, type) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, type } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionMarks = (id, marks) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, marks: parseInt(marks) } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionDifficulty = (id, difficulty) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, difficulty } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateTheoryAnswerText = (id, answerText) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, answerText } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+
+  const updateQuestionSubject = (id, subject) => {
+    const updatedQuestions = questions.map((question) =>
+      question.id === id ? { ...question, subject } : question
+    );
+    setQuestions(updatedQuestions);
+  };
 
   const submitExamQuestions = async () => {
     setLoading(true);
@@ -147,8 +220,8 @@ function ExamBuilder({ jsonContent }) {
         {questions.length === 0 && examName ? (
           <p>No questions available for the selected exam. You can add new questions below.</p>
         ) : (
-          questions.map((question, index) => (
-            <section key={`${question.id}-${index}`} className='my-4'>
+          questions.map((question) => (
+            <section key={question.id} className='my-4'>
               <div className='flex flex-row justify-between text-center my-2'>
                 <h3 className='font-bold my-auto'>Question {question.id}</h3>
                 <input
@@ -170,6 +243,7 @@ function ExamBuilder({ jsonContent }) {
                   </select>
                 </label>
               </div>
+
               <div className='my-4 flex justify-between'>
                 <label className='my-auto border-2 p-2 rounded-full text-center'>
                   Difficulty Level:
@@ -190,41 +264,58 @@ function ExamBuilder({ jsonContent }) {
                     value={question.marks}
                     onChange={(e) => updateQuestionMarks(question.id, e.target.value)}
                     min="0"
-                    className='font-bold w-20 p-1'
+                    className='border rounded-md p-1 mx-2'
                   />
                 </label>
               </div>
 
-              {question.type === 'MCQ' ? (
-                <div>
-                  {question.options.map((option, optionIndex) => (
-                    <div key={`${question.id}-${optionIndex}`} className='flex flex-row'>
-                      <CustomRadioButton
-                        id={`option-${question.id}-${optionIndex}`}
-                        value={option}
-                        checked={question.correctAnswer === optionIndex}
-                        onChange={() => updateCorrectAnswer(question.id, optionIndex)}
-                      />
-                      <input
-                        type="text"
-                        placeholder={`Option ${optionIndex + 1}`}
-                        value={option}
-                        onChange={(e) => updateOptionText(question.id, optionIndex, e.target.value)}
-                        className='border-2 p-2 rounded-xl my-2'
-                      />
-                    </div>
+              <label className='my-auto border-2 p-2 rounded-full text-center'>
+                Subject:
+                <select
+                  value={question.subject}
+                  onChange={(e) => updateQuestionSubject(question.id, e.target.value)}
+                  className='my-auto mx-auto font-bold w-1/2'
+                >
+                  <option value="">Select a subject</option>
+                  {subjects.map(subject => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
                   ))}
-                </div>
-              ) : (
-                <div>
+                </select>
+              </label>
+
+              <div className='flex flex-col'>
+                {question.type === 'MCQ' ? (
+                  <div>
+                    {question.options.map((option, index) => (
+                      <div key={index} className='flex items-center my-2'>
+                        <CustomRadioButton
+                          id={`question-${question.id}-option-${index}`}
+                          checked={question.correctAnswer === index}
+                          onChange={() => updateCorrectAnswer(question.id, index)}
+                          value={option}
+                        >
+                          <input
+                            type="text"
+                            className='w-full m-1 p-2 border rounded-md'
+                            placeholder={`Option ${index + 1}`}
+                            value={option}
+                            onChange={(e) => updateOptionText(question.id, index, e.target.value)}
+                          />
+                        </CustomRadioButton>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
                   <textarea
-                    placeholder="Enter answer text"
+                    className='w-full border rounded-md p-2'
+                    placeholder="Enter your answer"
                     value={question.answerText}
                     onChange={(e) => updateTheoryAnswerText(question.id, e.target.value)}
-                    className='border-2 p-2 rounded-xl w-full'
                   />
-                </div>
-              )}
+                )}
+              </div>
             </section>
           ))
         )}
@@ -233,12 +324,6 @@ function ExamBuilder({ jsonContent }) {
       <div className='text-center my-4'>
         <button onClick={submitExamQuestions} className='button'>Submit Exam Questions</button>
       </div>
-
-      {jsonContent ? (
-        <pre>{JSON.stringify(jsonContent, null, 2)}</pre>
-      ) : (
-        <p>No JSON content available.</p>
-      )}
     </div>
   );
 }

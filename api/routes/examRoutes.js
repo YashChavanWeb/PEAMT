@@ -1,14 +1,19 @@
 import express from 'express';
 import Exam from '../models/Exam.js';
+import bcrypt from 'bcrypt'; // Import bcrypt for comparing secure code
 import moment from 'moment'; // Import moment.js for date manipulation
-import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
 // Create a new exam
 router.post('/', async (req, res) => {
     try {
-        const { adminEmail, secureCode, ...examDetails } = req.body;
+        const { adminEmail, secureCode, subjects, ...examDetails } = req.body;
+
+        // Validate subjects
+        if (!Array.isArray(subjects) || subjects.length === 0) {
+            return res.status(400).json({ message: 'Subjects must be an array and cannot be empty.' });
+        }
 
         // Get the start and end of the current month
         const startOfMonth = moment().startOf('month').toDate();
@@ -24,7 +29,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'You can only create up to 3 exams per month.' });
         }
 
-        const newExam = new Exam({ ...examDetails, adminEmail, secureCode });
+        const newExam = new Exam({ ...examDetails, adminEmail, secureCode, subjects });
         await newExam.save();
         res.status(201).json({ message: 'Exam created successfully' });
     } catch (error) {
@@ -44,10 +49,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-
-
 // Verify secure code for the exam
-// Verify secure code for the exam by exam name
 router.post('/verify-code', async (req, res) => {
     const { examName, enteredCode } = req.body;
     try {
@@ -57,8 +59,9 @@ router.post('/verify-code', async (req, res) => {
             return res.status(404).json({ message: 'Exam not found' });
         }
 
-        // Compare the secure code entered with the stored secure code, ensuring both are trimmed
-        if (exam.secureCode.trim() === enteredCode.trim()) {
+        // Compare the entered code with the hashed secureCode using bcrypt
+        const isMatch = await bcrypt.compare(enteredCode, exam.secureCode);
+        if (isMatch) {
             return res.status(200).json({ valid: true, message: 'Code is valid' });
         } else {
             return res.status(400).json({ valid: false, message: 'Invalid secure code' });
@@ -69,5 +72,22 @@ router.post('/verify-code', async (req, res) => {
     }
 });
 
+// Fetch subjects based on the exam name
+router.get('/subjects', async (req, res) => {
+    const { examName } = req.query;
+    try {
+        const exam = await Exam.findOne({ examName });
+
+        if (!exam) {
+            return res.status(404).json({ message: 'Exam not found' });
+        }
+
+        const subjects = exam.subjects || [];
+        res.status(200).json(subjects);
+    } catch (error) {
+        console.error('Error fetching subjects:', error);
+        res.status(500).json({ message: 'Failed to fetch subjects', error });
+    }
+});
 
 export default router;

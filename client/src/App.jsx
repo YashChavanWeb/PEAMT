@@ -20,16 +20,11 @@ import AdminRoute from "./components/private/AdminRoute";
 import UserRoute from "./components/private/UserRoute";
 import FileUploader from "./pages/Admin/FileUploader";
 import MyExams from "./pages/Users/MyExams";
-import { useState } from "react";
+import Result from './pages/Exam_Section/Result';
+import RegisteredUsers from "./pages/Admin/RegisteredUsers";
 
 function App() {
   const privatePassId = import.meta.env.VITE_PRIVATE_DASHBOARD_ID;
-  const [jsonContent, setJsonContent] = useState(null); // State to hold JSON content
-
-  // Define the function to handle JSON content change
-  const handleJsonContentChange = (newJsonContent) => {
-    setJsonContent(newJsonContent); // Update the state with new JSON content
-  };
 
   return (
     <BrowserRouter>
@@ -45,8 +40,9 @@ function App() {
           {/* Admin-only Routes */}
           <Route element={<AdminRoute />}>
             <Route path='/admin-dashboard' element={<AdminDashboard />} />
-            <Route path='/converter' element={<FileUploader onJsonContentChange={handleJsonContentChange} />} />
-            <Route path='/exam-builder' element={<ExamBuilder jsonContent={jsonContent} />} />
+            <Route path='/exam-builder' element={<ExamBuilder />} />
+            <Route path='/converter' element={<FileUploader />} />
+            <Route path='/registered-users' element={<RegisteredUsers />} />
           </Route>
 
           {/* User-only Routes */}
@@ -71,6 +67,7 @@ function App() {
 
           {/* Catch-all Route for 404 */}
           <Route path='*' element={<Home />} /> {/* Optionally, you might want to use a 404 page */}
+          <Route path="/result" element={<Result />} />
         </Routes>
       </div>
     </BrowserRouter>

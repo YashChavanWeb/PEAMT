@@ -40,12 +40,16 @@ const examSchema = new mongoose.Schema({
         minlength: 6,
         maxlength: 6,
     },
+    subjects: {
+        type: [String], // Array of strings for subjects
+        required: true,
+    },
 }, {
     timestamps: true,
 });
 
 // Middleware to hash secureCode before saving
-examSchema.pre('save', async function(next) {
+examSchema.pre('save', async function (next) {
     if (this.isModified('secureCode')) {
         const salt = await bcrypt.genSalt(10);
         this.secureCode = await bcrypt.hash(this.secureCode, salt);

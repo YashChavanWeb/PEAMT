@@ -171,3 +171,8 @@ This project is licensed under the ISC License. For detailed information, refer 
 ## Contact
 
 For questions or further information, contact the project maintainer via GitHub or the project's support channels. Your feedback and inquiries are highly valued.
+
+
+
+
+npm install jspdf

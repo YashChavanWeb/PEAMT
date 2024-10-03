@@ -1,17 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function ExamWindow() {
     const location = useLocation();
     const { examName } = location.state || { examName: 'defaultExam' };
-    const [questions, setQuestions] = useState([]);
+    const { currentUser } = useSelector((state) => state.user);
+    const [allQuestions, setAllQuestions] = useState({});
+    const [subjects, setSubjects] = useState([]); // List of subjects
+    const [selectedSubject, setSelectedSubject] = useState(''); // Currently selected subject
+    const [currentQuestions, setCurrentQuestions] = useState([]); // Questions of selected subject
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [responses, setResponses] = useState({});
+    const [markedForReview, setMarkedForReview] = useState({});
     const [error, setError] = useState('');
     const [time, setTime] = useState({ hours: 1, minutes: 0, seconds: 0 });
     const [warningShown, setWarningShown] = useState(false);
     const [showAutoSubmitPopup, setShowAutoSubmitPopup] = useState(false);
-    const [sessionTimeout, setSessionTimeout] = useState(null);
+    const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
     const timerRef = useRef();
     const navigate = useNavigate();
 
@@ -19,12 +25,27 @@ function ExamWindow() {
         const fetchData = async () => {
             try {
                 const response = await fetch(`/api/examQuestions?examName=${encodeURIComponent(examName)}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch questions');
-                }
+                if (!response.ok) throw new Error('Failed to fetch questions');
                 const data = await response.json();
+
                 if (data.questions && data.questions.length > 0) {
-                    setQuestions(data.questions);
+                    const groupedQuestions = data.questions.reduce((acc, question) => {
+                        const subject = question.subject;
+                        if (!acc[subject]) acc[subject] = [];
+                        acc[subject].push(question);
+                        return acc;
+                    }, {});
+
+                    setAllQuestions(groupedQuestions);
+                    const subjectsList = Object.keys(groupedQuestions);
+                    setSubjects(subjectsList);
+
+                    // Initialize with the first subject's questions
+                    if (subjectsList.length > 0) {
+                        setSelectedSubject(subjectsList[0]);
+                        setCurrentQuestions(groupedQuestions[subjectsList[0]]);
+                        setSelectedQuestionIndex(0);
+                    }
                 } else {
                     setError(`No questions available for the exam: ${examName}.`);
                 }
@@ -36,6 +57,7 @@ function ExamWindow() {
 
         fetchData();
 
+        // Timer logic
         timerRef.current = setInterval(() => {
             setTime((prevTime) => {
                 const { hours, minutes, seconds } = prevTime;
@@ -47,132 +69,90 @@ function ExamWindow() {
                     return { hours: hours - 1, minutes: 59, seconds: 59 };
                 } else {
                     clearInterval(timerRef.current);
-                    handleSubmit(); // Auto-submit when time runs out
+                    handleSubmit();
                     return prevTime;
                 }
             });
         }, 1000);
 
-        const handleActivity = () => {
-            clearTimeout(sessionTimeout);
-            setSessionTimeout(setTimeout(() => {
-                alert("Your session has timed out due to inactivity.");
-                navigate('/logout'); // Redirect to logout or login page
-            }, 15 * 60 * 1000)); // 15 minutes timeout
-        };
-
-        window.addEventListener('mousemove', handleActivity);
-        window.addEventListener('keypress', handleActivity);
-
-        // Prevent copy-paste
-        const preventCopyPaste = (event) => {
-            event.preventDefault();
-            alert("Copying and pasting are not allowed during the exam.");
-        };
-
-        window.addEventListener('copy', preventCopyPaste);
-        window.addEventListener('paste', preventCopyPaste);
-        window.addEventListener('cut', preventCopyPaste);
-
-        const handleKeyLock = (event) => {
-            if (
-                event.key === "Escape" ||
-                event.key === "F5" ||
-                (event.ctrlKey && event.key === "r")
-            ) {
-                event.preventDefault();
-                alert("Navigation is disabled during the exam. Please stay on this page.");
-            }
-        };
-
-        const handleVisibilityChange = (event) => {
-            if (document.visibilityState === 'hidden') {
-                event.preventDefault();
-                if (warningShown) {
-                    setShowAutoSubmitPopup(true);
-                    setTimeout(() => {
-                        handleSubmit(); // Auto-submit after showing the popup
-                    }, 6000); // 6 seconds
-                } else {
-                    const confirmation = window.confirm("Switching tabs is not allowed during the exam. Are you sure you want to leave this tab?");
-                    if (!confirmation) {
-                        setWarningShown(true);
-                        alert("Please stay on this page during the exam.");
-                    }
-                }
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyLock);
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-
-        const requestFullscreen = () => {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) {
-                document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) {
-                document.documentElement.msRequestFullscreen();
-            }
-        };
-
-        requestFullscreen();
-
         return () => {
             clearInterval(timerRef.current);
-            clearTimeout(sessionTimeout);
-            window.removeEventListener('mousemove', handleActivity);
-            window.removeEventListener('keypress', handleActivity);
-            window.removeEventListener('copy', preventCopyPaste);
-            window.removeEventListener('paste', preventCopyPaste);
-            window.removeEventListener('cut', preventCopyPaste);
-            window.removeEventListener("keydown", handleKeyLock);
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
-    }, [examName, warningShown, sessionTimeout]);
+    }, [examName]);
 
-    const handleQuestionSelect = (index) => {
-        setSelectedQuestionIndex(index);
-        setError('');
-    };
-
-    const handleSaveResponse = () => {
-        const currentResponse = responses[selectedQuestionIndex] || {};
-        if (!currentResponse.option) {
-            setError('Please select an option before proceeding.');
-            return;
-        }
-        setResponses({
-            ...responses,
-            [selectedQuestionIndex]: { ...currentResponse, status: 'saved' }
-        });
-        setSelectedQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questions.length - 1));
-        setError('');
+    const handleSubjectSelect = (subject) => {
+        setSelectedSubject(subject);
+        setCurrentQuestions(allQuestions[subject] || []); // Update questions based on subject
+        setSelectedQuestionIndex(0); // Reset to the first question of the new subject
     };
 
     const handleOptionChange = (option) => {
-        const currentResponse = responses[selectedQuestionIndex] || {};
-        setResponses({
-            ...responses,
-            [selectedQuestionIndex]: { option, status: option ? 'selected' : 'skipped' }
-        });
+        setResponses((prevResponses) => ({
+            ...prevResponses,
+            [selectedSubject]: {
+                ...(prevResponses[selectedSubject] || {}),
+                [selectedQuestionIndex]: { option, status: 'selected' },
+            },
+        }));
         setError('');
     };
 
+    const handleMarkForReview = () => {
+        setMarkedForReview((prevMarked) => ({
+            ...prevMarked,
+            [selectedSubject]: {
+                ...(prevMarked[selectedSubject] || {}),
+                [selectedQuestionIndex]: true,
+            },
+        }));
+    };
+
     const handlePrevious = () => {
-        setSelectedQuestionIndex(Math.max(selectedQuestionIndex - 1, 0));
+        if (selectedQuestionIndex > 0) {
+            setSelectedQuestionIndex((prevIndex) => prevIndex - 1);
+        } else {
+            alert('This is the first question in the subject.');
+        }
         setError('');
     };
 
     const handleNext = () => {
-        handleSaveResponse();
+        if (selectedQuestionIndex < currentQuestions.length - 1) {
+            setSelectedQuestionIndex((prevIndex) => prevIndex + 1);
+        } else {
+            alert('You have completed all questions for this subject.');
+        }
+        setError('');
     };
 
     const handleSubmit = () => {
-        // Implement submit logic
-        navigate('/submit-confirmation');
+        setShowConfirmSubmit(true);
+    };
+
+    const confirmSubmit = async () => {
+        const resultData = {
+            userId: currentUser._id,
+            examName: examName,
+            responses: responses,
+        };
+
+        try {
+            const response = await fetch('http://localhost:3000/api/submitResult', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(resultData),
+            });
+
+            if (!response.ok) throw new Error('Failed to submit results');
+
+            const data = await response.json();
+            console.log('Result submitted successfully:', data);
+            navigate('/success');
+        } catch (error) {
+            console.error('Error submitting results:', error);
+        }
     };
 
     const formatTime = (time) => {
@@ -180,8 +160,7 @@ function ExamWindow() {
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
-    const currentQuestion = questions[selectedQuestionIndex];
-    const selectedOption = responses[selectedQuestionIndex]?.option;
+    const selectedOption = responses[selectedSubject]?.[selectedQuestionIndex]?.option;
 
     return (
         <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
@@ -192,76 +171,102 @@ function ExamWindow() {
             )}
             <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
                 <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
-                    <h3 className="text-xl font-semibold mb-4">Questions</h3>
-                    {error ? (
-                        <p className="text-red-500">{error}</p>
-                    ) : (
-                        <div className="grid grid-cols-3 gap-2">
-                            {questions.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleQuestionSelect(index)}
-                                    className={`px-4 py-2 rounded-lg text-white ${responses[index]?.status === 'saved' ? 'bg-green-500' : 'bg-blue-500'} hover:bg-opacity-75`}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    <h3 className="text-xl font-semibold mb-4">Subjects</h3>
+                    {error && <p className="text-red-500">{error}</p>}
+                    <div className="grid grid-cols-1 gap-2">
+                        {subjects.map((subject, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleSubjectSelect(subject)}
+                                className={`px-4 py-2 rounded-lg text-white ${selectedSubject === subject ? 'bg-blue-600' : 'bg-gray-500'} hover:bg-opacity-75`}
+                            >
+                                {subject}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
-            <div className="w-3/4 p-2 relative" style={{ height: '100%', overflowY: 'auto' }}>
-                <div className="absolute top-4 right-4 text-lg font-semibold">{formatTime(time)}</div>
-                <div className="flex flex-col h-full p-0 bg-white rounded-lg shadow-md">
-                    {error ? (
-                        <p className="text-red-500 ml-10 mb-3">{error}</p>
-                    ) : (
+            <div className="w-4/6 p-4">
+                <div className="bg-white shadow-md p-4 rounded-lg h-full">
+                    <h3 className="text-xl font-bold">Question {selectedQuestionIndex + 1} of {currentQuestions.length} for {selectedSubject}</h3>
+                    {currentQuestions.length > 0 && (
                         <>
-                            <h3 className="ml-10 text-2xl font-semibold mb-4">Question {currentQuestion?.number + 1}</h3>
-                            <p className="ml-10 text-lg mb-4">{currentQuestion?.text}</p>
-                            <div className="space-y-2 ml-10 mb-4">
-                                {currentQuestion?.options.map((option, index) => (
-                                    <div key={index} className="flex items-center space-x-2">
+                            <p className="mt-2 mb-4">{currentQuestions[selectedQuestionIndex].question}</p>
+                            <div className="flex flex-col space-y-2">
+                                {currentQuestions[selectedQuestionIndex].options.map((option, optionIndex) => (
+                                    <label key={optionIndex} className="flex items-center space-x-2">
                                         <input
                                             type="radio"
-                                            id={`option${index}`}
-                                            name="options"
                                             value={option}
                                             checked={selectedOption === option}
                                             onChange={() => handleOptionChange(option)}
-                                            className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                            className="form-radio"
                                         />
-                                        <label htmlFor={`option${index}`} className="text-lg">{option}</label>
-                                    </div>
+                                        <span>{option}</span>
+                                    </label>
                                 ))}
                             </div>
-                            <div className="flex justify-between mt-auto space-2 mb-4 ml-10 mr-10">
+                            <div className="flex justify-between mt-4">
                                 <button
                                     onClick={handlePrevious}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    disabled={selectedQuestionIndex === 0}
                                 >
                                     Previous
                                 </button>
-                                {selectedQuestionIndex === questions.length - 1 ? (
-                                    <button
-                                        onClick={handleSubmit}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                                    >
-                                        Submit
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={handleNext}
-                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                                    >
-                                        Save & Next
-                                    </button>
-                                )}
+                                <button
+                                    onClick={handleNext}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    disabled={selectedQuestionIndex === currentQuestions.length - 1}
+                                >
+                                    Next
+                                </button>
+                                <button
+                                    onClick={handleMarkForReview}
+                                    className={`px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 ${markedForReview[selectedSubject]?.[selectedQuestionIndex] ? 'opacity-50' : ''}`}
+                                >
+                                    {markedForReview[selectedSubject]?.[selectedQuestionIndex] ? 'Marked' : 'Mark for Review'}
+                                </button>
                             </div>
                         </>
                     )}
                 </div>
             </div>
+            <div className="w-1/6 p-2 bg-gray-100 flex flex-col justify-between">
+                <div className="bg-gray-200 p-4 rounded-lg shadow-md">
+                    <h3 className="text-xl font-semibold mb-4">Timer</h3>
+                    <p className="text-2xl font-bold">{formatTime(time)}</p>
+                </div>
+                <button
+                    onClick={() => setShowConfirmSubmit(true)}
+                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mt-4"
+                >
+                    Submit Exam
+                </button>
+            </div>
+
+            {showConfirmSubmit && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 className="text-xl font-bold mb-4">Are you sure you want to submit?</h3>
+                        <p>Once you submit, you will not be able to change your answers.</p>
+                        <div className="mt-6 flex justify-between">
+                            <button
+                                onClick={confirmSubmit}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                            >
+                                Yes, Submit
+                            </button>
+                            <button
+                                onClick={() => setShowConfirmSubmit(false)}
+                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

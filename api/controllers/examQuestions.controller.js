@@ -49,7 +49,6 @@
 
 
 
-
 import ExamQuestions from "../models/examQuestions.model.js";
 
 // Create or update exam questions
@@ -60,6 +59,13 @@ export const createExamQuestions = async (req, res) => {
         // Validate request body
         if (!examName || !Array.isArray(questions) || questions.length === 0 || !adminEmail) {
             return res.status(400).json({ message: 'Exam name, questions, and admin email are required' });
+        }
+
+        // Check that each question has a subject
+        for (const question of questions) {
+            if (!question.subject) {
+                return res.status(400).json({ message: 'Each question must have a subject' });
+            }
         }
 
         // Find existing exam questions for the adminEmail
@@ -93,7 +99,22 @@ export const getExamQuestions = async (req, res) => {
 
         const exam = await ExamQuestions.findOne({ examName });
         if (exam) {
-            res.status(200).json(exam); // Return the full exam object
+            // Map through questions to include subjects explicitly if needed
+            const questionsWithSubjects = exam.questions.map(question => ({
+                text: question.text,
+                type: question.type,
+                options: question.options,
+                correctAnswer: question.correctAnswer,
+                marks: question.marks,
+                difficulty: question.difficulty,
+                subject: question.subject, // Including the subject explicitly
+            }));
+
+            res.status(200).json({
+                examName: exam.examName,
+                adminEmail: exam.adminEmail,
+                questions: questionsWithSubjects
+            }); // Return the exam details along with questions and their subjects
         } else {
             res.status(404).json({ message: 'Exam not found' });
         }
@@ -102,3 +123,4 @@ export const getExamQuestions = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch exam questions', error });
     }
 };
+
