@@ -46,7 +46,7 @@ function ExamBuilder() {
     fetchExams();
   }, [adminEmail]);
 
- // Fetch questions and subjects
+  // Fetch questions and subjects
   useEffect(() => {
     if (examName) {
       const fetchExistingQuestions = async () => {
@@ -111,7 +111,7 @@ function ExamBuilder() {
       localStorage.removeItem('convertedExamQuestions');
     }
   }, []);
-  
+
   const handleExamNameChange = (event) => {
     setExamName(event.target.value);
   };

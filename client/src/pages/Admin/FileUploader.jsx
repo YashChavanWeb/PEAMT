@@ -1,10 +1,10 @@
-// FileUploader.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import JsonPreview from './JsonPreview'; // Adjust the path as needed
 import FilePreview from './FilePreview'; // Import the new FilePreview component
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom'; 
 
 function FileUploader({ onJsonContentChange }) {
