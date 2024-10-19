@@ -31,7 +31,7 @@ function ExamWindow() {
         fullscreen: 0,
     });
 
-    const securityFeaturesEnabled = true;
+    const securityFeaturesEnabled = false;
 
     useEffect(() => {
         if (!currentUser || !currentUser._id) {

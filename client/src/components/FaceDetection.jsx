@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import * as faceapi from 'face-api.js';
 import '../styles/FaceDetection.css';
 
@@ -7,7 +7,7 @@ const FaceDetection = () => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const faceCanvasRef = useRef(null);
-    const [message, setMessage] = useState("Click the button to start detecting faces.");
+    const [message, setMessage] = useState("Click the button to start face verification.");
     const [detectedFaceImage, setDetectedFaceImage] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
     const [currentDetection, setCurrentDetection] = useState(null);
@@ -20,9 +20,8 @@ const FaceDetection = () => {
     const [warningMessage, setWarningMessage] = useState(null);
     const [detectedFaceDescriptor, setDetectedFaceDescriptor] = useState(null);
     const [showDocumentUpload, setShowDocumentUpload] = useState(false);
-    const [videoStream, setVideoStream] = useState(null); // Store the video stream
-
-    const navigate = useNavigate();
+    
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const loadModels = async () => {
         const MODEL_URL = '/models';
@@ -39,7 +38,6 @@ const FaceDetection = () => {
         if (permissionGranted) {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-                setVideoStream(stream); // Save the stream to state
                 videoRef.current.srcObject = stream;
                 videoRef.current.play();
                 videoRef.current.onloadedmetadata = handleVideoPlay;
@@ -146,9 +144,9 @@ const FaceDetection = () => {
         const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks()
             .withFaceDescriptors();
-
+        
         if (detections.length > 0) {
-            return detections[0].descriptor;
+            return detections[0].descriptor; // Return the descriptor of the first detected face
         }
         return null;
     };
@@ -163,58 +161,50 @@ const FaceDetection = () => {
 
         if (uploadedFaceDescriptor) {
             const distance = faceapi.euclideanDistance(detectedFaceDescriptor, uploadedFaceDescriptor);
-            const threshold = 0.6;
+            const threshold = 0.6; // Set a threshold for comparison
 
             setTimeout(() => {
                 setShowProgressBar(false);
                 if (distance < threshold) {
                     setComparisonResult("The faces match!");
-                    setShowDocumentUpload(true);
+                    setShowDocumentUpload(true); // Show document upload buttons if matched
                 } else {
                     setComparisonResult("The faces do not match.");
-                    setShowDocumentUpload(false);
+                    setShowDocumentUpload(false); // Hide if not matched
                 }
-            }, 1000);
+            }, 1000); // Simulate progress duration
         } else {
             setShowProgressBar(false);
             setComparisonResult("No face detected in the uploaded image.");
         }
 
+        // Simulate progress bar
         const interval = setInterval(() => {
             setProgress((prev) => {
                 if (prev >= 100) {
                     clearInterval(interval);
                     return 100;
                 }
-                return prev + 20;
+                return prev + 20; // Increment progress
             });
-        }, 500);
+        }, 500); // Adjust the duration to simulate progress
     };
 
     useEffect(() => {
         loadModels();
-        return () => {
-            // Cleanup video stream when the component unmounts
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-            }
-        };
-    }, [videoStream]);
+    }, []);
 
     const triggerFileInput = () => {
         document.getElementById('fileInput').click();
     };
 
-    const handleNavigate = () => {
-        if (videoStream) {
-            videoStream.getTracks().forEach(track => track.stop()); // Stop the video stream before navigating
-        }
-        navigate('/documents');
-    };
-
     return (
-        <div className="flex flex-col items-center w-full">
-            <section className='flex flex-row m-4 gap-6 mx-auto'>
+        <>
+        <div className='text-center p-4 text-xl bg-cyan-800 text-white'>
+            <p><b>Please upload your <i>current passport-size photograph</i> for face verification.</b></p>
+        </div>
+        <div className="flex flex-row items-center w-full">
+            <section className='flex flex-row-reverse m-4 gap-9 mx-auto w-[160%]'>
                 <div>
                     <section
                         onDrop={handleDrop}
@@ -243,12 +233,16 @@ const FaceDetection = () => {
                             />
                             <button
                                 onClick={compareFaces}
-                                className="mt-2 px-4 py-2 bg-[#4A4E69] text-white rounded-3xl hover:bg-[#22223B]"
+                                className="mt-2 px-4 py-2 bg-cyan-800 text-white rounded-3xl hover:bg-cyan-600"
                             >
                                 Compare Faces
                             </button>
                         </div>
                     )}
+
+        {/* <p className="mt-4 text-center text-gray-700">
+                    Please upload a recent passport-sized photo for face detection.
+                </p> */}
                 </div>
 
                 <div>
@@ -256,10 +250,10 @@ const FaceDetection = () => {
                         {!isVideoStarted && !detectedFaceImage && (
                             <button
                                 onClick={startVideo}
-                                className="absolute inset-0 m-auto px-4 py-2 bg-[#4A4E69] text-white rounded-3xl hover:bg-[#22223B] transition z-50"
+                                className="absolute inset-0 m-auto px-4 py-2 bg-cyan-800 text-white rounded-3xl hover:bg-cyan-600 transition z-50"
                                 style={{ width: 'fit-content', height: 'fit-content' }}
                             >
-                                Start Face Detection
+                                Start Face Verification
                             </button>
                         )}
                         {!detectedFaceImage && (
@@ -309,7 +303,7 @@ const FaceDetection = () => {
                 </div>
             </section>
 
-            <div className="mt-4 w-full text-center">
+            <div className="w-full text-center m-4">
                 {showProgressBar && (
                     <div className="mt-4 w-full">
                         <div className="bg-gray-200 rounded-full">
@@ -324,25 +318,25 @@ const FaceDetection = () => {
                 )}
 
                 {comparisonResult && (
-                    <div className="mt-4 text-lg p-3 bg-[#C9ADA7] w-[60%] text-center mx-auto rounded-3xl">
+                    <div className="mt-4 text-lg p-3 bg-cyan-200 w-[60%] text-center mx-auto rounded-3xl">
                         {comparisonResult}
                     </div>
                 )}
 
                 {showDocumentUpload && comparisonResult === "The faces match!" && (
                     <div className="mt-4 m-4">
-                        <h3 className="text-lg font-bold">Upload Further Documents</h3>
+                        <h3 className="text-lg font-bold">Start with your exams, All the Best !!</h3>
                         <button
-                            className="mt-2 px-4 py-2 bg-[#4A4E69] text-white rounded-3xl hover:bg-[#22223B] rounded-3xl"
-                            onClick={handleNavigate} // Use handleNavigate to stop the stream and navigate
+                            className="mt-2 w-4/5 px-4 py-2 bg-cyan-900 text-white hover:bg-cyan-700 rounded-3xl"
+                            onClick={() => navigate('/exam-window')} // Navigate to /documents
                         >
-                            Upload Documents
+                            Start Exams
                         </button>
                     </div>
-              
-              )}
+                )}
             </div>
         </div>
+        </>
     );
 };
 
