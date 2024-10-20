@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import FaceDetection from '../../components/FaceDetection';
+import MouseTracker from '../../components/MouseTracker';
 
 function ExamWindow() {
     const location = useLocation();
@@ -439,6 +440,7 @@ function ExamWindow() {
                 <canvas ref={canvasRef} style={{ display: 'none' }} />
             </div> */}
 
+            <MouseTracker />
 
             {showConfirmSubmit && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
