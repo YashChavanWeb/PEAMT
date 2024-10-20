@@ -54,13 +54,14 @@ export const submitResult = async (req, res) => {
 };
 
 export const getResults = async (req, res) => {
-    const { userId } = req.query; // Changed from req.params to req.query
+    const { userEmail } = req.query; // Fetch userEmail from query parameters
 
     try {
-        const results = await Result.find({ userId });
+        const results = await Result.find({ email: userEmail }); // Query by email
         res.status(200).json(results); // Return the results with a status of 200
     } catch (error) {
         console.error("Error in getResults:", error.message);
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
+

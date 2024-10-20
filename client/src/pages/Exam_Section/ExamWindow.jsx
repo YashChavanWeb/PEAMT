@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import FaceDetection from '../../components/FaceDetection';
 
 function ExamWindow() {
     const location = useLocation();
@@ -345,6 +346,8 @@ function ExamWindow() {
                     </div>
                 </div>
             </div>
+
+            <FaceDetection />
             <div className="w-4/6 p-4">
                 <div className="bg-white shadow-md p-4 rounded-lg h-full">
                     <h3 className="text-xl font-bold">Question {selectedQuestionIndex + 1} of {currentQuestions.length} for {selectedSubject}</h3>
@@ -420,7 +423,7 @@ function ExamWindow() {
                 </button>
             </div>
 
-            <div className="relative flex justify-center items-center h-full">
+            {/* <div className="relative flex justify-center items-center h-full">
                 <video
                     ref={videoRef}
                     style={{
@@ -434,7 +437,7 @@ function ExamWindow() {
                     muted
                 />
                 <canvas ref={canvasRef} style={{ display: 'none' }} />
-            </div>
+            </div> */}
 
 
             {showConfirmSubmit && (

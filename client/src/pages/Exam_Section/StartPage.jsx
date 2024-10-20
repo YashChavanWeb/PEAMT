@@ -22,7 +22,7 @@ function StartPage() {
                 enteredCode: code,
             });
             if (response.data.valid) {
-                navigate('/face-detection', { state: { examName, duration } }); // Pass examName and duration to ExamWindow
+                navigate('/exam-window', { state: { examName, duration } }); // Pass examName and duration to ExamWindow
             } else {
                 setError('Invalid secure code. Please try again.');
             }
