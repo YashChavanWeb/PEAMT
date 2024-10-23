@@ -131,8 +131,8 @@ function RegisteredUsers() {
     const usersWithResults = users.filter(user => results[user.email]?.length > 0);
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
+        <div className="container mx-auto p-8 bg-cyan-800 text-white">
+            <h1 className="text-2xl font-bold text-center mb-6 text-white-500">
                 Registered Users for Exam: {examName}
             </h1>
             {error && <p className="text-red-600 text-center">{error}</p>}
@@ -140,28 +140,28 @@ function RegisteredUsers() {
             {notification && <p className="text-green-600 text-center">{notification}</p>} {/* Notification message */}
 
             {users.length > 0 ? (
-                <div>
+                <div className='mx-auto p-8 bg-cyan-600 rounded-3xl'>
                     <h2 className="text-xl font-semibold mb-4">Registered Users:</h2>
                     {users.map((user) => (
-                        <p key={user.email} className="text-gray-800">{user.username} - {user.email}</p>
+                        <p key={user.email} className="">{user.username} - {user.email}</p>
                     ))}
                 </div>
             ) : (
-                <p className="text-gray-600 text-center">No users registered for this exam.</p>
+                <p className="text-gray-200 text-center">No users registered for this exam.</p>
             )}
 
             {usersWithResults.length > 0 ? (
-                <div className="mt-8">
+                <div className="mt-8 px-8">
                     <h2 className="text-xl font-semibold mb-4">Results:</h2>
                     {usersWithResults.map((user) => (
                         <div key={user.email} className="mb-6">
                             <h3 className="text-lg font-bold">{user.username} - {user.email}</h3>
                             {results[user.email].map((result) => (
-                                <div key={result._id} className="mb-4">
+                                <div key={result._id} className="m-4 bg-cyan-100/50 text-black p-8 rounded-3xl">
                                     <h4 className="font-bold">{result.examName}</h4>
-                                    <p className="text-gray-600 mb-2">Date: {new Date(result.createdAt).toLocaleDateString()}</p>
-                                    <table className="min-w-full bg-white border">
-                                        <thead>
+                                    <p className="text-black font-bold mb-2">Date: {new Date(result.createdAt).toLocaleDateString()}</p>
+                                    <table className="min-w-full bg-white border-2 text-black rounded-3xl overflow-hidden">
+                                        <thead className='bg-gradient-to-t from-cyan-400 to-cyan-600'>
                                             <tr>
                                                 <th className="border px-4 py-2">Subject</th>
                                                 <th className="border px-4 py-2">Score</th>
@@ -182,14 +182,14 @@ function RegisteredUsers() {
                     ))}
                 </div>
             ) : (
-                <p className="text-gray-600 text-center">No results found for any registered users.</p>
+                <p className="text-gray-300 text-center">No results found for any registered users.</p>
             )}
 
             <div className="mt-8">
                 <h2 className="text-xl font-semibold mb-4">Calculate Percentile:</h2>
                 <div className="flex items-center">
                     <button
-                        className="bg-blue-500 text-white p-2 rounded"
+                        className="bg-sky-300 text-cyan-900 font-bold p-4 rounded-3xl"
                         onClick={() => {
                             setCalculatePercentile(true);
                             handleCalculatePercentile();
@@ -201,8 +201,8 @@ function RegisteredUsers() {
             </div>
 
             {calculatePercentile && usersWithResults.length > 0 && (
-                <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-4">Calculated Percentiles:</h2>
+                <div className="mt-8 bg-slate-300 p-8 rounded-3xl w-3/5">
+                    <h2 className="text-xl font-bold text-black mb-4">Calculated Percentiles:</h2>
                     {usersWithResults.map(user => (
                         <p key={user.email} className="text-gray-800">
                             {user.username} - {user.email}: {percentiles[user.email] !== undefined ? percentiles[user.email] : 'N/A'}%
@@ -212,7 +212,7 @@ function RegisteredUsers() {
             )}
 
             <button
-                className="bg-green-500 text-white p-2 rounded mt-4"
+                className="bg-green-500 text-white font-bold p-4 rounded-3xl mt-4"
                 onClick={shareScores}
             >
                 Share Scores
@@ -220,14 +220,14 @@ function RegisteredUsers() {
 
             <div className="mt-8">
                 <h2 className="text-xl font-semibold mb-4">Highest and Lowest Scores:</h2>
-                <div className="flex justify-between">
-                    <div className="text-center">
-                        <h3 className="font-bold">Highest Score</h3>
+                <div className="flex gap-3">
+                    <div className="text-center bg-gradient-to-b from-cyan-600 to-cyan-400 p-8 rounded-2xl">
+                        <h3 className="font-bold ">Highest Score</h3>
                         <p>{highest.email}</p>
                         <p>Score: {highest.totalScore}</p>
                         <p>Percentile: {percentiles[highest.email] !== undefined ? percentiles[highest.email] : 'N/A'}%</p>
                     </div>
-                    <div className="text-center">
+                    <div className="text-center bg-gradient-to-b from-cyan-600 to-cyan-400 p-8 rounded-2xl">
                         <h3 className="font-bold">Lowest Score</h3>
                         <p>{lowest.email}</p>
                         <p>Score: {lowest.totalScore}</p>
@@ -236,9 +236,9 @@ function RegisteredUsers() {
                 </div>
                 <div className="mt-4">
                     {usersWithResults.length === 0 ? (
-                        <p className="text-gray-600 text-center">No scores available for chart representation.</p>
+                        <p className="text-white text-center">No scores available for chart representation.</p>
                     ) : (
-                        <p className="text-gray-600 text-center">Scores are available for the highest and lowest users.</p>
+                        <p className="text-white text-center">Scores are available for the highest and lowest users.</p>
                     )}
                 </div>
             </div>

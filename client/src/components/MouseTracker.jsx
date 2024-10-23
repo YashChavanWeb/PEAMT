@@ -71,9 +71,9 @@ const MouseTracker = () => {
 
     return (
         <div>
-            <h1>Mouse Tracker</h1>
+            {/* <h1>Mouse Tracker</h1> */}
             <p>
-                X: {mousePosition.x}, Y: {mousePosition.y}
+                {/* X: {mousePosition.x}, Y: {mousePosition.y} */}
             </p>
         </div>
     );

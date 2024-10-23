@@ -80,7 +80,7 @@ const FaceDetection = () => {
     }, []);
 
     return (
-        <>
+        <div className='flex flex-col m-4 w-2/5'>
             <div className="relative rounded-3xl border-2 border-[#22223B] overflow-hidden mt-4">
                 <video
                     ref={videoRef}
@@ -95,10 +95,10 @@ const FaceDetection = () => {
                     style={{ width: '100%', height: 'auto' }}
                 />
             </div>
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center bg-cyan-600/50 p-2 rounded-3xl">
                 <h2 className="text-lg font-bold">{message}</h2>
             </div>
-        </>
+        </div>
     );
 };
 

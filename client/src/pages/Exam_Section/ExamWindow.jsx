@@ -326,20 +326,23 @@ function ExamWindow() {
     return (
         <div className="flex mt-10 p-10" style={{ height: '80vh' }}>
             {showAutoSubmitPopup && (
-                <div className="fixed top-0 left-0 right-0 bg-yellow-300 text-black text-lg text-center p-4 z-50">
+                <div className="fixed top-0 left-0 right-0 bg-yellow-300 rounded-3xl text-black text-lg text-center p-4 z-50">
                     Your exam is auto-submitting due to excessive interruptions. Please wait...
                 </div>
             )}
-            <div className="w-1/6 p-2 bg-gray-100" style={{ height: '100%', overflowY: 'auto' }}>
-                <div className="bg-gray-200 p-4 rounded-lg shadow-md h-full">
+            <FaceDetection />
+            
+            <div className="w-1/6 p-2 bg-gray-100 rounded-lg" style={{ height: '100%', overflowY: 'auto' }}>
+
+                <div className="bg-cyan-200/50 p-4 rounded-lg shadow-md h-full">
                     <h3 className="text-xl font-semibold mb-4">Subjects</h3>
-                    {error && <p className="text-red-500">{error}</p>}
+                    {error && <p className="text-rose-500">{error}</p>}
                     <div className="grid grid-cols-1 gap-2">
                         {subjects.map((subject, index) => (
                             <button
                                 key={index}
                                 onClick={() => handleSubjectSelect(subject)}
-                                className={`px-4 py-2 rounded-lg text-white ${selectedSubject === subject ? 'bg-blue-600' : 'bg-gray-500'} hover:bg-opacity-75`}
+                                className={`px-4 py-2 rounded-lg text-white ${selectedSubject === subject ? 'bg-cyan-600' : 'bg-gray-500'} hover:bg-opacity-75`}
                             >
                                 {subject}
                             </button>
@@ -348,12 +351,12 @@ function ExamWindow() {
                 </div>
             </div>
 
-            <FaceDetection />
             <div className="w-4/6 p-4">
-                <div className="bg-white shadow-md p-4 rounded-lg h-full">
+                <div className="bg-white shadow-md p-4 rounded-lg h-full flex flex-col justify-between">
                     <h3 className="text-xl font-bold">Question {selectedQuestionIndex + 1} of {currentQuestions.length} for {selectedSubject}</h3>
                     {currentQuestions.length > 0 && (
                         <>
+                            <section>
                             <p className="mt-2 mb-4">{currentQuestions[selectedQuestionIndex].text}</p>
                             <div className="flex flex-col space-y-2">
                                 {currentQuestions[selectedQuestionIndex].options &&
@@ -384,24 +387,25 @@ function ExamWindow() {
                                     ))
                                 )}
                             </div>
+                            </section>
                             <div className="flex justify-between mt-4">
                                 <button
                                     onClick={handlePrevious}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    className="px-4 py-2 bg-cyan-800 text-white rounded-3xl hover:bg-sky-500"
                                     disabled={selectedQuestionIndex === 0}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={handleNext}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    className="px-4 py-2 bg-cyan-600 text-white rounded-3xl hover:bg-sky-700"
                                     disabled={selectedQuestionIndex === currentQuestions.length - 1}
                                 >
                                     Next
                                 </button>
                                 <button
                                     onClick={handleMarkForReview}
-                                    className={`px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 ${markedForReview[selectedSubject]?.[selectedQuestionIndex] ? 'opacity-50' : ''}`}
+                                    className={`px-4 py-2 bg-yellow-500 text-white rounded-3xl hover:bg-yellow-600 ${markedForReview[selectedSubject]?.[selectedQuestionIndex] ? 'opacity-50' : ''}`}
                                 >
                                     {markedForReview[selectedSubject]?.[selectedQuestionIndex] ? 'Marked' : 'Mark for Review'}
                                 </button>
@@ -411,14 +415,14 @@ function ExamWindow() {
                 </div>
             </div>
 
-            <div className="w-1/6 p-2 bg-gray-100 flex flex-col justify-between">
-                <div className="bg-gray-200 p-4 rounded-lg shadow-md">
+            <div className="w-1/6 p-2 bg-gray-100 rounded-lg flex flex-col justify-between">
+                <div className="bg-sky-800 p-4 rounded-3xl shadow-md text-white">
                     <h3 className="text-xl font-semibold mb-4">Timer</h3>
                     <p className="text-2xl font-bold">{formatTime(time)}</p>
                 </div>
                 <button
                     onClick={() => setShowConfirmSubmit(true)}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mt-4"
+                    className="w-full px-4 py-2 bg-red-600 text-white rounded-3xl hover:bg-red-700 mt-4"
                 >
                     Submit Exam
                 </button>

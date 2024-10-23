@@ -7,6 +7,7 @@ function StartPage() {
     const { examName, duration } = location.state || { examName: 'defaultExam', duration: '01:00:00' }; // Get exam name and duration from state
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
+    const [uploadedImage, setUploadedImage] = useState(null); // New state for uploaded image
 
     const navigate = useNavigate();
 
@@ -32,6 +33,40 @@ function StartPage() {
         }
     };
 
+    // Handle image upload
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setUploadedImage(e.target.result); // Save the image data URL
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Handle file drop
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setUploadedImage(e.target.result); // Save the image data URL
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Prevent default drag over behavior
+    const handleDragOver = (event) => {
+        event.preventDefault();
+    };
+
+    const triggerFileInput = () => {
+        document.getElementById('fileInput').click(); // Trigger hidden file input
+    };
+
     return (
         <div className="relative flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
             <div className="p-6 bg-white shadow-lg rounded-lg w-full max-w-3xl border border-gray-200">
@@ -54,6 +89,35 @@ function StartPage() {
                         className="px-4 py-2 border border-gray-300 rounded-lg w-full bg-cyan-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
+                <section className='flex flex-row h-40 mx-auto justify-center'>
+                <div
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    className="p-4 w-1/3 m-2 my-auto border-2 border-dashed border-gray-500 cursor-pointer rounded-3xl bg-slate-200 text-center"
+                    onClick={triggerFileInput}
+                >
+                    <input
+                        id="fileInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        style={{ display: 'none' }}
+                    />
+                    <p className='text-center text-slate-500'><ion-icon name="cloud-upload" size="large"></ion-icon></p>
+                    <p className='text-center'>{uploadedImage ? "Image Uploaded" : "Drag & Drop or Click to Upload"}</p>
+                </div>
+
+                {uploadedImage && (
+                    <div className="flex flex-col mt-2 items-center">
+                        <img
+                            src={uploadedImage}
+                            alt="Uploaded"
+                            className="border w-28 border-gray-300"
+                            // style={{ width: '200px', height: 'auto' }}
+                        />
+                    </div>
+                )}
+                </section>
 
                 <p className="text-md bg-green-200 p-2 rounded-2xl border-2 text-green-900 mb-4 font-bold">
                     <strong>Note:</strong> A current passport-size photo is required for face verification. Your face will be monitored during the exam.
