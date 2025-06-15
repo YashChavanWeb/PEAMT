@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: `${import.meta.env.VITE_BASE_URL}`,
+        target: 'https://peamt.onrender.com',
         secure: false,
       },
     },
