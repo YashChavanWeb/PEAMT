@@ -29,7 +29,7 @@ const app = express();
 
 // Set up CORS configuration to allow the frontend from Vercel
 const corsOptions = {
-  origin: 'http://localhost:5173', // Replace with your Vercel URL
+  origin: 'https://scorezy.vercel.app', // Replace with your Vercel URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Allow cookies to be sent with requests
