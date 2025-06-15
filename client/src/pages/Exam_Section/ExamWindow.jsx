@@ -43,7 +43,7 @@ function ExamWindow() {
 
         const fetchData = async () => {
             try {
-                const response = await fetch(`/api/examQuestions?examName=${encodeURIComponent(examName)}`, {
+                const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/examQuestions?examName=${encodeURIComponent(examName)}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${currentUser.token}`,
